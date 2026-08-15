@@ -1,0 +1,223 @@
+:root {
+  --font-heading: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-body: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+  /* Color Palette */
+  --bg-primary: #0a0d14;
+  --bg-secondary: #111622;
+  --bg-tertiary: #192032;
+  --bg-card: rgba(22, 29, 46, 0.7);
+  --bg-card-hover: rgba(30, 40, 64, 0.85);
+  
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-focus: rgba(99, 102, 241, 0.5);
+  --border-glow: rgba(99, 102, 241, 0.3);
+
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+
+  --accent-primary: #6366f1;
+  --accent-secondary: #818cf8;
+  --accent-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%);
+  --accent-glow: 0 0 25px rgba(99, 102, 241, 0.35);
+
+  --success-bg: rgba(16, 185, 129, 0.12);
+  --success-text: #34d399;
+  --success-border: rgba(16, 185, 129, 0.3);
+
+  --warning-bg: rgba(245, 158, 11, 0.12);
+  --warning-text: #fbbf24;
+  --warning-border: rgba(245, 158, 11, 0.3);
+
+  --danger-bg: rgba(239, 68, 68, 0.12);
+  --danger-text: #f87171;
+  --danger-border: rgba(239, 68, 68, 0.3);
+
+  --midnight-blue: #0f172a;
+  --midnight-accent: #38bdf8;
+
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.2), 0 2px 4px -1px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.4), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+  --shadow-glass: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --radius-full: 9999px;
+
+  --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  line-height: 1.6;
+  min-height: 100vh;
+  overflow-x: hidden;
+  background-image: 
+    radial-gradient(at 15% 15%, rgba(99, 102, 241, 0.12) 0px, transparent 50%),
+    radial-gradient(at 85% 25%, rgba(168, 85, 247, 0.1) 0px, transparent 50%),
+    radial-gradient(at 50% 90%, rgba(56, 189, 248, 0.08) 0px, transparent 50%);
+  background-attachment: fixed;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+
+button {
+  font-family: var(--font-body);
+  cursor: pointer;
+  border: none;
+  outline: none;
+}
+
+input, textarea, select {
+  font-family: var(--font-body);
+  outline: none;
+}
+
+/* Glass Card */
+.glass-card {
+  background: var(--bg-card);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-glass);
+  transition: var(--transition);
+}
+
+.glass-card:hover {
+  border-color: var(--border-focus);
+}
+
+/* Primary Button */
+.btn-primary {
+  background: var(--accent-gradient);
+  color: white;
+  padding: 10px 22px;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  font-size: 0.95rem;
+  box-shadow: var(--accent-glow);
+  transition: var(--transition);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 30px rgba(99, 102, 241, 0.55);
+}
+
+.btn-secondary {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-subtle);
+  padding: 10px 20px;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: var(--transition);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-secondary:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--border-focus);
+  transform: translateY(-2px);
+}
+
+/* Badge & Status Pills */
+.badge-pill {
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.badge-eligible {
+  background: var(--success-bg);
+  color: var(--success-text);
+  border: 1px solid var(--success-border);
+}
+
+.badge-ineligible {
+  background: var(--danger-bg);
+  color: var(--danger-text);
+  border: 1px solid var(--danger-border);
+}
+
+.badge-unverified {
+  background: var(--warning-bg);
+  color: var(--warning-text);
+  border: 1px solid var(--warning-border);
+}
+
+.badge-midnight {
+  background: rgba(56, 189, 248, 0.15);
+  color: var(--midnight-accent);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+}
+
+/* Container */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* Animation Keyframes */
+@keyframes pulseGlow {
+  0%, 100% { opacity: 0.4; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(1.05); }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-slide-up {
+  animation: slideUp 0.4s ease-out forwards;
+}
+
+/* Modal Backdrop */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(5, 7, 12, 0.85);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}

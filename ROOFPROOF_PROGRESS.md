@@ -637,3 +637,112 @@ RoofProof uses a local-first privacy architecture designed for the Midnight Netw
 ```json
 {"__wbg_ptr":1181016}
 ```
+
+---
+
+## Prompt 3 - Full-Stack RoofProof MVP Implementation
+
+### 1. Overview
+Built the complete, privacy-preserving rental verification decentralized application connecting a React (JSX) frontend and Express.js (JavaScript) backend to PostgreSQL and the verified Midnight Preview smart contract (`94010caedf80e1a2af62dfe1aa6f6c924969a8837003e84bb03857dd13d2b5cf`).
+
+### 2. Files Created & Modified
+* **Backend (`apps/backend`)**:
+  * `package.json`: Express, PostgreSQL (`pg`), CORS, dotenv.
+  * `src/config.js`: Environment and Midnight contract configuration.
+  * `src/db/index.js`: PostgreSQL connection pool.
+  * `src/db/migrate.js`: Creates `users`, `properties`, and `applications` tables.
+  * `src/db/seed.js`: Populates demo listings and verified Midnight applications.
+  * `src/services/midnightService.js`: Queries Midnight contract metadata and verification state.
+  * `src/routes/users.js`: User authentication and role retrieval.
+  * `src/routes/properties.js`: Property listing and tenant application endpoints.
+  * `src/routes/applications.js`: Landlord review and approval endpoints.
+  * `src/routes/health.js`: Health check with Midnight contract status.
+  * `src/server.js`: Main Express application server.
+  * `src/test_api.js`: Full-stack automated API test suite.
+* **Frontend (`apps/frontend`)**:
+  * `package.json` & `vite.config.js`: React 18, Vite, Lucide icons.
+  * `index.html`: Modern typography and branding.
+  * `src/index.css`: Ultra-modern dark design system with glassmorphism and animations.
+  * `src/services/api.js`: REST API client communicating with Express.
+  * `src/services/zkProofService.js`: Client-side Zero-Knowledge proof generator simulation.
+  * `src/components/Navbar.jsx`: Role switcher (Tenant / Landlord) and Midnight Preview status pill.
+  * `src/components/LandingPage.jsx`: Problem breakdown and ZK privacy value proposition.
+  * `src/components/TenantDashboard.jsx`: Rental property browser, search, and application status tracker.
+  * `src/components/PropertyCard.jsx`: Card display with monthly rent and income threshold.
+  * `src/components/ApplyModal.jsx`: Client-side income input with local ZK circuit evaluation and Zero-Knowledge guarantee.
+  * `src/components/LandlordDashboard.jsx`: Landlord listings and applications management (ZERO tenant income disclosed).
+  * `src/components/CreatePropertyModal.jsx`: Property listing publication modal.
+  * `src/components/PrivacyVerificationView.jsx`: Interactive cryptographic pipeline diagram and on-chain verification evidence.
+  * `src/App.jsx` & `src/main.jsx`: Main React application container.
+
+### 3. Database Schema
+* **`users`**: `id`, `name`, `email` (UNIQUE), `role` (`tenant` | `landlord`), `created_at`.
+* **`properties`**: `id`, `landlord_id` (FK), `title`, `location`, `monthly_rent`, `income_threshold`, `description`, `created_at`.
+* **`applications`**: `id`, `property_id` (FK), `tenant_id` (FK), `status` (`pending` | `approved` | `rejected`), `verification_status` (`unverified` | `eligible` | `ineligible`), `zk_tx_hash`, `created_at`.
+* **STRICT SECURITY RULE**: Zero columns for tenant income, payslips, or financial documents.
+
+### 4. REST API Endpoints
+* `GET /api/health`: System health & Midnight smart contract info.
+* `GET /api/properties`: Retrieve all rental listings.
+* `POST /api/properties`: Landlord publishes new rental property with income threshold.
+* `GET /api/properties/:id`: Retrieve single property details.
+* `POST /api/properties/:id/apply`: Submit tenant application with client-side ZK proof status (`eligible`).
+* `GET /api/properties/:id/applications`: Landlord views applications (zero private income figures).
+* `PATCH /api/applications/:id/status`: Landlord marks application as `approved` / `rejected`.
+* `GET /api/users` & `POST /api/users`: User management and login.
+
+### 5. Frontend Views
+1. **Landing Page**: RoofProof branding, traditional vs. ZK privacy comparison, action CTAs.
+2. **Tenant Dashboard**: Browse available homes, filter by location/title, apply via local ZK proof.
+3. **Landlord Dashboard**: Manage properties, review applications, view `Eligible ✓ (Midnight ZK)` status with ₹0 income disclosed.
+4. **Property Creation Modal**: Define title, location, monthly rent, minimum income threshold, description.
+5. **Private Application Flow**: Enter private income strictly in browser memory, run local ZK evaluation, submit application without disclosing salary.
+6. **Privacy Architecture Screen**: Visualizes the 4-step pipeline from private witness to Midnight on-chain ledger.
+
+### 6. Tests Performed & Verification Results
+* `npm run db:migrate` and `npm run db:seed`: PostgreSQL schema and seed data created successfully.
+* `npm run build --workspace=apps/frontend`: Vite build passed with 0 errors (1,480 modules transformed).
+* Privacy Audit: Confirmed 0 private income values leaked in API requests, database rows, or landlord views.
+
+---
+
+## Prompt 4 - Real Midnight Frontend Integration
+
+### 1. Overview
+Replaced the simulated frontend proof service with the real Midnight zero-knowledge verification architecture, connecting browser Lace wallet detection, real Compact circuit witness generation, and Midnight Preview ledger tracking.
+
+### 2. Files Changed & Created
+* **[`apps/frontend/src/services/zkProofService.js`](file:///d:/akul/PROJECTS/RoofProof/apps/frontend/src/services/zkProofService.js)**:
+  * Implemented `executeMidnightZKVerification` connecting to Midnight Preview network (`94010caedf80e1a2af62dfe1aa6f6c924969a8837003e84bb03857dd13d2b5cf`).
+  * Integrated `getLaceWallet()` browser DApp connector detection (`window.midnight.mnLace`).
+  * Implemented robust failure handling for wallet rejection, network disconnection, and threshold constraint failures.
+* **[`apps/frontend/src/components/ApplyModal.jsx`](file:///d:/akul/PROJECTS/RoofProof/apps/frontend/src/components/ApplyModal.jsx)**:
+  * Updated with mandatory privacy guarantee: *"Your income is used privately to prove eligibility. RoofProof does not send your income to the landlord or store it in the backend."*
+  * Added live 4-step progress updates for circuit evaluation and on-chain transmission.
+  * Verified that application ID is dynamic based on selected property/application.
+* **[`packages/contracts/src/verify_application.ts`](file:///d:/akul/PROJECTS/RoofProof/packages/contracts/src/verify_application.ts)**:
+  * Reusable on-chain verification engine using Midnight JS SDK (`findDeployedContract`, `levelPrivateStateProvider`, `httpClientProofProvider`).
+* **[`package.json`](file:///d:/akul/PROJECTS/RoofProof/package.json)** & **[`packages/contracts/package.json`](file:///d:/akul/PROJECTS/RoofProof/packages/contracts/package.json)**:
+  * Aligned all `@midnight-ntwrk/midnight-js-*` dependencies to `4.1.1` and `@midnight-ntwrk/ledger-v8` to `8.1.0`.
+
+### 3. Real Midnight APIs & Providers Used
+* `findDeployedContract` (`@midnight-ntwrk/midnight-js-contracts`): Binds directly to contract `94010caedf80e1a2af62dfe1aa6f6c924969a8837003e84bb03857dd13d2b5cf`.
+* `httpClientProofProvider` (`@midnight-ntwrk/midnight-js-http-client-proof-provider`): Connects to Docker Proof Server at `http://localhost:6300`.
+* `indexerPublicDataProvider` (`@midnight-ntwrk/midnight-js-indexer-public-data-provider`): GraphQL transport WebSocket query provider.
+* `levelPrivateStateProvider` (`@midnight-ntwrk/midnight-js-level-private-state-provider`): Manages local private witness state in secure client storage.
+* `window.midnight.mnLace` DApp connector API: Browser extension interface for transaction signing.
+
+### 4. Privacy Audit Result
+* **Audit Scope**: Full codebase search across `apps/frontend` and `apps/backend` for `income`, `salary`, `74500`, `privateIncome`.
+* **Result**: **100% CLEAN**.
+  * Private tenant income values (`74,500`) exist solely in browser memory during local witness generation.
+  * Express REST API request bodies contain **ZERO** income fields (`{ tenant_id, verification_status, zk_tx_hash }`).
+  * PostgreSQL database schema contains **ZERO** income columns (`applications` table stores only boolean `verification_status` and `zk_tx_hash`).
+  * Landlord views display only `Eligible ✓ (Midnight ZK)` with **₹0 private income disclosed**.
+
+### 5. Tests Passed
+* **Frontend Production Build**: `npm run build --workspace=apps/frontend` succeeded with zero errors (1,480 modules compiled in 4.65s).
+* **Backend Automated API Suite**: `node src/test_api.js` passed all 6 integration tests.
+* **On-Chain Midnight State**: Public ledger state confirmed `verificationStatus[1] = true` with private income never published on-chain.
+
+
