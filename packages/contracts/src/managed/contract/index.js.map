@@ -1,0 +1,8 @@
+{
+  "version": 3,
+  "file": "index.js",
+  "sourceRoot": "../../",
+  "sources": ["roofproof.compact"],
+  "names": [],
+  "mappings": ";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;EAAA;;;;;;;;;;;;;MAYA,AAAA,iBASC;;;;;cATgC,eAAuB;cAAE,WAAmB;;;;;;;;;;;;;;;;;;;;;;;;;yCAA5C,eAAuB,+BAAE,WAAmB;;;;;;;;;mDAA5C,eAAuB;mDAAE,WAAmB;;;OAS5E;;;;;;;;GACA;EAtBD;;;;;;;;;;;;;;;;;;;;;;;;;;;;;IAKA;;;;;;;;;;yEAAyD;;;;;;;GAiBxD;EAdD,AAAA,mBAAqC;;0DAArC,gBAAqC;;;;;;;;;;;;;;GAAA;EAIrC,AAAA,oBASC,4BATgC,eAAuB,EAAE,WAAmB;;UAEnE,eAAkC;4BAGjC,eAAa,IAAI,WAAS;;IAGjC;;;;;;;;;;2HAAmC,eAAa;;;;;;wEAA9B;;GACrB;;;;;;;;;;;;;;;;IAhBD;;;;;uCAAA;;;;;;;;;;;;;;;;4GAAyD;;;;;;uCAAzD;;;;;;;;;;;;4GAAyD;;;;;;;;;;;;;;uCAAzD;;;;;;;;;;;;;;;4GAAyD;;;;;;;;;;;;;;uCAAzD;;;;;;;;;;;;;;;;;4GAAyD;;;;;;;;;KAAA;;;;;;;;;;;;"
+}

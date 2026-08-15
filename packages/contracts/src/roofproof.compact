@@ -1,0 +1,22 @@
+pragma language_version >= 0.20.0;
+
+import CompactStandardLibrary;
+
+// Public ledger state mapping Application ID to verification success
+export ledger verificationStatus: Map<Uint<64>, Boolean>;
+
+// Private witness callback to fetch the tenant's actual income locally
+witness getPrivateIncome(): Uint<64>;
+
+// Public circuit that verifies if the tenant's private income satisfies
+// the required threshold without revealing the actual income.
+export circuit verifyEligibility(applicationId: Uint<64>, threshold: Uint<64>): [] {
+    // 1. Fetch the private income locally via witness
+    const privateIncome = getPrivateIncome();
+
+    // 2. Perform zero-knowledge assertion that the income satisfies the criteria
+    assert(privateIncome >= threshold, "Income is below the required threshold");
+
+    // 3. Write a public confirmation to the ledger mapping for this application ID
+    verificationStatus.insert(disclose(applicationId), true);
+}
