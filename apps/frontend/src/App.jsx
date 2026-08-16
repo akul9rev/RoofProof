@@ -107,13 +107,17 @@ export default function App() {
   };
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <div className="app-viewport-frame">
       <Navbar
         activeView={activeView}
         setActiveView={setActiveView}
         currentRole={currentRole}
         setCurrentRole={setCurrentRole}
         currentUser={currentRole === 'tenant' ? tenantUser : landlordUser}
+        onListProperty={() => {
+          setCurrentRole('landlord');
+          setIsCreateModalOpen(true);
+        }}
       />
 
       {/* Global Toast Notification */}

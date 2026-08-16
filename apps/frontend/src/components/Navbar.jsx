@@ -1,216 +1,171 @@
-import React, { useState, useEffect } from 'react';
-import { Shield, Home, Building2, Lock, UserCheck, Sparkles, Wallet, CheckCircle2, FileText } from 'lucide-react';
-import { getLaceWallet } from '../services/zkProofService';
+import React from 'react';
+import { Shield, Sparkles } from 'lucide-react';
 
-export default function Navbar({ activeView, setActiveView, currentRole, setCurrentRole, currentUser }) {
-  const [hasLace, setHasLace] = useState(false);
-
-  useEffect(() => {
-    const check = () => setHasLace(!!getLaceWallet());
-    check();
-    const interval = setInterval(check, 1000);
-    return () => clearInterval(interval);
-  }, []);
-
+export default function Navbar({ activeView, setActiveView, currentRole, setCurrentRole, onListProperty }) {
   return (
     <header style={{
-      position: 'sticky',
-      top: 0,
-      zIndex: 100,
-      background: 'rgba(10, 13, 20, 0.85)',
-      backdropFilter: 'blur(16px)',
-      borderBottom: '1px solid var(--border-subtle)',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      paddingBottom: '2.5rem',
+      width: '100%',
     }}>
-      <div className="container" style={{
+      {/* Brand Logo - RoofProof */}
+      <div 
+        onClick={() => setActiveView('landing')}
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '10px',
+          cursor: 'pointer',
+        }}
+      >
+        <div style={{
+          width: '38px',
+          height: '38px',
+          borderRadius: '11px',
+          background: 'linear-gradient(135deg, #EBA834 0%, #F59E0B 100%)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          boxShadow: '0 0 20px rgba(235, 168, 52, 0.45)',
+        }}>
+          <Shield size={22} color="#0c141d" />
+        </div>
+        <span style={{
+          fontSize: '1.45rem',
+          fontWeight: 700,
+          letterSpacing: '-0.03em',
+          color: '#ffffff',
+          fontFamily: 'var(--font-heading)',
+        }}>
+          RoofProof
+        </span>
+      </div>
+
+      {/* Nav Links: Locations, Tenant Portal, Landlord Portal, Form 16 Test UI, About, Reviews */}
+      <nav style={{
         display: 'flex',
         alignItems: 'center',
-        justifyContent: 'space-between',
-        height: '74px',
+        gap: '26px',
       }}>
-        {/* Brand Logo */}
-        <div 
+        <button
           onClick={() => setActiveView('landing')}
           style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '12px',
+            background: 'transparent',
+            color: activeView === 'landing' ? '#ffffff' : 'rgba(255, 255, 255, 0.75)',
+            fontWeight: activeView === 'landing' ? 700 : 500,
+            fontSize: '0.9rem',
+            border: 'none',
             cursor: 'pointer',
+            transition: 'all 0.2s ease',
           }}
         >
-          <div style={{
-            width: '42px',
-            height: '42px',
-            borderRadius: '12px',
-            background: 'var(--accent-gradient)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            boxShadow: 'var(--accent-glow)',
-          }}>
-            <Shield size={24} color="#ffffff" />
-          </div>
-          <div>
-            <span style={{ fontSize: '1.35rem', fontWeight: 800, letterSpacing: '-0.03em' }}>
-              Roof<span style={{ background: 'var(--accent-gradient)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Proof</span>
-            </span>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '-2px' }}>
-              <span className="badge-pill badge-midnight" style={{ fontSize: '0.65rem', padding: '1px 7px' }}>
-                Midnight Preview
-              </span>
-              {hasLace && (
-                <span className="badge-pill badge-eligible" style={{ fontSize: '0.65rem', padding: '1px 7px' }}>
-                  <CheckCircle2 size={10} /> Lace Active
-                </span>
-              )}
-            </div>
-          </div>
-        </div>
+          Locations
+        </button>
 
-        {/* Nav Links */}
-        <nav style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <button
-            onClick={() => setActiveView('landing')}
-            style={{
-              padding: '8px 16px',
-              borderRadius: 'var(--radius-md)',
-              background: activeView === 'landing' ? 'var(--bg-tertiary)' : 'transparent',
-              color: activeView === 'landing' ? 'var(--accent-secondary)' : 'var(--text-secondary)',
-              fontWeight: 600,
-              fontSize: '0.9rem',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-            }}
-          >
-            <Sparkles size={16} />
-            Home
-          </button>
+        <button
+          onClick={() => {
+            setCurrentRole('tenant');
+            setActiveView('tenant');
+          }}
+          style={{
+            background: 'transparent',
+            color: activeView === 'tenant' ? '#ffffff' : 'rgba(255, 255, 255, 0.75)',
+            fontWeight: activeView === 'tenant' ? 700 : 500,
+            fontSize: '0.9rem',
+            border: 'none',
+            cursor: 'pointer',
+            transition: 'all 0.2s ease',
+          }}
+        >
+          Tenant Portal
+        </button>
 
-          <button
-            onClick={() => {
-              setCurrentRole('tenant');
-              setActiveView('tenant');
-            }}
-            style={{
-              padding: '8px 16px',
-              borderRadius: 'var(--radius-md)',
-              background: activeView === 'tenant' ? 'var(--bg-tertiary)' : 'transparent',
-              color: activeView === 'tenant' ? 'var(--accent-secondary)' : 'var(--text-secondary)',
-              fontWeight: 600,
-              fontSize: '0.9rem',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-            }}
-          >
-            <Home size={16} />
-            Find a Home (Tenant)
-          </button>
+        <button
+          onClick={() => {
+            setCurrentRole('landlord');
+            setActiveView('landlord');
+          }}
+          style={{
+            background: 'transparent',
+            color: activeView === 'landlord' ? '#ffffff' : 'rgba(255, 255, 255, 0.75)',
+            fontWeight: activeView === 'landlord' ? 700 : 500,
+            fontSize: '0.9rem',
+            border: 'none',
+            cursor: 'pointer',
+            transition: 'all 0.2s ease',
+          }}
+        >
+          Landlord Portal
+        </button>
 
-          <button
-            onClick={() => {
-              setCurrentRole('landlord');
-              setActiveView('landlord');
-            }}
-            style={{
-              padding: '8px 16px',
-              borderRadius: 'var(--radius-md)',
-              background: activeView === 'landlord' ? 'var(--bg-tertiary)' : 'transparent',
-              color: activeView === 'landlord' ? 'var(--accent-secondary)' : 'var(--text-secondary)',
-              fontWeight: 600,
-              fontSize: '0.9rem',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-            }}
-          >
-            <Building2 size={16} />
-            Landlord Portal
-          </button>
+        <button
+          onClick={() => setActiveView('testui')}
+          style={{
+            background: 'transparent',
+            color: activeView === 'testui' ? '#ffffff' : 'rgba(255, 255, 255, 0.75)',
+            fontWeight: activeView === 'testui' ? 700 : 500,
+            fontSize: '0.9rem',
+            border: 'none',
+            cursor: 'pointer',
+            transition: 'all 0.2s ease',
+          }}
+        >
+          Form 16 Test UI
+        </button>
 
-          <button
-            onClick={() => setActiveView('privacy')}
-            style={{
-              padding: '8px 16px',
-              borderRadius: 'var(--radius-md)',
-              background: activeView === 'privacy' ? 'var(--bg-tertiary)' : 'transparent',
-              color: activeView === 'privacy' ? 'var(--accent-secondary)' : 'var(--text-secondary)',
-              fontWeight: 600,
-              fontSize: '0.9rem',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-            }}
-          >
-            <Lock size={16} />
-            ZK Architecture
-          </button>
+        <button
+          onClick={() => setActiveView('privacy')}
+          style={{
+            background: 'transparent',
+            color: activeView === 'privacy' ? '#ffffff' : 'rgba(255, 255, 255, 0.75)',
+            fontWeight: activeView === 'privacy' ? 700 : 500,
+            fontSize: '0.9rem',
+            border: 'none',
+            cursor: 'pointer',
+            transition: 'all 0.2s ease',
+          }}
+        >
+          About
+        </button>
 
-          <button
-            onClick={() => setActiveView('testui')}
-            style={{
-              padding: '8px 16px',
-              borderRadius: 'var(--radius-md)',
-              background: activeView === 'testui' ? 'var(--bg-tertiary)' : 'transparent',
-              color: activeView === 'testui' ? 'var(--accent-secondary)' : 'var(--text-secondary)',
-              fontWeight: 600,
-              fontSize: '0.9rem',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-            }}
-          >
-            <FileText size={16} />
-            Form 16 Test UI
-          </button>
-        </nav>
+        <button
+          onClick={() => setActiveView('privacy')}
+          style={{
+            background: 'transparent',
+            color: 'rgba(255, 255, 255, 0.75)',
+            fontWeight: 500,
+            fontSize: '0.9rem',
+            border: 'none',
+            cursor: 'pointer',
+            transition: 'all 0.2s ease',
+          }}
+        >
+          Reviews
+        </button>
+      </nav>
 
-        {/* Role & Persona Switcher */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <div style={{
-            background: 'var(--bg-secondary)',
-            border: '1px solid var(--border-subtle)',
-            borderRadius: 'var(--radius-full)',
-            padding: '4px 6px',
-            display: 'flex',
-            gap: '4px',
-          }}>
-            <button
-              onClick={() => {
-                setCurrentRole('tenant');
-                if (activeView !== 'landing' && activeView !== 'privacy') setActiveView('tenant');
-              }}
-              style={{
-                padding: '6px 14px',
-                borderRadius: 'var(--radius-full)',
-                background: currentRole === 'tenant' ? 'var(--accent-primary)' : 'transparent',
-                color: currentRole === 'tenant' ? '#ffffff' : 'var(--text-muted)',
-                fontSize: '0.8rem',
-                fontWeight: 700,
-                transition: 'var(--transition)',
-              }}
-            >
-              Tenant View
-            </button>
-            <button
-              onClick={() => {
-                setCurrentRole('landlord');
-                if (activeView !== 'landing' && activeView !== 'privacy') setActiveView('landlord');
-              }}
-              style={{
-                padding: '6px 14px',
-                borderRadius: 'var(--radius-full)',
-                background: currentRole === 'landlord' ? 'var(--accent-primary)' : 'transparent',
-                color: currentRole === 'landlord' ? '#ffffff' : 'var(--text-muted)',
-                fontSize: '0.8rem',
-                fontWeight: 700,
-                transition: 'var(--transition)',
-              }}
-            >
-              Landlord View
-            </button>
-          </div>
-        </div>
+      {/* Right Controls: List Now Glass Button & Book Now White Pill Button */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+        <button 
+          onClick={onListProperty}
+          className="btn-glass"
+          style={{ padding: '10px 20px', fontSize: '0.85rem' }}
+        >
+          List Now
+        </button>
+
+        <button 
+          onClick={() => {
+            setCurrentRole('tenant');
+            setActiveView('landing');
+          }}
+          className="btn-white-pill"
+          style={{ padding: '12px 26px', fontSize: '0.9rem' }}
+        >
+          Book Now
+        </button>
       </div>
     </header>
   );

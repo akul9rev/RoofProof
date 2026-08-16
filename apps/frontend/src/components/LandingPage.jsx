@@ -1,221 +1,290 @@
 import React from 'react';
-import { ShieldCheck, Lock, EyeOff, CheckCircle2, ArrowRight, FileCheck, Layers, Award, Sparkles } from 'lucide-react';
+import { Star, Lock, Calendar, Building2, ShieldCheck, Sparkles, ArrowRight } from 'lucide-react';
 
-export default function LandingPage({ onExploreHomes, onListProperty, onLearnPrivacy }) {
+export default function LandingPage({ properties = [], onApplyToProperty, onListProperty }) {
+  const featuredProp = properties[0] || {
+    id: 1,
+    title: 'Evergreen Pine Family Lodge',
+    location: 'Manali, Himachal Pradesh',
+    monthly_rent: 75000,
+    income_threshold: 225000,
+    image_url: 'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=1200&q=80',
+  };
+
   return (
-    <div style={{ paddingBottom: '80px' }}>
-      {/* Hero Section */}
-      <section style={{
-        padding: '80px 0 60px',
-        textAlign: 'center',
-        position: 'relative',
+    <div className="animate-fade-in" style={{ width: '100%' }}>
+      {/* RoofProof Hero Section - Crisp Text directly over background image */}
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))',
+        gap: '40px',
+        alignItems: 'center',
+        padding: '10px 0 60px',
       }}>
-        <div className="container" style={{ maxWidth: '900px' }}>
-          <div style={{ display: 'inline-flex', marginBottom: '20px' }}>
-            <span className="badge-pill badge-midnight" style={{ padding: '6px 16px', fontSize: '0.85rem' }}>
-              <Sparkles size={14} /> Built & Verified on Midnight Network Preview
-            </span>
+        {/* Left Column: Private Rental Verification */}
+        <div>
+          <div style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '8px',
+            background: 'rgba(255, 255, 255, 0.1)',
+            border: '1px solid rgba(255, 255, 255, 0.18)',
+            padding: '6px 14px',
+            borderRadius: '999px',
+            marginBottom: '20px',
+            fontSize: '0.8rem',
+            color: '#EBA834',
+            fontWeight: 600,
+          }}>
+            <Sparkles size={14} /> Zero-Knowledge Privacy on Midnight Network
           </div>
 
-          <h1 style={{
-            fontSize: '3.6rem',
-            lineHeight: 1.15,
-            marginBottom: '24px',
-            fontWeight: 800,
-          }}>
-            Rent without revealing your <br />
-            <span style={{
-              background: 'var(--accent-gradient)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-            }}>
-              bank statements or salary
-            </span>
+          <h1 className="hero-title">
+            Private <br />
+            <span className="text-accent-slate">Rental</span> <br />
+            Verification
           </h1>
 
-          <p style={{
-            fontSize: '1.25rem',
-            color: 'var(--text-secondary)',
-            marginBottom: '40px',
-            lineHeight: 1.6,
+          <div style={{
+            display: 'flex',
+            alignItems: 'flex-start',
+            gap: '40px',
+            marginTop: '2.2rem',
+            flexWrap: 'wrap',
           }}>
-            RoofProof leverages Zero-Knowledge smart contracts on Midnight to let tenants prove they meet rent income thresholds — without handing over sensitive payslips, bank balances, or tax returns.
-          </p>
+            <p style={{
+              maxWidth: '320px',
+              fontSize: '0.98rem',
+              color: 'rgba(255, 255, 255, 0.85)',
+              lineHeight: 1.6,
+              textShadow: '0 2px 10px rgba(0, 0, 0, 0.7)',
+            }}>
+              Discover handpicked luxury properties. Prove rent income eligibility privately via Form 16 Zero-Knowledge proofs — without sharing payslips or bank statements.
+            </p>
 
-          <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', flexWrap: 'wrap' }}>
-            <button className="btn-primary" onClick={onExploreHomes} style={{ padding: '14px 32px', fontSize: '1.05rem' }}>
-              Find a Home (Tenant) <ArrowRight size={18} />
-            </button>
-            <button className="btn-secondary" onClick={onListProperty} style={{ padding: '14px 32px', fontSize: '1.05rem' }}>
-              List a Property (Landlord)
-            </button>
-          </div>
-        </div>
-      </section>
-
-      {/* The Problem vs RoofProof Solution */}
-      <section className="container" style={{ margin: '40px auto' }}>
-        <div style={{ textAlign: 'center', marginBottom: '48px' }}>
-          <h2 style={{ fontSize: '2.2rem', marginBottom: '12px' }}>Why Traditional Rental Verification is Broken</h2>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '1.1rem' }}>
-            Tenants sacrifice total financial privacy just to rent an apartment.
-          </p>
-        </div>
-
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
-          gap: '28px',
-        }}>
-          {/* Traditional Way */}
-          <div className="glass-card" style={{
-            padding: '32px',
-            border: '1px solid var(--danger-border)',
-            background: 'rgba(30, 15, 20, 0.4)',
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
+            <div>
               <div style={{
-                width: '40px', height: '40px', borderRadius: '10px',
-                background: 'var(--danger-bg)', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                color: 'var(--danger-text)'
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                fontSize: '1.45rem',
+                fontWeight: 700,
+                color: '#ffffff',
+                textShadow: '0 2px 10px rgba(0,0,0,0.8)',
               }}>
-                ✕
+                <Star size={22} fill="#EBA834" color="#EBA834" />
+                4.9
               </div>
-              <h3 style={{ fontSize: '1.3rem', color: 'var(--danger-text)' }}>Traditional Rental Verification</h3>
+              <span style={{ fontSize: '0.85rem', color: 'rgba(255, 255, 255, 0.7)', fontWeight: 500 }}>
+                from 1,800+ ZK proofs
+              </span>
             </div>
-            <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '14px', color: 'var(--text-secondary)' }}>
-              <li style={{ display: 'flex', gap: '10px' }}>
-                <span style={{ color: 'var(--danger-text)' }}>•</span> Landlords demand 3–6 months of complete unredacted bank statements.
-              </li>
-              <li style={{ display: 'flex', gap: '10px' }}>
-                <span style={{ color: 'var(--danger-text)' }}>•</span> Exposes exact salaries, employer bonuses, account balances, and spending habits.
-              </li>
-              <li style={{ display: 'flex', gap: '10px' }}>
-                <span style={{ color: 'var(--danger-text)' }}>•</span> High risk of identity theft, data leaks, and arbitrary landlord discrimination.
-              </li>
-              <li style={{ display: 'flex', gap: '10px' }}>
-                <span style={{ color: 'var(--danger-text)' }}>•</span> Data stored insecurely in landlord email inboxes or WhatsApp chats.
-              </li>
-            </ul>
           </div>
+        </div>
 
-          {/* RoofProof ZK Way */}
+        {/* Right Column: Floating Dark Glass Booking/Verification Card */}
+        <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
           <div className="glass-card" style={{
-            padding: '32px',
-            border: '1px solid var(--success-border)',
-            background: 'rgba(10, 30, 25, 0.4)',
+            maxWidth: '430px',
+            width: '100%',
+            padding: '28px',
+            borderRadius: '28px',
+            background: 'rgba(12, 19, 27, 0.88)',
+            border: '1px solid rgba(255, 255, 255, 0.15)',
           }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
-              <div style={{
-                width: '40px', height: '40px', borderRadius: '10px',
-                background: 'var(--success-bg)', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                color: 'var(--success-text)'
-              }}>
-                <CheckCircle2 size={22} />
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '20px' }}>
+              <div>
+                <h3 style={{
+                  fontSize: '1.45rem',
+                  fontWeight: 600,
+                  color: '#ffffff',
+                  lineHeight: 1.2,
+                  marginBottom: '6px',
+                }}>
+                  {featuredProp.title}
+                </h3>
+                <span style={{ fontSize: '0.85rem', color: 'rgba(255, 255, 255, 0.6)' }}>
+                  {featuredProp.location}
+                </span>
               </div>
-              <h3 style={{ fontSize: '1.3rem', color: 'var(--success-text)' }}>RoofProof (Zero-Knowledge)</h3>
+              <div style={{
+                width: '36px',
+                height: '36px',
+                borderRadius: '50%',
+                background: 'rgba(255, 255, 255, 0.1)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}>
+                <Lock size={16} color="rgba(255,255,255,0.85)" />
+              </div>
             </div>
-            <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '14px', color: 'var(--text-secondary)' }}>
-              <li style={{ display: 'flex', gap: '10px' }}>
-                <span style={{ color: 'var(--success-text)' }}>✓</span> Income is evaluated strictly in the tenant's browser memory.
-              </li>
-              <li style={{ display: 'flex', gap: '10px' }}>
-                <span style={{ color: 'var(--success-text)' }}>✓</span> ZK SNARK cryptographic proof submitted to the Midnight blockchain.
-              </li>
-              <li style={{ display: 'flex', gap: '10px' }}>
-                <span style={{ color: 'var(--success-text)' }}>✓</span> Landlord only receives a cryptographic verification: <strong>"Eligible ✓"</strong>.
-              </li>
-              <li style={{ display: 'flex', gap: '10px' }}>
-                <span style={{ color: 'var(--success-text)' }}>✓</span> <strong>Zero</strong> financial figures, account numbers, or documents are stored or disclosed.
-              </li>
-            </ul>
+
+            {/* Check-in / Check-out Input Pills */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 1fr',
+              gap: '12px',
+              marginBottom: '16px',
+            }}>
+              <div style={{
+                background: 'rgba(255, 255, 255, 0.06)',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
+                borderRadius: '16px',
+                padding: '12px 14px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '10px',
+              }}>
+                <Calendar size={16} color="rgba(255,255,255,0.6)" />
+                <div>
+                  <div style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.5)' }}>Check-in</div>
+                  <div style={{ fontSize: '0.85rem', fontWeight: 600, color: '#ffffff' }}>After 2:00 PM</div>
+                </div>
+              </div>
+
+              <div style={{
+                background: 'rgba(255, 255, 255, 0.06)',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
+                borderRadius: '16px',
+                padding: '12px 14px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '10px',
+              }}>
+                <Calendar size={16} color="rgba(255,255,255,0.6)" />
+                <div>
+                  <div style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.5)' }}>Check-out</div>
+                  <div style={{ fontSize: '0.85rem', fontWeight: 600, color: '#ffffff' }}>Until 12:00 PM</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Min Annual Income Requirement */}
+            <div style={{
+              background: 'rgba(235, 168, 52, 0.08)',
+              border: '1px solid rgba(235, 168, 52, 0.25)',
+              borderRadius: '16px',
+              padding: '14px 16px',
+              marginBottom: '22px',
+              display: 'flex',
+              justify: 'space-between',
+              alignItems: 'center',
+            }}>
+              <div>
+                <div style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.6)' }}>Min Income Threshold</div>
+                <div style={{ fontSize: '1rem', fontWeight: 700, color: '#EBA834' }}>
+                  ₹{(featuredProp.income_threshold || 225000).toLocaleString('en-IN')}/yr
+                </div>
+              </div>
+              <span style={{ fontSize: '0.75rem', color: '#ffffff', background: 'rgba(255,255,255,0.12)', padding: '4px 12px', borderRadius: '999px', fontWeight: 600 }}>
+                Form 16 ZK
+              </span>
+            </div>
+
+            {/* Price & Action */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '20px' }}>
+              <div>
+                <span style={{ fontSize: '1.85rem', fontWeight: 700, color: '#ffffff' }}>
+                  ₹{(featuredProp.monthly_rent || 75000).toLocaleString('en-IN')}
+                </span>
+                <span style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.6)' }}> / month</span>
+              </div>
+              <span style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.5)' }}>2–5 guests</span>
+            </div>
+
+            <button
+              onClick={() => onApplyToProperty(featuredProp)}
+              className="btn-white-pill"
+              style={{ width: '100%' }}
+            >
+              Book Now (ZK Proof)
+            </button>
           </div>
         </div>
-      </section>
+      </div>
 
-      {/* How it Works Step-by-Step */}
-      <section className="container" style={{ margin: '80px auto' }}>
-        <div style={{ textAlign: 'center', marginBottom: '48px' }}>
-          <span className="badge-pill badge-midnight" style={{ marginBottom: '12px' }}>How it Works</span>
-          <h2 style={{ fontSize: '2.2rem' }}>Cryptographic Proof in 3 Simple Steps</h2>
-        </div>
-
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
-          gap: '24px',
-        }}>
-          <div className="glass-card" style={{ padding: '28px', textAlign: 'center' }}>
-            <div style={{
-              width: '56px', height: '56px', borderRadius: '16px',
-              background: 'var(--accent-gradient)', display: 'flex', alignItems: 'center', justifyContent: 'center',
-              margin: '0 auto 20px',
-            }}>
-              <Lock size={26} color="#ffffff" />
-            </div>
-            <h4 style={{ fontSize: '1.2rem', marginBottom: '10px' }}>1. Local Evaluation</h4>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem' }}>
-              Tenant enters their private income. The computation happens strictly in local memory and never touches our servers.
-            </p>
-          </div>
-
-          <div className="glass-card" style={{ padding: '28px', textAlign: 'center' }}>
-            <div style={{
-              width: '56px', height: '56px', borderRadius: '16px',
-              background: 'linear-gradient(135deg, #0ea5e9 0%, #38bdf8 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center',
-              margin: '0 auto 20px',
-            }}>
-              <Layers size={26} color="#ffffff" />
-            </div>
-            <h4 style={{ fontSize: '1.2rem', marginBottom: '10px' }}>2. Midnight ZK Circuit</h4>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem' }}>
-              The Compact circuit <code style={{ color: 'var(--midnight-accent)' }}>verifyEligibility</code> proves <code style={{ color: 'var(--midnight-accent)' }}>income &ge; threshold</code> on the Midnight Preview blockchain.
-            </p>
-          </div>
-
-          <div className="glass-card" style={{ padding: '28px', textAlign: 'center' }}>
-            <div style={{
-              width: '56px', height: '56px', borderRadius: '16px',
-              background: 'linear-gradient(135deg, #10b981 0%, #34d399 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center',
-              margin: '0 auto 20px',
-            }}>
-              <Award size={26} color="#ffffff" />
-            </div>
-            <h4 style={{ fontSize: '1.2rem', marginBottom: '10px' }}>3. Verified Rental Status</h4>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem' }}>
-              Landlord reviews the application and sees the on-chain verified status: <span style={{ color: 'var(--success-text)', fontWeight: 700 }}>Eligible ✓</span>.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* On-Chain Verified Details CTA */}
-      <section className="container">
-        <div className="glass-card" style={{
-          padding: '40px',
-          background: 'linear-gradient(135deg, rgba(22, 29, 46, 0.9) 0%, rgba(15, 23, 42, 0.95) 100%)',
-          border: '1px solid var(--border-glow)',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          flexWrap: 'wrap',
-          gap: '24px',
-        }}>
+      {/* Featured Properties Grid */}
+      <div style={{ marginTop: '40px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-              <span className="badge-pill badge-eligible">Live on Preview</span>
-              <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Contract: 94010caedf...</span>
-            </div>
-            <h3 style={{ fontSize: '1.6rem', marginBottom: '6px' }}>Inspect RoofProof Zero-Knowledge Architecture</h3>
-            <p style={{ color: 'var(--text-secondary)' }}>
-              Explore the deployed Midnight Compact contract, proof generation metrics, and privacy ledger state.
+            <h2 style={{ fontSize: '2.2rem', fontWeight: 600, color: '#ffffff' }}>Available Locations</h2>
+            <p style={{ color: 'rgba(255, 255, 255, 0.7)', fontSize: '0.95rem' }}>
+              Select a luxury property to verify eligibility privately via Zero-Knowledge proof.
             </p>
           </div>
-          <button className="btn-secondary" onClick={onLearnPrivacy} style={{ padding: '12px 24px' }}>
-            View ZK Details <ArrowRight size={16} />
+          <button onClick={onListProperty} className="btn-glass">
+            + List a Property
           </button>
         </div>
-      </section>
+
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))',
+          gap: '24px',
+        }}>
+          {properties.map((prop) => (
+            <div key={prop.id} className="glass-card" style={{ padding: '20px', borderRadius: '24px' }}>
+              <div style={{
+                height: '200px',
+                borderRadius: '16px',
+                overflow: 'hidden',
+                marginBottom: '16px',
+                position: 'relative',
+              }}>
+                <img
+                  src={prop.image_url || 'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=800&q=80'}
+                  alt={prop.title}
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                />
+                <span style={{
+                  position: 'absolute',
+                  top: '12px',
+                  right: '12px',
+                  background: 'rgba(12, 20, 29, 0.85)',
+                  backdropFilter: 'blur(8px)',
+                  padding: '4px 12px',
+                  borderRadius: '999px',
+                  fontSize: '0.75rem',
+                  color: '#EBA834',
+                  fontWeight: 600,
+                }}>
+                  ZK Eligible
+                </span>
+              </div>
+
+              <h3 style={{ fontSize: '1.2rem', fontWeight: 600, color: '#ffffff', marginBottom: '4px' }}>
+                {prop.title}
+              </h3>
+              <p style={{ fontSize: '0.85rem', color: 'rgba(255, 255, 255, 0.6)', marginBottom: '16px' }}>
+                {prop.location}
+              </p>
+
+              <div style={{
+                display: 'flex',
+                justify: 'space-between',
+                alignItems: 'center',
+                paddingTop: '12px',
+                borderTop: '1px solid rgba(255, 255, 255, 0.1)',
+              }}>
+                <div>
+                  <span style={{ fontSize: '1.2rem', fontWeight: 700, color: '#ffffff' }}>
+                    ₹{(prop.monthly_rent || 0).toLocaleString('en-IN')}
+                  </span>
+                  <span style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.6)' }}> / mo</span>
+                </div>
+                <button
+                  onClick={() => onApplyToProperty(prop)}
+                  className="btn-white-pill"
+                  style={{ padding: '8px 20px', fontSize: '0.85rem' }}
+                >
+                  Book Now
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
