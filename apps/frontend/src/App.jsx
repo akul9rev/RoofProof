@@ -186,39 +186,6 @@ export default function App() {
         )}
       </main>
 
-      {/* Footer */}
-      <footer style={{
-        borderTop: '1px solid var(--border-subtle)',
-        padding: '32px 0',
-        background: 'var(--bg-secondary)',
-        marginTop: 'auto',
-      }}>
-        <div className="container" style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          flexWrap: 'wrap',
-          gap: '16px',
-        }}>
-          <div>
-            <div style={{ fontWeight: 800, fontSize: '1.1rem' }}>
-              Roof<span style={{ color: 'var(--accent-secondary)' }}>Proof</span>
-            </div>
-            <div style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>
-              Decentralized Zero-Knowledge Rental Eligibility on Midnight Preview
-            </div>
-          </div>
-
-          <div style={{ display: 'flex', gap: '20px', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
-            <span style={{ fontFamily: 'monospace' }}>Contract: 94010caedf...</span>
-            <span>•</span>
-            <span>Zero Data Stored</span>
-            <span>•</span>
-            <span>Built with Midnight.js</span>
-          </div>
-        </div>
-      </footer>
-
       {/* Modals */}
       {selectedPropertyForApply && (
         <ApplyModal

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Star, Edit3, MapPin, Home } from 'lucide-react';
+import { Edit3, MapPin, Home } from 'lucide-react';
 
 export default function LandingPage({ properties = [], onApplyToProperty }) {
   const featuredProp = properties[0] || {
@@ -18,54 +18,32 @@ export default function LandingPage({ properties = [], onApplyToProperty }) {
         gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))',
         gap: '40px',
         alignItems: 'center',
-        padding: '10px 0 20px',
+        padding: '10px 0 10px',
       }}>
-        {/* Left Column: RoofProof Core Value Proposition */}
+        {/* Left Column: Hero Title & AI/ZK Subtext */}
         <div>
           <h1 className="hero-title">
-            Proof <br />
-            <span className="text-accent-slate">Before</span> <br />
-            Roof
+            Prove your <br />
+            <span className="text-accent-slate">income. Keep</span> <br />
+            your privacy.
           </h1>
 
           <div style={{
-            display: 'flex',
-            alignItems: 'flex-start',
-            gap: '40px',
-            marginTop: '2.5rem',
-            flexWrap: 'wrap',
+            marginTop: '2rem',
           }}>
             <p style={{
-              maxWidth: '330px',
-              fontSize: '0.94rem',
+              maxWidth: '420px',
+              fontSize: '0.96rem',
               color: 'rgba(255, 255, 255, 0.85)',
               lineHeight: 1.6,
               textShadow: '0 2px 10px rgba(0, 0, 0, 0.85)',
             }}>
-              RoofProof lets tenants verify rent income eligibility using Form 16 Zero-Knowledge proofs on Midnight — without disclosing payslips, bank statements, or private tax records.
+              RoofProof uses AI-powered document verification and Midnight zero-knowledge proofs to verify rental income without revealing the tenant's exact salary.
             </p>
-
-            <div>
-              <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                fontSize: '1.4rem',
-                fontWeight: 600,
-                color: '#ffffff',
-                textShadow: '0 2px 10px rgba(0,0,0,0.9)',
-              }}>
-                <Star size={20} fill="#EBA834" color="#EBA834" />
-                4.9
-              </div>
-              <span style={{ fontSize: '0.82rem', color: 'rgba(255, 255, 255, 0.65)', fontWeight: 400 }}>
-                from 1,800+ ZK proofs
-              </span>
-            </div>
           </div>
         </div>
 
-        {/* Right Column: RoofProof Property Booking & Income Verification Card */}
+        {/* Right Column: House Booking & Verification Card */}
         <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
           <div className="glass-card" style={{
             maxWidth: '420px',

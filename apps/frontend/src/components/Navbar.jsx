@@ -43,32 +43,18 @@ export default function Navbar({ activeView, setActiveView, currentRole, setCurr
         </span>
       </div>
 
-      {/* Right-aligned Nav Links & Buttons matching Image 2 */}
+      {/* Right-aligned Nav Links & Action Buttons */}
       <div style={{
         display: 'flex',
         alignItems: 'center',
-        gap: '36px',
+        gap: '32px',
+        marginLeft: 'auto',
       }}>
         <nav style={{
           display: 'flex',
           alignItems: 'center',
-          gap: '28px',
+          gap: '24px',
         }}>
-          <button
-            onClick={() => setActiveView('landing')}
-            style={{
-              background: 'transparent',
-              color: activeView === 'landing' ? '#ffffff' : 'rgba(255, 255, 255, 0.75)',
-              fontWeight: 400,
-              fontSize: '0.9rem',
-              border: 'none',
-              cursor: 'pointer',
-              transition: 'all 0.2s ease',
-            }}
-          >
-            Locations
-          </button>
-
           <button
             onClick={() => {
               setCurrentRole('tenant');
@@ -106,21 +92,6 @@ export default function Navbar({ activeView, setActiveView, currentRole, setCurr
           </button>
 
           <button
-            onClick={() => setActiveView('testui')}
-            style={{
-              background: 'transparent',
-              color: activeView === 'testui' ? '#ffffff' : 'rgba(255, 255, 255, 0.75)',
-              fontWeight: 400,
-              fontSize: '0.9rem',
-              border: 'none',
-              cursor: 'pointer',
-              transition: 'all 0.2s ease',
-            }}
-          >
-            Form 16 Test UI
-          </button>
-
-          <button
             onClick={() => setActiveView('privacy')}
             style={{
               background: 'transparent',
@@ -151,7 +122,7 @@ export default function Navbar({ activeView, setActiveView, currentRole, setCurr
           </button>
         </nav>
 
-        {/* Both List Now and Book Now are solid white pill buttons */}
+        {/* Buttons: List Now and Find a Home */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <button 
             onClick={onListProperty}
@@ -164,12 +135,12 @@ export default function Navbar({ activeView, setActiveView, currentRole, setCurr
           <button 
             onClick={() => {
               setCurrentRole('tenant');
-              setActiveView('landing');
+              setActiveView('tenant');
             }}
             className="btn-white-pill"
             style={{ padding: '10px 22px', fontSize: '0.88rem' }}
           >
-            Book Now
+            Find a Home
           </button>
         </div>
       </div>
