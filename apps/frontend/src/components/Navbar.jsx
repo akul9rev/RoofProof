@@ -1,7 +1,20 @@
 import React from 'react';
 import { Shield } from 'lucide-react';
 
-export default function Navbar({ activeView, setActiveView, currentRole, setCurrentRole, onListProperty }) {
+export default function Navbar({ activeView, setActiveView, currentRole, setCurrentRole, onListProperty, currentUser, onOpenLogin }) {
+  // Get initials from current user name
+  const getUserInitials = (name) => {
+    if (!name) return 'RP';
+    const parts = name.trim().split(' ');
+    if (parts.length >= 2) {
+      return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+    }
+    return name.slice(0, 2).toUpperCase();
+  };
+
+  const initials = getUserInitials(currentUser?.name);
+  const isTenant = currentRole === 'tenant';
+
   return (
     <header style={{
       display: 'flex',
@@ -47,7 +60,7 @@ export default function Navbar({ activeView, setActiveView, currentRole, setCurr
       <div style={{
         display: 'flex',
         alignItems: 'center',
-        gap: '32px',
+        gap: '24px',
         marginLeft: 'auto',
       }}>
         <nav style={{
@@ -63,7 +76,7 @@ export default function Navbar({ activeView, setActiveView, currentRole, setCurr
             style={{
               background: 'transparent',
               color: activeView === 'tenant' ? '#ffffff' : 'rgba(255, 255, 255, 0.75)',
-              fontWeight: 400,
+              fontWeight: activeView === 'tenant' ? 600 : 400,
               fontSize: '0.9rem',
               border: 'none',
               cursor: 'pointer',
@@ -81,7 +94,7 @@ export default function Navbar({ activeView, setActiveView, currentRole, setCurr
             style={{
               background: 'transparent',
               color: activeView === 'landlord' ? '#ffffff' : 'rgba(255, 255, 255, 0.75)',
-              fontWeight: 400,
+              fontWeight: activeView === 'landlord' ? 600 : 400,
               fontSize: '0.9rem',
               border: 'none',
               cursor: 'pointer',
@@ -134,7 +147,52 @@ export default function Navbar({ activeView, setActiveView, currentRole, setCurr
           </button>
         </nav>
 
-        {/* Buttons: List Now and Find a Home */}
+        {/* Minimalist Profile Circle Avatar */}
+        <div
+          onClick={onOpenLogin}
+          title={`Signed in as ${currentUser?.name || 'User'} (${currentRole}) - Click to switch profile`}
+          style={{
+            position: 'relative',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <div style={{
+            width: '40px',
+            height: '40px',
+            borderRadius: '50%',
+            background: isTenant 
+              ? 'linear-gradient(135deg, #EBA834 0%, #F59E0B 100%)' 
+              : 'linear-gradient(135deg, #6B9B76 0%, #4A7C59 100%)',
+            color: isTenant ? '#0c141d' : '#ffffff',
+            fontWeight: 700,
+            fontSize: '0.92rem',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            boxShadow: isTenant ? '0 0 16px rgba(235, 168, 52, 0.35)' : '0 0 16px rgba(107, 155, 118, 0.35)',
+            border: '2px solid rgba(255, 255, 255, 0.2)',
+            transition: 'all 0.2s ease',
+          }}>
+            {initials}
+          </div>
+
+          {/* Active status indicator dot */}
+          <span style={{
+            position: 'absolute',
+            bottom: '0',
+            right: '0',
+            width: '11px',
+            height: '11px',
+            borderRadius: '50%',
+            background: '#22c55e',
+            border: '2px solid #09121a',
+          }}></span>
+        </div>
+
+        {/* Action Buttons: List Now and Find a Home */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <button 
             onClick={onListProperty}

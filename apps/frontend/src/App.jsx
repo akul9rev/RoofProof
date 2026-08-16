@@ -7,26 +7,21 @@ import PrivacyVerificationView from './components/PrivacyVerificationView.jsx';
 import PdfExtractTestUI from './components/PdfExtractTestUI.jsx';
 import ApplyModal from './components/ApplyModal.jsx';
 import CreatePropertyModal from './components/CreatePropertyModal.jsx';
+import LoginModal from './components/LoginModal.jsx';
 import { fetchProperties, fetchApplications, applyForProperty, updateApplicationStatus, createProperty } from './services/api.js';
 
 export default function App() {
   const [activeView, setActiveView] = useState('landing'); // 'landing' | 'tenant' | 'landlord' | 'privacy' | 'testui'
   const [currentRole, setCurrentRole] = useState('tenant'); // 'tenant' | 'landlord'
 
-  const tenantUser = {
+  const [currentUser, setCurrentUser] = useState({
     id: 1,
     name: 'Rahul Sharma',
     email: 'rahul.sharma@example.com',
     role: 'tenant',
-  };
+  });
 
-  const landlordUser = {
-    id: 2,
-    name: 'Ananya Verma',
-    email: 'ananya.verma@example.com',
-    role: 'landlord',
-  };
-
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [properties, setProperties] = useState([]);
   const [applications, setApplications] = useState([]);
   const [selectedPropertyForApply, setSelectedPropertyForApply] = useState(null);
@@ -58,6 +53,12 @@ export default function App() {
   useEffect(() => {
     fetchData();
   }, []);
+
+  const handleLoginSuccess = (userObj) => {
+    setCurrentUser(userObj);
+    setCurrentRole(userObj.role);
+    showNotification(`Signed in successfully as ${userObj.name} (${userObj.role})`, 'success');
+  };
 
   const handleApplySubmit = async (payload) => {
     try {
@@ -106,7 +107,8 @@ export default function App() {
         setActiveView={setActiveView}
         currentRole={currentRole}
         setCurrentRole={setCurrentRole}
-        currentUser={currentRole === 'tenant' ? tenantUser : landlordUser}
+        currentUser={currentUser}
+        onOpenLogin={() => setIsLoginModalOpen(true)}
         onListProperty={() => {
           setCurrentRole('landlord');
           setIsCreateModalOpen(true);
@@ -153,7 +155,7 @@ export default function App() {
             applications={applications}
             onApply={(property) => setSelectedPropertyForApply(property)}
             onWithdraw={handleWithdrawApplication}
-            currentUser={tenantUser}
+            currentUser={currentUser}
           />
         )}
 
@@ -163,7 +165,7 @@ export default function App() {
             applications={applications}
             onOpenCreateModal={() => setIsCreateModalOpen(true)}
             onUpdateStatus={handleUpdateStatus}
-            currentUser={landlordUser}
+            currentUser={currentUser}
           />
         )}
 
@@ -177,10 +179,18 @@ export default function App() {
       </main>
 
       {/* Modals */}
+      <LoginModal
+        isOpen={isLoginModalOpen}
+        onClose={() => setIsLoginModalOpen(false)}
+        currentRole={currentRole}
+        currentUser={currentUser}
+        onLoginSuccess={handleLoginSuccess}
+      />
+
       {selectedPropertyForApply && (
         <ApplyModal
           property={selectedPropertyForApply}
-          tenant={tenantUser}
+          tenant={currentUser}
           onClose={() => setSelectedPropertyForApply(null)}
           onSuccess={handleApplySubmit}
         />
@@ -188,7 +198,7 @@ export default function App() {
 
       {isCreateModalOpen && (
         <CreatePropertyModal
-          landlord={landlordUser}
+          landlord={currentUser}
           onClose={() => setIsCreateModalOpen(false)}
           onSuccess={handleCreateProperty}
         />
