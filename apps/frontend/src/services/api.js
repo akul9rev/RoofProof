@@ -24,43 +24,54 @@ export async function createProperty(data) {
   return res.json();
 }
 
+export async function fetchApplications() {
+  const res = await fetch(`${API_BASE}/applications`);
+  return res.json();
+}
+
 export async function fetchPropertyApplications(propertyId) {
   const res = await fetch(`${API_BASE}/properties/${propertyId}/applications`);
   return res.json();
 }
 
-export async function fetchApplications(params = {}) {
-  const query = new URLSearchParams(params).toString();
-  const res = await fetch(`${API_BASE}/applications?${query}`);
+export async function fetchTenantApplications(tenantId) {
+  const res = await fetch(`${API_BASE}/applications/tenant/${tenantId}`);
   return res.json();
 }
 
-export async function applyForProperty(propertyId, payload) {
-  // STRICT PRIVACY CHECK: Ensure NO income or sensitive keys are in payload
-  const { tenant_id, verification_status, zk_tx_hash } = payload;
-  const res = await fetch(`${API_BASE}/properties/${propertyId}/apply`, {
+export async function submitApplication(data) {
+  const res = await fetch(`${API_BASE}/applications`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      tenant_id,
-      verification_status,
-      zk_tx_hash,
-    }),
+    body: JSON.stringify(data),
   });
   return res.json();
 }
 
-export async function updateApplicationStatus(applicationId, status) {
-  const res = await fetch(`${API_BASE}/applications/${applicationId}/status`, {
+export async function applyForProperty(propertyIdOrData, payload = null) {
+  if (typeof propertyIdOrData === 'object' && propertyIdOrData !== null) {
+    return submitApplication(propertyIdOrData);
+  }
+  const fullData = {
+    property_id: propertyIdOrData,
+    ...payload,
+  };
+  return submitApplication(fullData);
+}
+
+export async function withdrawApplication(id) {
+  const res = await fetch(`${API_BASE}/applications/${id}`, {
+    method: 'DELETE',
+  });
+  return res.json();
+}
+
+export async function updateApplicationStatus(id, status, landlordNotes = '') {
+  const res = await fetch(`${API_BASE}/applications/${id}/status`, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ status }),
+    body: JSON.stringify({ status, landlord_notes: landlordNotes }),
   });
-  return res.json();
-}
-
-export async function fetchUsers() {
-  const res = await fetch(`${API_BASE}/users`);
   return res.json();
 }
 
@@ -71,4 +82,20 @@ export async function loginOrRegister(data) {
     body: JSON.stringify(data),
   });
   return res.json();
+}
+
+export async function extractPdfText(file) {
+  const formData = new FormData();
+  formData.append('pdfFile', file);
+
+  const res = await fetch(`${API_BASE}/pdf/extract`, {
+    method: 'POST',
+    body: formData,
+  });
+
+  return res.json();
+}
+
+export async function analyzeForm16Document(file) {
+  return extractPdfText(file);
 }

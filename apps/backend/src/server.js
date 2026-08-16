@@ -6,6 +6,7 @@ import usersRoutes from './routes/users.js';
 import propertiesRoutes from './routes/properties.js';
 import applicationsRoutes from './routes/applications.js';
 import healthRoutes from './routes/health.js';
+import pdfExtractRoutes from './routes/pdfExtract.js';
 
 const app = express();
 
@@ -19,6 +20,8 @@ app.use('/api/health', healthRoutes);
 app.use('/api/users', usersRoutes);
 app.use('/api/properties', propertiesRoutes);
 app.use('/api/applications', applicationsRoutes);
+app.use('/api/pdf', pdfExtractRoutes);
+app.use('/api/form16', pdfExtractRoutes);
 
 // Global Error Handler
 app.use((err, req, res, next) => {

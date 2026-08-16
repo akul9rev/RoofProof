@@ -40,7 +40,8 @@ const INDEXER_HTTP = process.env.INDEXER_HTTP_URL ?? 'https://indexer.preview.mi
 const INDEXER_WS = process.env.INDEXER_WS_URL ?? 'wss://indexer.preview.midnight.network/api/v3/graphql/ws';
 const NODE_HTTP = process.env.NODE_HTTP_URL ?? 'https://rpc.preview.midnight.network';
 const NODE_WS = process.env.NODE_WS_URL ?? 'wss://rpc.preview.midnight.network';
-const PROOF_URL = process.env.PROOF_SERVER_URL ?? 'http://localhost:6300';
+const PROOF_URL = process.env.PROOF_SERVER_URL ?? 'https://proof-service.preview.midnight.network';
+const STORAGE_PASSWORD = process.env.PROOF_STORAGE_PASSWORD ?? process.env.PRIVATE_STORAGE_PASSWORD ?? 'Midnight-Proof-Storage-Secret';
 const CONTRACT_ADDRESS = process.env.CONTRACT_ADDRESS ?? '94010caedf80e1a2af62dfe1aa6f6c924969a8837003e84bb03857dd13d2b5cf';
 const PRIVATE_STATE_ID = 'roofproof-v1';
 
@@ -212,7 +213,7 @@ export async function executeMidnightVerification({
     const privateStateProvider = levelPrivateStateProvider<string, PrivateState>({
       privateStateStoreName: `roofproof-verify-${Date.now()}`,
       signingKeyStoreName: `roofproof-verify-keys-${Date.now()}`,
-      privateStoragePasswordProvider: () => 'RoofProof-Preview-2026!',
+      privateStoragePasswordProvider: () => STORAGE_PASSWORD,
       accountId: String(walletProvider.getCoinPublicKey()),
     });
 

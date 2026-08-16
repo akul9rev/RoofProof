@@ -6,7 +6,8 @@ import LandlordDashboard from './components/LandlordDashboard';
 import PrivacyVerificationView from './components/PrivacyVerificationView';
 import ApplyModal from './components/ApplyModal';
 import CreatePropertyModal from './components/CreatePropertyModal';
-import { fetchProperties, fetchApplications, applyForProperty, createProperty, updateApplicationStatus } from './services/api';
+import PdfExtractTestUI from './components/PdfExtractTestUI';
+import { fetchProperties, fetchApplications, applyForProperty, createProperty, updateApplicationStatus, withdrawApplication } from './services/api';
 
 export default function App() {
   const [activeView, setActiveView] = useState('landing'); // 'landing' | 'tenant' | 'landlord' | 'privacy'
@@ -57,13 +58,14 @@ export default function App() {
 
       if (res.success) {
         setSelectedPropertyForApply(null);
-        showNotification('Rental application submitted with Zero-Knowledge proof! Private income was not stored.');
+        showNotification('Application verified & saved successfully! Verified by Midnight Lace.');
         await loadData();
+        return { success: true };
       } else {
-        alert(res.error || 'Failed to submit application.');
+        return { success: false, error: res.error || 'Failed to submit application.' };
       }
     } catch (err) {
-      alert(err.message || 'Error submitting application.');
+      return { success: false, error: err.message || 'Error submitting application.' };
     }
   };
 
@@ -78,15 +80,29 @@ export default function App() {
     }
   };
 
-  const handleUpdateStatus = async (applicationId, status) => {
+  const handleUpdateStatus = async (applicationId, status, rejectionReason = null) => {
     try {
-      const res = await updateApplicationStatus(applicationId, status);
+      const res = await updateApplicationStatus(applicationId, status, rejectionReason);
       if (res.success) {
         showNotification(`Application #${applicationId} marked as ${status}`);
         await loadData();
       }
     } catch (err) {
       alert('Error updating status: ' + err.message);
+    }
+  };
+
+  const handleWithdrawApplication = async (applicationId) => {
+    try {
+      const res = await withdrawApplication(applicationId);
+      if (res.success) {
+        showNotification('Application taken back. You can now re-verify with ZK proof and apply again.');
+        await loadData();
+      } else {
+        alert(res.error || 'Failed to withdraw application.');
+      }
+    } catch (err) {
+      alert('Error withdrawing application: ' + err.message);
     }
   };
 
@@ -142,6 +158,7 @@ export default function App() {
             properties={properties}
             applications={applications}
             onApply={(property) => setSelectedPropertyForApply(property)}
+            onWithdraw={handleWithdrawApplication}
             currentUser={tenantUser}
           />
         )}
@@ -158,6 +175,10 @@ export default function App() {
 
         {activeView === 'privacy' && (
           <PrivacyVerificationView />
+        )}
+
+        {activeView === 'testui' && (
+          <PdfExtractTestUI />
         )}
       </main>
 

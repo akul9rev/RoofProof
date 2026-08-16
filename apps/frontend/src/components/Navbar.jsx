@@ -1,7 +1,17 @@
-import React from 'react';
-import { Shield, Home, Building2, Lock, UserCheck, Sparkles } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Shield, Home, Building2, Lock, UserCheck, Sparkles, Wallet, CheckCircle2, FileText } from 'lucide-react';
+import { getLaceWallet } from '../services/zkProofService';
 
 export default function Navbar({ activeView, setActiveView, currentRole, setCurrentRole, currentUser }) {
+  const [hasLace, setHasLace] = useState(false);
+
+  useEffect(() => {
+    const check = () => setHasLace(!!getLaceWallet());
+    check();
+    const interval = setInterval(check, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <header style={{
       position: 'sticky',
@@ -47,6 +57,11 @@ export default function Navbar({ activeView, setActiveView, currentRole, setCurr
               <span className="badge-pill badge-midnight" style={{ fontSize: '0.65rem', padding: '1px 7px' }}>
                 Midnight Preview
               </span>
+              {hasLace && (
+                <span className="badge-pill badge-eligible" style={{ fontSize: '0.65rem', padding: '1px 7px' }}>
+                  <CheckCircle2 size={10} /> Lace Active
+                </span>
+              )}
             </div>
           </div>
         </div>
@@ -129,6 +144,24 @@ export default function Navbar({ activeView, setActiveView, currentRole, setCurr
           >
             <Lock size={16} />
             ZK Architecture
+          </button>
+
+          <button
+            onClick={() => setActiveView('testui')}
+            style={{
+              padding: '8px 16px',
+              borderRadius: 'var(--radius-md)',
+              background: activeView === 'testui' ? 'var(--bg-tertiary)' : 'transparent',
+              color: activeView === 'testui' ? 'var(--accent-secondary)' : 'var(--text-secondary)',
+              fontWeight: 600,
+              fontSize: '0.9rem',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+            }}
+          >
+            <FileText size={16} />
+            Form 16 Test UI
           </button>
         </nav>
 

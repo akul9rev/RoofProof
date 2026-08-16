@@ -40,8 +40,10 @@ export async function migrate() {
         status VARCHAR(50) NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'rejected')),
         verification_status VARCHAR(50) NOT NULL DEFAULT 'unverified' CHECK (verification_status IN ('unverified', 'eligible', 'ineligible')),
         zk_tx_hash VARCHAR(255),
+        rejection_reason TEXT,
         created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
       );
+      ALTER TABLE applications ADD COLUMN IF NOT EXISTS rejection_reason TEXT;
     `);
 
     await client.query('COMMIT');

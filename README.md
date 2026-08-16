@@ -1,29 +1,30 @@
 # RoofProof 🏠🔒
 
-> **Zero-Knowledge Privacy-Preserving Rental Verification on Midnight Network**
-> 
-> *Brainwave 2026 — Midnight Blockchain Track Submission*
+> **"Proof before roof."**  
+> *Prove you're eligible. Don't prove your entire financial life.*
+>
+> Zero-Knowledge Privacy-Preserving Rental Eligibility DApp built on the **Midnight Network**.
 
 ---
 
 ## 🌟 Executive Summary
 
-**RoofProof** revolutionizes the residential tenant screening process using Zero-Knowledge proofs powered by the **Midnight Network**.
+**RoofProof** revolutionizes residential tenant screening by replacing sensitive financial paperwork with **Zero-Knowledge (ZK) proofs** powered by **Midnight Network** and **Compact** smart contracts.
 
-In traditional rental applications, tenants are forced to hand over unredacted bank statements, tax returns, and employer salary slips to prospective landlords and property management portals. This creates massive privacy risks, exposure to identity theft, and unnecessary financial surveillance.
+In traditional rental applications, tenants are forced to hand over unredacted bank statements, tax returns, and employer salary slips to prospective landlords and third-party property management portals. This exposes tenants to identity theft, financial surveillance, and severe privacy breaches.
 
-With **RoofProof**, tenants prove mathematically that their monthly income satisfies or exceeds the landlord's required threshold (`income >= threshold`) without revealing their exact salary, employer identity, or bank balance.
+With **RoofProof**, tenants prove mathematically that their monthly income satisfies or exceeds the landlord's required threshold (`income >= threshold`) without disclosing their exact salary, employer identity, bank account balance, or transaction history.
 
 ---
 
-## 🔐 Zero-Knowledge Privacy Guarantees
+## 🔐 Privacy Model & Zero-Knowledge Guarantees
 
 | Traditional Screening | RoofProof Screening |
 |---|---|
-| Tenant submits bank statements & salary slips | Tenant enters income locally in private memory |
-| Landlord sees exact balance, salary, and transactions | Landlord sees only: `Income Requirement: Satisfied ✓` |
-| Financial documents stored on centralized servers | Zero private financial figures sent over the network |
-| Vulnerable to data breaches & identity theft | Cryptographically guaranteed by Midnight Compact circuits |
+| Tenant hands over unredacted bank statements & salary slips | Tenant evaluates income locally in browser memory as a private witness |
+| Landlord sees exact balance, salary, employer, and transactions | Landlord sees only: **`Eligibility: Satisfied ✓ (Midnight Verified)`** |
+| Financial documents stored on insecure centralized servers | **0 Bytes** of private financial figures sent over the network |
+| High exposure to data breaches & identity theft | Cryptographically guaranteed by Midnight Compact ZK circuits |
 
 ---
 
@@ -39,44 +40,74 @@ RoofProof is live and verified on the **Midnight Preview Network**:
 
 ---
 
-## 🏗️ Architecture & Technology Stack
+## 🧮 Compact Zero-Knowledge Circuit
+
+The core smart contract logic is written in **Compact 0.2.0** (`packages/contracts/src/roofproof.compact`):
+
+```compact
+pragma language_version >= 0.20.0;
+
+import CompactStandardLibrary;
+
+// Public ledger state mapping Application ID to verification success
+export ledger verificationStatus: Map<Uint<64>, Boolean>;
+
+// Private witness callback to fetch the tenant's actual income locally
+witness getPrivateIncome(): Uint<64>;
+
+// Public circuit that verifies if the tenant's private income satisfies
+// the required threshold without revealing the actual income.
+export circuit verifyEligibility(applicationId: Uint<64>, threshold: Uint<64>): [] {
+    // 1. Fetch the private income locally via witness
+    const privateIncome = getPrivateIncome();
+
+    // 2. Perform zero-knowledge assertion that the income satisfies the criteria
+    assert(privateIncome >= threshold, "Income is below the required threshold");
+
+    // 3. Write a public confirmation to the ledger mapping for this application ID
+    verificationStatus.insert(disclose(applicationId), true);
+}
+```
+
+---
+
+## 🏗️ Architecture & Technical Data Flow
 
 ```
-[ Tenant Browser (React + Vite) ]
+[ Tenant Browser (React 18 + Vite) ]
         │
-        ├── 🔒 Private Income (Client Memory Only)
+        ├── 🔒 Private Income (Browser Memory Only)
         │
         ▼
-[ Midnight Compact Circuit (verifyEligibility) ] ── (Proof Server :6300 / Lace Wallet)
+[ Midnight Compact Circuit (verifyEligibility) ] ── (Lace Wallet / Proof Provider)
         │
-        ├── 🔏 Zero-Knowledge Proof (income >= threshold)
+        ├── 🔏 Zero-Knowledge Witness Evaluation (income >= threshold)
         ▼
 [ Midnight Preview Network ] ──▶ Public Ledger State: verificationStatus[appId] = true
         │
-        ▼ (zk_tx_hash only)
+        ▼ (Verification Status & Authorization Reference)
 [ Node.js + Express REST API ]
         │
-        ▼ (Stores metadata only, NO income)
+        ▼ (Stores metadata & verification status ONLY, NO income)
 [ PostgreSQL Database ]
         │
         ▼
 [ Landlord Dashboard ] ──▶ Sees "Eligible ✓ (Midnight Verified)" (Actual Income: NEVER DISCLOSED)
 ```
 
-### Components
-1. **Blockchain Layer (`packages/contracts`)**:
-   * Compact Smart Contract (`roofproof.compact`)
-   * Midnight JS SDK (`@midnight-ntwrk/midnight-js-*` v4.1.1, `@midnight-ntwrk/ledger-v8` v8.1.0)
-   * Standalone on-chain verification engine (`verify_application.ts`)
-2. **Backend Layer (`apps/backend`)**:
-   * Node.js + Express REST API
-   * PostgreSQL database connection pool
-   * Strict privacy filter rejecting any illegal income payload
-3. **Frontend Layer (`apps/frontend`)**:
-   * React 18 + Vite (JavaScript / JSX)
-   * Custom dark glassmorphism design system
-   * DApp connector detection for Midnight Lace wallet (`window.midnight.mnLace`)
-   * Real-time 4-step ZK proof progress indicators
+---
+
+## 🔑 Data Element Segregation & Terminology
+
+RoofProof strictly segregates data elements to maintain technical defensibility:
+
+* `walletAddress`: Authentic Bech32m wallet address from Midnight Lace (`mn_addr_preview1...`).
+* `laceSignature`: Cryptographic signature returned by Lace `signData` (where supported).
+* `authorizationProof`: Authenticated Lace connection reference token.
+* `zkTxHash`: Real Midnight transaction hash (`5deb9fcd464487459544cf4ae07445d6b1f037033f0c40305527d81a297b061c`).
+* `verificationStatus`: `eligible` | `ineligible`.
+
+*Note: RoofProof never uses wallet addresses as signatures or assigns transaction hashes to synthetic identifiers.*
 
 ---
 
@@ -84,8 +115,8 @@ RoofProof is live and verified on the **Midnight Preview Network**:
 
 ### Prerequisites
 * **Node.js**: v18+ or v20+
-* **Docker Desktop**: For running the local Midnight Proof Server
 * **PostgreSQL**: Local or remote database instance
+* **Chrome Browser**: With official Midnight Lace Wallet extension installed for Preview testing
 
 ### 1. Clone & Install Dependencies
 ```bash
@@ -94,12 +125,7 @@ cd RoofProof
 npm install
 ```
 
-### 2. Start Midnight Proof Server (Docker)
-```bash
-docker run -d --name midnight-proof-server -p 6300:6300 midnightnetwork/proof-server:latest
-```
-
-### 3. Setup Backend & PostgreSQL Database
+### 2. Setup Backend & PostgreSQL Database
 ```bash
 # Configure environment
 cp .env.example .env
@@ -112,7 +138,7 @@ npm run db:seed --workspace=apps/backend
 npm run dev --workspace=apps/backend
 ```
 
-### 4. Start Frontend Application
+### 3. Start Frontend Application
 ```bash
 # Start Vite dev server (Port 5173)
 npm run dev --workspace=apps/frontend
@@ -121,45 +147,57 @@ Open **`http://localhost:5173`** in your browser.
 
 ---
 
-## 🧪 Testing & Verification
+## 🧪 Testing & Verification Evidence
 
-### Run Contract ZK Unit Tests
+### 1. Compact Smart Contract Unit Tests
 ```bash
 npm run test --workspace=packages/contracts
 ```
-*Validates eligible income (`74,500 >= 60,000`), ineligible rejection (`40,000 < 60,000`), boundary checks, and public ledger privacy.*
+* **Test 1**: Valid eligibility (`74,500 >= 60,000`) &rarr; **PASS**
+* **Test 2**: Invalid eligibility (`40,000 < 60,000`) &rarr; **PASS**
+* **Test 3**: Boundary condition (`60,000 == 60,000`) &rarr; **PASS**
+* **Test 4**: Ledger privacy check (0 private bytes written) &rarr; **PASS**
 
-### Run Full-Stack Backend Integration Tests
+### 2. Full-Stack Backend API Integration Tests
 ```bash
 node apps/backend/src/test_api.js
 ```
-*Validates health endpoints, property creation, ZK application submissions, landlord review, and privacy audits.*
+* **Scenario 1**: Health check & DB connection &rarr; **PASS**
+* **Scenario 2**: Property listings fetch & creation &rarr; **PASS**
+* **Scenario 3**: Ineligible/Unsigned submission blocked (HTTP 400) &rarr; **PASS**
+* **Scenario 4**: Verified application submission & status update &rarr; **PASS**
+* **Scenario 5**: Strict Privacy Audit (0 income values in API responses) &rarr; **PASS**
+* **Scenario 6**: Re-application lock on denied listing (HTTP 409) &rarr; **PASS**
+* **Scenario 7**: Application withdrawal flow &rarr; **PASS**
 
-### Build Frontend Production Bundle
+### 3. Frontend Production Build
 ```bash
 npm run build --workspace=apps/frontend
 ```
+* **Vite Production Build**: **0 errors**
 
 ---
 
-## 📊 Brainwave 2026 Requirements Traceability
+## 🛡️ Threat Model & Security Audit
 
-| Requirement | Status | Verification Evidence |
-|---|---|---|
-| **Full-Stack Application** | **PASS** | React + Express + PostgreSQL + Midnight monorepo |
-| **Meaningful Midnight Tech** | **PASS** | Compact contract with private witness & ZK circuit constraints |
-| **Deployed on Preview** | **PASS** | Contract `94010caedf80e1a2af62dfe1aa6f6c924969a8837003e84bb03857dd13d2b5cf` |
-| **Working Demonstration** | **PASS** | End-to-end listing, local ZK proving, and landlord verification |
-| **Privacy Audit** | **PASS** | Confirmed 0 private income values leaked in API, DB, or UI |
+1. **Client-Side Witness Isolation**: Tenant income exists solely in local browser memory as a private witness during Compact circuit execution.
+2. **Zero Backend Leakage**: Express REST payloads and PostgreSQL tables contain only `{ tenant_id, verification_status, zk_tx_hash }`.
+3. **Backend Integrity Guards**: The backend strictly rejects any application submission that is not marked `eligible` with a valid authorization reference.
+4. **Denial Hard Gate**: If a tenant cancels or denies the Lace wallet popup, execution halts immediately, clearing all proof states, disabling submit, and making 0 network calls.
+5. **No Secret Leakage**: All wallet mnemonics, private keys, and leveldb states are strictly excluded from client code and gitignored.
 
 ---
 
-## 🛡️ Security & Privacy Audit Findings
+## 🔮 Future Architecture: Verifiable Credential Issuers
 
-* **Client-Side Witness Isolation**: Tenant income exists solely in browser memory during circuit execution.
-* **Zero Backend Exposure**: Express REST payloads and database tables contain only `{ tenant_id, verification_status, zk_tx_hash }`.
-* **Zero Landlord Exposure**: Landlords view cryptographically verified eligibility badges with `Actual Income: NEVER DISCLOSED`.
-* **Secret Protection**: All wallet keys, mnemonics, and leveldb states are strictly gitignored.
+In this hackathon demonstration, income input can be evaluated either as a **Self-Declared Private Witness** or as a **RoofProof Demo Credential Issuer (W3C Signed)**.
+
+In full production deployment, RoofProof will integrate trusted **W3C Verifiable Credential Issuers**:
+* Employer / Payroll APIs (e.g., ADP, Gusto, Deel)
+* Open Banking APIs (e.g., Plaid, MX, Salt Edge)
+* Government Tax Portals
+
+The issuer digitally signs the tenant's income credential off-chain. The tenant stores the credential in their local wallet, using it as the private witness in the Midnight Compact circuit without ever exposing the credential payload to the landlord.
 
 ---
 

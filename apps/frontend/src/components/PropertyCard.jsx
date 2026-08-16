@@ -1,7 +1,7 @@
 import React from 'react';
-import { MapPin, ShieldCheck, ArrowRight, ShieldAlert } from 'lucide-react';
+import { MapPin, ShieldCheck, ArrowRight, AlertCircle, Info, XCircle } from 'lucide-react';
 
-export default function PropertyCard({ property, onApply, hasApplied, userRole }) {
+export default function PropertyCard({ property, onApply, hasApplied, isDenied, onViewDenial, onWithdraw, application, userRole }) {
   const formattedRent = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(property.monthly_rent);
   const formattedThreshold = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(property.income_threshold);
 
@@ -71,25 +71,93 @@ export default function PropertyCard({ property, onApply, hasApplied, userRole }
 
         {/* Action button */}
         {hasApplied ? (
-          <button 
-            disabled 
-            style={{
-              width: '100%',
-              padding: '12px',
-              borderRadius: 'var(--radius-md)',
-              background: 'var(--bg-tertiary)',
-              color: 'var(--success-text)',
-              fontWeight: 600,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '8px',
-              cursor: 'default',
-              border: '1px solid var(--success-border)',
-            }}
-          >
-            <ShieldCheck size={18} /> Applied with ZK Proof
-          </button>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <button 
+              disabled 
+              style={{
+                width: '100%',
+                padding: '10px',
+                borderRadius: 'var(--radius-md)',
+                background: 'var(--bg-tertiary)',
+                color: 'var(--success-text)',
+                fontWeight: 600,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                cursor: 'default',
+                border: '1px solid var(--success-border)',
+                fontSize: '0.85rem',
+              }}
+            >
+              <ShieldCheck size={16} /> Applied with ZK Proof
+            </button>
+            {onWithdraw && application && application.status === 'pending' && (
+              <button
+                type="button"
+                onClick={() => onWithdraw(application.id)}
+                style={{
+                  width: '100%',
+                  padding: '8px',
+                  borderRadius: 'var(--radius-md)',
+                  background: 'rgba(239, 68, 68, 0.1)',
+                  color: '#ef4444',
+                  border: '1px solid rgba(239, 68, 68, 0.4)',
+                  fontWeight: 600,
+                  fontSize: '0.8rem',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '6px',
+                }}
+              >
+                <XCircle size={14} /> Withdraw Application
+              </button>
+            )}
+          </div>
+        ) : isDenied ? (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <button
+              disabled
+              style={{
+                width: '100%',
+                padding: '12px',
+                borderRadius: 'var(--radius-md)',
+                background: 'rgba(239, 68, 68, 0.15)',
+                color: '#ef4444',
+                fontWeight: 600,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                cursor: 'not-allowed',
+                border: '1px solid rgba(239, 68, 68, 0.4)',
+              }}
+            >
+              <AlertCircle size={18} /> Owner Denied Application
+            </button>
+            {onViewDenial && (
+              <button
+                type="button"
+                onClick={onViewDenial}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  color: 'var(--accent-secondary)',
+                  fontSize: '0.8rem',
+                  cursor: 'pointer',
+                  textAlign: 'center',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '4px',
+                }}
+              >
+                <Info size={12} /> View Why Owner Denied
+              </button>
+            )}
+          </div>
         ) : (
           <button
             className="btn-primary"
