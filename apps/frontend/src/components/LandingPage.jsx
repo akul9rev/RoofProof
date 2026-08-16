@@ -202,8 +202,8 @@ export default function LandingPage({ properties = [], onApplyToProperty }) {
           </div>
 
           <h2 className="serif-heading-light">
-            Stop finding problems <br />
-            <em>after</em> they happen.
+            Know what's real. <br />
+            <em>Before</em> you sign.
           </h2>
 
           <p style={{
@@ -235,7 +235,7 @@ export default function LandingPage({ properties = [], onApplyToProperty }) {
               transition: 'all 0.2s ease',
             }}
           >
-            START PRIVACY VERIFICATION
+            FIND A HOME
           </button>
         </div>
 
@@ -390,6 +390,25 @@ export default function LandingPage({ properties = [], onApplyToProperty }) {
             </div>
           </div>
         </div>
+
+        {/* Minimalist Footer */}
+        <footer style={{
+          marginTop: '40px',
+          paddingTop: '24px',
+          borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          gap: '16px',
+          fontSize: '0.78rem',
+          color: 'rgba(255, 255, 255, 0.4)',
+          fontFamily: 'var(--font-body)',
+        }}>
+          <div>RoofProof © 2026</div>
+          <div>Privacy-Preserving Rental Verification on Midnight Network</div>
+          <div>Zero Data Stored • ZK Verified</div>
+        </footer>
       </section>
     </div>
   );
