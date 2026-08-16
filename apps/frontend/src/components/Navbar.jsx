@@ -92,10 +92,16 @@ export default function Navbar({ activeView, setActiveView, currentRole, setCurr
           </button>
 
           <button
-            onClick={() => setActiveView('privacy')}
+            onClick={() => {
+              setActiveView('landing');
+              setTimeout(() => {
+                const el = document.getElementById('about-section');
+                if (el) el.scrollIntoView({ behavior: 'smooth' });
+              }, 50);
+            }}
             style={{
               background: 'transparent',
-              color: activeView === 'privacy' ? '#ffffff' : 'rgba(255, 255, 255, 0.75)',
+              color: 'rgba(255, 255, 255, 0.75)',
               fontWeight: 400,
               fontSize: '0.9rem',
               border: 'none',
@@ -107,7 +113,13 @@ export default function Navbar({ activeView, setActiveView, currentRole, setCurr
           </button>
 
           <button
-            onClick={() => setActiveView('privacy')}
+            onClick={() => {
+              setActiveView('landing');
+              setTimeout(() => {
+                const el = document.getElementById('reviews-section');
+                if (el) el.scrollIntoView({ behavior: 'smooth' });
+              }, 50);
+            }}
             style={{
               background: 'transparent',
               color: 'rgba(255, 255, 255, 0.75)',
