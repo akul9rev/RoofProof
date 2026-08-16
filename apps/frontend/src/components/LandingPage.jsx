@@ -1,7 +1,7 @@
 import React from 'react';
-import { Star, Lock, Calendar, Edit3 } from 'lucide-react';
+import { Star, Edit3, Calendar } from 'lucide-react';
 
-export default function LandingPage({ properties = [], onApplyToProperty, onListProperty }) {
+export default function LandingPage({ properties = [], onApplyToProperty }) {
   const featuredProp = properties[0] || {
     id: 1,
     title: 'Evergreen Pine Family Lodge',
@@ -19,10 +19,9 @@ export default function LandingPage({ properties = [], onApplyToProperty, onList
         gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))',
         gap: '40px',
         alignItems: 'center',
-        padding: '0 0 40px',
-        minHeight: '480px',
+        padding: '10px 0 20px',
       }}>
-        {/* Left Column: Hero Typography matching image 1 */}
+        {/* Left Column: Hero Typography matching reference image */}
         <div>
           <h1 className="hero-title">
             Private <br />
@@ -34,7 +33,7 @@ export default function LandingPage({ properties = [], onApplyToProperty, onList
             display: 'flex',
             alignItems: 'flex-start',
             gap: '40px',
-            marginTop: '3rem',
+            marginTop: '2.5rem',
             flexWrap: 'wrap',
           }}>
             <p style={{
@@ -67,7 +66,7 @@ export default function LandingPage({ properties = [], onApplyToProperty, onList
           </div>
         </div>
 
-        {/* Right Column: Dark Glass Booking/Verification Card matching image 1 */}
+        {/* Right Column: Dark Glass Booking/Verification Card matching reference image */}
         <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
           <div className="glass-card" style={{
             maxWidth: '410px',
@@ -163,7 +162,7 @@ export default function LandingPage({ properties = [], onApplyToProperty, onList
                 <span style={{ fontSize: '1.75rem', fontWeight: 600, color: '#ffffff' }}>
                   ₹{(featuredProp.monthly_rent || 75000).toLocaleString('en-IN')}
                 </span>
-                <span style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.5)' }}>/month</span>
+                <span style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.5)' }}>/night</span>
               </div>
               <span style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.5)' }}>2–5 guests</span>
             </div>
@@ -176,88 +175,6 @@ export default function LandingPage({ properties = [], onApplyToProperty, onList
               Reserve
             </button>
           </div>
-        </div>
-      </div>
-
-      {/* Featured Properties Grid */}
-      <div style={{ marginTop: '30px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-          <div>
-            <h2 style={{ fontSize: '2rem', fontWeight: 500, color: '#ffffff' }}>Available Locations</h2>
-            <p style={{ color: 'rgba(255, 255, 255, 0.6)', fontSize: '0.9rem' }}>
-              Select a luxury property to verify eligibility privately via Form 16 Zero-Knowledge proof.
-            </p>
-          </div>
-          <button onClick={onListProperty} className="btn-glass">
-            + List a Property
-          </button>
-        </div>
-
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(330px, 1fr))',
-          gap: '24px',
-        }}>
-          {properties.map((prop) => (
-            <div key={prop.id} className="glass-card" style={{ padding: '20px', borderRadius: '24px' }}>
-              <div style={{
-                height: '190px',
-                borderRadius: '16px',
-                overflow: 'hidden',
-                marginBottom: '16px',
-                position: 'relative',
-              }}>
-                <img
-                  src={prop.image_url || 'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=800&q=80'}
-                  alt={prop.title}
-                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                />
-                <span style={{
-                  position: 'absolute',
-                  top: '12px',
-                  right: '12px',
-                  background: 'rgba(12, 18, 25, 0.85)',
-                  backdropFilter: 'blur(8px)',
-                  padding: '4px 10px',
-                  borderRadius: '999px',
-                  fontSize: '0.72rem',
-                  color: '#EBA834',
-                  fontWeight: 600,
-                }}>
-                  ZK Eligible
-                </span>
-              </div>
-
-              <h3 style={{ fontSize: '1.15rem', fontWeight: 500, color: '#ffffff', marginBottom: '4px' }}>
-                {prop.title}
-              </h3>
-              <p style={{ fontSize: '0.82rem', color: 'rgba(255, 255, 255, 0.5)', marginBottom: '16px' }}>
-                {prop.location}
-              </p>
-
-              <div style={{
-                display: 'flex',
-                justify: 'space-between',
-                alignItems: 'center',
-                paddingTop: '12px',
-                borderTop: '1px solid rgba(255, 255, 255, 0.08)',
-              }}>
-                <div>
-                  <span style={{ fontSize: '1.15rem', fontWeight: 600, color: '#ffffff' }}>
-                    ₹{(prop.monthly_rent || 0).toLocaleString('en-IN')}
-                  </span>
-                  <span style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.5)' }}> / mo</span>
-                </div>
-                <button
-                  onClick={() => onApplyToProperty(prop)}
-                  className="btn-white-pill"
-                  style={{ padding: '8px 18px', fontSize: '0.82rem' }}
-                >
-                  Book Now
-                </button>
-              </div>
-            </div>
-          ))}
         </div>
       </div>
     </div>

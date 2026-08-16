@@ -45,16 +45,16 @@ body {
 .app-viewport-frame {
   max-width: 1280px;
   width: 92%;
-  margin: 2rem auto;
+  margin: 1.8rem auto;
   border-radius: var(--radius-xl);
   background: rgba(8, 14, 20, 0.15);
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
   border: 1.5px solid var(--border-glass);
   box-shadow: 0 40px 100px rgba(0, 0, 0, 0.75);
-  padding: 2.2rem 3.2rem;
+  padding: 2rem 3rem 2.2rem;
   position: relative;
-  min-height: calc(100vh - 4rem);
+  min-height: auto;
   display: flex;
   flex-direction: column;
 }
