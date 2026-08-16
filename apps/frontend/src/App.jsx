@@ -7,7 +7,7 @@ import PrivacyVerificationView from './components/PrivacyVerificationView.jsx';
 import PdfExtractTestUI from './components/PdfExtractTestUI.jsx';
 import ApplyModal from './components/ApplyModal.jsx';
 import CreatePropertyModal from './components/CreatePropertyModal.jsx';
-import { fetchProperties, fetchApplications, createApplication, updateApplicationStatus, createProperty } from './services/api.js';
+import { fetchProperties, fetchApplications, applyForProperty, updateApplicationStatus, createProperty } from './services/api.js';
 
 export default function App() {
   const [activeView, setActiveView] = useState('landing'); // 'landing' | 'tenant' | 'landlord' | 'privacy' | 'testui'
@@ -100,7 +100,19 @@ export default function App() {
   };
 
   return (
-    <div className="app-container">
+    <div className="app-viewport-frame">
+      <Navbar
+        activeView={activeView}
+        setActiveView={setActiveView}
+        currentRole={currentRole}
+        setCurrentRole={setCurrentRole}
+        currentUser={currentRole === 'tenant' ? tenantUser : landlordUser}
+        onListProperty={() => {
+          setCurrentRole('landlord');
+          setIsCreateModalOpen(true);
+        }}
+      />
+
       {/* Global Toast Notification */}
       {notification && (
         <div style={{
@@ -122,20 +134,8 @@ export default function App() {
         </div>
       )}
 
-      {/* Hero Glass Frame containing Navbar + Hero Landing Card */}
-      <div className="hero-glass-frame">
-        <Navbar
-          activeView={activeView}
-          setActiveView={setActiveView}
-          currentRole={currentRole}
-          setCurrentRole={setCurrentRole}
-          currentUser={currentRole === 'tenant' ? tenantUser : landlordUser}
-          onListProperty={() => {
-            setCurrentRole('landlord');
-            setIsCreateModalOpen(true);
-          }}
-        />
-
+      {/* Main Content Area */}
+      <main style={{ flex: 1 }}>
         {activeView === 'landing' && (
           <LandingPage
             properties={properties}
@@ -174,7 +174,7 @@ export default function App() {
         {activeView === 'testui' && (
           <PdfExtractTestUI />
         )}
-      </div>
+      </main>
 
       {/* Modals */}
       {selectedPropertyForApply && (

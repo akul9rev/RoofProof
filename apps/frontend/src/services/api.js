@@ -59,6 +59,8 @@ export async function applyForProperty(propertyIdOrData, payload = null) {
   return submitApplication(fullData);
 }
 
+export const createApplication = applyForProperty;
+
 export async function withdrawApplication(id) {
   const res = await fetch(`${API_BASE}/applications/${id}`, {
     method: 'DELETE',
