@@ -1,19 +1,18 @@
 import React from 'react';
-import { Star, Edit3, Calendar } from 'lucide-react';
+import { Star, Edit3, MapPin, Home } from 'lucide-react';
 
 export default function LandingPage({ properties = [], onApplyToProperty }) {
   const featuredProp = properties[0] || {
     id: 1,
-    title: 'Evergreen Pine Family Lodge',
+    title: 'Evergreen Pine Luxury Villa',
     location: 'Manali, Himachal Pradesh',
     monthly_rent: 75000,
     income_threshold: 225000,
-    image_url: 'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=1200&q=80',
   };
 
   return (
     <div className="animate-fade-in" style={{ width: '100%', position: 'relative' }}>
-      {/* WoodNest / RoofProof Hero Section */}
+      {/* RoofProof Hero Section */}
       <div style={{
         display: 'grid',
         gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))',
@@ -21,12 +20,12 @@ export default function LandingPage({ properties = [], onApplyToProperty }) {
         alignItems: 'center',
         padding: '10px 0 20px',
       }}>
-        {/* Left Column: Hero Typography matching reference image */}
+        {/* Left Column: RoofProof Core Value Proposition */}
         <div>
           <h1 className="hero-title">
-            Private <br />
-            <span className="text-accent-slate">Rental</span> <br />
-            Verification
+            Proof <br />
+            <span className="text-accent-slate">Before</span> <br />
+            Roof
           </h1>
 
           <div style={{
@@ -37,13 +36,13 @@ export default function LandingPage({ properties = [], onApplyToProperty }) {
             flexWrap: 'wrap',
           }}>
             <p style={{
-              maxWidth: '310px',
-              fontSize: '0.92rem',
+              maxWidth: '330px',
+              fontSize: '0.94rem',
               color: 'rgba(255, 255, 255, 0.85)',
-              lineHeight: 1.55,
-              textShadow: '0 2px 10px rgba(0, 0, 0, 0.8)',
+              lineHeight: 1.6,
+              textShadow: '0 2px 10px rgba(0, 0, 0, 0.85)',
             }}>
-              Discover handpicked luxury cabins in breathtaking locations. Unplug, verify privately with Form 16, and reconnect with what matters most.
+              RoofProof lets tenants verify rent income eligibility using Form 16 Zero-Knowledge proofs on Midnight — without disclosing payslips, bank statements, or private tax records.
             </p>
 
             <div>
@@ -57,19 +56,19 @@ export default function LandingPage({ properties = [], onApplyToProperty }) {
                 textShadow: '0 2px 10px rgba(0,0,0,0.9)',
               }}>
                 <Star size={20} fill="#EBA834" color="#EBA834" />
-                4.7
+                4.9
               </div>
-              <span style={{ fontSize: '0.82rem', color: 'rgba(255, 255, 255, 0.6)', fontWeight: 400 }}>
-                from 1,800+ stays
+              <span style={{ fontSize: '0.82rem', color: 'rgba(255, 255, 255, 0.65)', fontWeight: 400 }}>
+                from 1,800+ ZK proofs
               </span>
             </div>
           </div>
         </div>
 
-        {/* Right Column: Dark Glass Booking/Verification Card matching reference image */}
+        {/* Right Column: RoofProof Property Booking & Income Verification Card */}
         <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
           <div className="glass-card" style={{
-            maxWidth: '410px',
+            maxWidth: '420px',
             width: '100%',
             padding: '26px',
             borderRadius: '26px',
@@ -79,7 +78,7 @@ export default function LandingPage({ properties = [], onApplyToProperty }) {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '18px' }}>
               <div>
                 <h3 style={{
-                  fontSize: '1.4rem',
+                  fontSize: '1.45rem',
                   fontWeight: 500,
                   color: '#ffffff',
                   lineHeight: 1.25,
@@ -87,6 +86,9 @@ export default function LandingPage({ properties = [], onApplyToProperty }) {
                 }}>
                   {featuredProp.title}
                 </h3>
+                <span style={{ fontSize: '0.82rem', color: 'rgba(255, 255, 255, 0.55)' }}>
+                  {featuredProp.location} • 3 BHK Luxury Villa
+                </span>
               </div>
               <div style={{
                 width: '32px',
@@ -102,7 +104,7 @@ export default function LandingPage({ properties = [], onApplyToProperty }) {
               </div>
             </div>
 
-            {/* Date / Check-in Pills */}
+            {/* Location & BHK Input Pills */}
             <div style={{
               display: 'grid',
               gridTemplateColumns: '1fr 1fr',
@@ -118,8 +120,11 @@ export default function LandingPage({ properties = [], onApplyToProperty }) {
                 alignItems: 'center',
                 gap: '8px',
               }}>
-                <Calendar size={15} color="rgba(255,255,255,0.5)" />
-                <span style={{ fontSize: '0.85rem', color: '#ffffff' }}>Feb 11</span>
+                <MapPin size={15} color="rgba(255,255,255,0.5)" />
+                <div>
+                  <div style={{ fontSize: '0.68rem', color: 'rgba(255,255,255,0.45)' }}>Location</div>
+                  <div style={{ fontSize: '0.82rem', color: '#ffffff', fontWeight: 500 }}>Manali, HP</div>
+                </div>
               </div>
 
               <div style={{
@@ -131,40 +136,44 @@ export default function LandingPage({ properties = [], onApplyToProperty }) {
                 alignItems: 'center',
                 gap: '8px',
               }}>
-                <Calendar size={15} color="rgba(255,255,255,0.5)" />
-                <span style={{ fontSize: '0.85rem', color: '#ffffff' }}>Mar 25</span>
+                <Home size={15} color="rgba(255,255,255,0.5)" />
+                <div>
+                  <div style={{ fontSize: '0.68rem', color: 'rgba(255,255,255,0.45)' }}>Config</div>
+                  <div style={{ fontSize: '0.82rem', color: '#ffffff', fontWeight: 500 }}>3 BHK Villa</div>
+                </div>
               </div>
             </div>
 
-            {/* Check-in / Check-out Times */}
+            {/* Min Income Requirement Box */}
             <div style={{
               display: 'grid',
               gridTemplateColumns: '1fr 1fr',
               gap: '10px',
-              background: 'rgba(255, 255, 255, 0.03)',
+              background: 'rgba(235, 168, 52, 0.06)',
+              border: '1px solid rgba(235, 168, 52, 0.2)',
               borderRadius: '14px',
               padding: '12px 14px',
               marginBottom: '20px',
             }}>
               <div>
-                <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.4)' }}>Check-in</div>
-                <div style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.85)' }}>After 2:00 PM</div>
+                <div style={{ fontSize: '0.68rem', color: 'rgba(255,255,255,0.5)' }}>Estimated Rent</div>
+                <div style={{ fontSize: '0.88rem', color: '#ffffff', fontWeight: 600 }}>₹75,000 / month</div>
               </div>
               <div>
-                <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.4)' }}>Check-out</div>
-                <div style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.85)' }}>Until 12:00 PM</div>
+                <div style={{ fontSize: '0.68rem', color: 'rgba(255,255,255,0.5)' }}>Min Annual Income</div>
+                <div style={{ fontSize: '0.88rem', color: '#EBA834', fontWeight: 700 }}>₹2,25,000 / yr</div>
               </div>
             </div>
 
-            {/* Price & Guests */}
+            {/* Rent & Action */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '20px' }}>
               <div>
                 <span style={{ fontSize: '1.75rem', fontWeight: 600, color: '#ffffff' }}>
                   ₹{(featuredProp.monthly_rent || 75000).toLocaleString('en-IN')}
                 </span>
-                <span style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.5)' }}>/night</span>
+                <span style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.5)' }}> / month</span>
               </div>
-              <span style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.5)' }}>2–5 guests</span>
+              <span style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.5)' }}>3 BHK • 6 guests</span>
             </div>
 
             <button
@@ -172,7 +181,7 @@ export default function LandingPage({ properties = [], onApplyToProperty }) {
               className="btn-white-pill"
               style={{ width: '100%' }}
             >
-              Reserve
+              Book Now
             </button>
           </div>
         </div>
