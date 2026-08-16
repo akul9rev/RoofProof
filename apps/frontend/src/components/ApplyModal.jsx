@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ShieldCheck, Lock, CheckCircle2, AlertCircle, X, ArrowRight, Loader2, Sparkles, Wallet } from 'lucide-react';
+import { ShieldCheck, Lock, CheckCircle2, AlertCircle, X, ArrowRight, Loader2, Sparkles, Wallet, Info } from 'lucide-react';
 import { executeMidnightZKVerification, getLaceWallet } from '../services/zkProofService';
 
 export default function ApplyModal({ property, tenant, onClose, onSuccess }) {
@@ -30,7 +30,7 @@ export default function ApplyModal({ property, tenant, onClose, onSuccess }) {
       setProofResult(result);
     } catch (err) {
       setIsProving(false);
-      setError(err.message || 'Error generating Midnight Zero-Knowledge proof.');
+      setError(err.message || 'Error executing Midnight Zero-Knowledge verification.');
     }
   };
 
@@ -50,7 +50,7 @@ export default function ApplyModal({ property, tenant, onClose, onSuccess }) {
         className="glass-card animate-slide-up" 
         onClick={e => e.stopPropagation()}
         style={{
-          maxWidth: '560px',
+          maxWidth: '580px',
           width: '100%',
           padding: '32px',
           background: 'var(--bg-secondary)',
@@ -69,8 +69,8 @@ export default function ApplyModal({ property, tenant, onClose, onSuccess }) {
               <Lock size={18} color="#ffffff" />
             </div>
             <div>
-              <h3 style={{ fontSize: '1.25rem' }}>Midnight Zero-Knowledge Verification</h3>
-              <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Contract: 94010caedf80e1a2af62dfe1aa6f6c924969a8837003e84bb03857dd13d2b5cf</p>
+              <h3 style={{ fontSize: '1.25rem' }}>Private ZK Rental Verification</h3>
+              <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Target: Property #{property.id} • Midnight Preview</p>
             </div>
           </div>
           <button 
@@ -89,7 +89,10 @@ export default function ApplyModal({ property, tenant, onClose, onSuccess }) {
           padding: '16px',
           marginBottom: '20px',
         }}>
-          <h4 style={{ fontSize: '1.05rem', marginBottom: '4px' }}>{property.title}</h4>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+            <h4 style={{ fontSize: '1.05rem' }}>{property.title}</h4>
+            <span className="badge-pill badge-midnight">App Target ID #{property.id}</span>
+          </div>
           <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginBottom: '10px' }}>{property.location}</p>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Required Income Threshold:</span>
@@ -139,7 +142,11 @@ export default function ApplyModal({ property, tenant, onClose, onSuccess }) {
               />
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '6px' }}>
                 <span>Try <strong>₹74,500</strong> (Eligible) or <strong>₹40,000</strong> (Ineligible)</span>
-                {hasLace && <span style={{ color: 'var(--midnight-accent)' }}>✓ Midnight Lace detected</span>}
+                {hasLace ? (
+                  <span style={{ color: 'var(--midnight-accent)' }}>✓ Midnight Lace detected</span>
+                ) : (
+                  <span style={{ color: 'var(--warning-text)' }}>⚠️ Lace not installed (Local Prover Mode)</span>
+                )}
               </div>
             </div>
 
@@ -164,7 +171,7 @@ export default function ApplyModal({ property, tenant, onClose, onSuccess }) {
               <div style={{ textAlign: 'center', padding: '16px 0' }}>
                 <Loader2 className="animate-spin" size={32} color="var(--accent-secondary)" style={{ margin: '0 auto 12px' }} />
                 <div style={{ fontWeight: 600, fontSize: '0.95rem', marginBottom: '8px' }}>
-                  Executing Midnight Zero-Knowledge Circuit...
+                  Evaluating Midnight Zero-Knowledge Constraints...
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', textAlign: 'left', background: 'var(--bg-primary)', padding: '12px', borderRadius: '8px', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
                   {proofSteps.map((s, i) => (
@@ -198,7 +205,7 @@ export default function ApplyModal({ property, tenant, onClose, onSuccess }) {
                   <CheckCircle2 size={40} color="var(--success-text)" style={{ margin: '0 auto 10px' }} />
                   <h4 style={{ color: 'var(--success-text)', fontSize: '1.3rem', marginBottom: '6px' }}>Income Requirement Satisfied ✓</h4>
                   <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
-                    Zero-Knowledge proof confirmed on Midnight Preview network.
+                    Zero-Knowledge constraint check passed: <code>income &ge; threshold</code>.
                   </p>
                 </>
               ) : (
@@ -212,34 +219,43 @@ export default function ApplyModal({ property, tenant, onClose, onSuccess }) {
               )}
             </div>
 
-            {/* Proof Metadata */}
+            {/* Proof Metadata & Transparency */}
             <div style={{
               background: 'var(--bg-primary)',
               borderRadius: 'var(--radius-md)',
-              padding: '14px',
-              fontSize: '0.8rem',
+              padding: '16px',
+              fontSize: '0.82rem',
               color: 'var(--text-muted)',
-              marginBottom: '24px',
+              marginBottom: '20px',
               display: 'flex',
               flexDirection: 'column',
-              gap: '6px',
+              gap: '8px',
             }}>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <span>Midnight Circuit:</span>
                 <span style={{ color: 'var(--text-primary)', fontFamily: 'monospace' }}>verifyEligibility</span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span>Income Threshold:</span>
+                <span>Application ID:</span>
+                <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>#{property.id}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span>Threshold Required:</span>
                 <span style={{ color: 'var(--midnight-accent)', fontWeight: 600 }}>{formattedThreshold}</span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span>Private Income Disclosed:</span>
-                <span style={{ color: 'var(--success-text)', fontWeight: 700 }}>NO (Zero-Knowledge)</span>
+                <span>Actual Income:</span>
+                <span style={{ color: 'var(--success-text)', fontWeight: 800 }}>NEVER DISCLOSED</span>
               </div>
-              {proofResult.zkTxHash && (
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <span>Verified On-Chain Tx:</span>
-                  <span style={{ color: 'var(--text-primary)', fontFamily: 'monospace' }}>{proofResult.zkTxHash.slice(0, 14)}...</span>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span>Execution Mode:</span>
+                <span style={{ color: proofResult.executionMode === 'LACE_WALLET_PREVIEW' ? 'var(--success-text)' : 'var(--warning-text)', fontWeight: 600 }}>
+                  {proofResult.executionMode === 'LACE_WALLET_PREVIEW' ? 'Midnight Lace (Preview)' : 'Local Prover (Demo)'}
+                </span>
+              </div>
+              {proofResult.notice && (
+                <div style={{ marginTop: '4px', padding: '8px', background: 'var(--bg-secondary)', borderRadius: '6px', fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+                  <Info size={12} style={{ display: 'inline', marginRight: '4px' }} /> {proofResult.notice}
                 </div>
               )}
             </div>
