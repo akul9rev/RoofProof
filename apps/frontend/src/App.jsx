@@ -37,12 +37,15 @@ export default function App() {
   const fetchData = async () => {
     setIsLoading(true);
     try {
-      const [propsData, appsData] = await Promise.all([
+      const [propsRes, appsRes] = await Promise.all([
         fetchProperties(),
         fetchApplications(),
       ]);
-      setProperties(propsData || []);
-      setApplications(appsData || []);
+      const loadedProperties = Array.isArray(propsRes) ? propsRes : (propsRes?.properties || []);
+      const loadedApplications = Array.isArray(appsRes) ? appsRes : (appsRes?.applications || []);
+
+      setProperties(loadedProperties);
+      setApplications(loadedApplications);
     } catch (err) {
       console.error('Failed to fetch DApp data:', err);
     } finally {
@@ -52,7 +55,7 @@ export default function App() {
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [activeView]);
 
   const handleLoginSuccess = (userObj) => {
     setCurrentUser(userObj);
