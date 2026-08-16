@@ -6,13 +6,13 @@ RoofProof is a privacy-preserving rental verification DApp built on the Midnight
 ---
 
 ## Hackathon Requirements
-Every requirement from the Brainwave 2026 Midnight Blockchain Track is verified below:
+Current requirement assessment from the Brainwave 2026 Midnight Blockchain Track:
 
 - [x] **Build a full-stack application on the Midnight ecosystem.** (React 18 + Express + PostgreSQL + Midnight Compact)
 - [x] **Use Midnight technology meaningfully within the project.** (Zero-Knowledge Compact circuit for private income verification)
 - [x] **Deploy the project's smart contract on Midnight Preview or PreProd.** (Deployed on Midnight Preview: `94010caedf80e1a2af62dfe1aa6f6c924969a8837003e84bb03857dd13d2b5cf`)
-- [x] **Complete the project within the hackathon timeline.** (Fully functional & hardened)
-- [x] **Provide a working demonstration.** (End-to-end tenant listing, local ZK proof generation, and landlord verification)
+- [x] **Complete the project within the hackathon timeline.** (Fully implemented & hardened)
+- [x] **Provide a working demonstration.** (Full-stack demo flow in local dev/prover mode; real on-chain transaction demonstrated via Midnight SDK CLI verification)
 - [x] **Include clear documentation and setup instructions.** (Complete README.md & ROOFPROOF_PROGRESS.md)
 - [x] **Identify a clear real-world problem/use case.** (Eliminate invasive financial document sharing during tenant screening)
 - [x] **Have a functional full-stack application.** (REST API, PostgreSQL connection pool, Vite JSX frontend)
@@ -20,22 +20,25 @@ Every requirement from the Brainwave 2026 Midnight Blockchain Track is verified 
 - [x] **Have a deployed smart contract on Preview or PreProd.** (Tx: `e44df905f615c8937636bb4b2bce9abf8c45da116c4ad2c8742d71942150b81c`)
 - [x] **Have working frontend and backend components.** (1,480 modules compiled cleanly in Vite, Express API passing all tests)
 - [x] **Have a functional MVP/demo.** (Landlord property creation &rarr; Tenant ZK verification &rarr; Landlord approval)
-- [x] **Demonstrate the deployed application.** (Verified on-chain state: `verificationStatus[1] = true` with zero private income disclosed)
+- [x] **Demonstrate the deployed application.** (Verified on-chain state: `verificationStatus[1] = true` with zero private income disclosed on Preview network)
 - [x] **Clearly explain how Midnight enables or improves the solution.** (Replaces centralized financial data storage with verifiable client-side Zero-Knowledge proofs)
 
 ---
 
-## Current Project Status (Prompt 4.5 Complete)
+## Current Project Status & Evidence Separation
 
-* **Stack**: React 18 + Vite (JS/JSX) Frontend | Node.js + Express (JS) Backend | PostgreSQL Database | Midnight Compact Smart Contract.
-* **On-Chain Contract Address**: `94010caedf80e1a2af62dfe1aa6f6c924969a8837003e84bb03857dd13d2b5cf` (Midnight Preview).
+### A. Real Verified On-Chain Evidence
+* **Compact Contract**: Compiled to JS/TS bindings & ZK circuit keys under `packages/contracts/src/managed/`.
+* **Deployed Contract Address**: `94010caedf80e1a2af62dfe1aa6f6c924969a8837003e84bb03857dd13d2b5cf` on Midnight Preview.
 * **Confirmed Deployment Tx**: `e44df905f615c8937636bb4b2bce9abf8c45da116c4ad2c8742d71942150b81c`.
 * **Confirmed Verification Tx**: `5deb9fcd464487459544cf4ae07445d6b1f037033f0c40305527d81a297b061c`.
-* **Privacy Audit Result**: **100% CLEAN** — Zero tenant income figures leaked to backend, database, logs, or landlord views.
-* **Test Status**:
-  * Contract ZK Unit Tests: 4/4 Passed (100%).
-  * Backend API Integration Tests: 6/6 Passed (100%).
-  * Frontend Production Build: Passed (1,480 modules compiled in 4.41s).
+* **Public Ledger State**: `verificationStatus[1] = true`.
+* **Privacy Verification**: Confirmed **0 private income values disclosed** on-chain or transmitted over the network.
+
+### B. Local / Development Environment & Demo Evidence
+* **Automated Browser Flow**: React frontend running at `http://localhost:5173` with local ZK circuit constraint evaluation.
+* **Local Proof Server**: Docker proof server running at `http://localhost:6300` (used for local development & CLI execution; not a production service).
+* **Lace Browser Integration**: `window.midnight.mnLace` connector code is fully implemented as an intended real-user path. In automated headless test environments where the Lace browser extension is not installed, the DApp accurately reports `Lace NOT DETECTED` and executes local client constraint checks without fabricating fake blockchain transactions.
 
 ---
 
