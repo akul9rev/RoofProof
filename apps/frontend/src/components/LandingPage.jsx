@@ -122,24 +122,42 @@ export default function LandingPage({ properties = [], onApplyToProperty }) {
               </div>
             </div>
 
-            {/* Min Income Requirement Box */}
+            {/* Annual Rent Box with 10% Discount (White Color) */}
             <div style={{
-              display: 'grid',
-              gridTemplateColumns: '1fr 1fr',
-              gap: '10px',
-              background: 'rgba(235, 168, 52, 0.06)',
-              border: '1px solid rgba(235, 168, 52, 0.2)',
-              borderRadius: '14px',
+              background: 'rgba(255, 255, 255, 0.05)',
+              border: '1px solid rgba(255, 255, 255, 0.12)',
+              borderRadius: '16px',
               padding: '12px 14px',
               marginBottom: '20px',
+              color: '#ffffff',
             }}>
-              <div>
-                <div style={{ fontSize: '0.68rem', color: 'rgba(255,255,255,0.5)' }}>Estimated Rent</div>
-                <div style={{ fontSize: '0.88rem', color: '#ffffff', fontWeight: 600 }}>₹75,000 / month</div>
+              <div style={{ fontSize: '0.72rem', color: 'rgba(255, 255, 255, 0.6)', marginBottom: '4px' }}>
+                Annual Rent
               </div>
-              <div>
-                <div style={{ fontSize: '0.68rem', color: 'rgba(255,255,255,0.5)' }}>Min Annual Income</div>
-                <div style={{ fontSize: '0.88rem', color: '#EBA834', fontWeight: 700 }}>₹2,25,000 / yr</div>
+
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginBottom: '4px' }}>
+                <span style={{
+                  fontSize: '0.88rem',
+                  color: 'rgba(255, 255, 255, 0.45)',
+                  textDecoration: 'line-through',
+                }}>
+                  ₹9,00,000
+                </span>
+                <span style={{
+                  fontSize: '1.1rem',
+                  fontWeight: 700,
+                  color: '#ffffff',
+                }}>
+                  ₹8,10,000 / yr
+                </span>
+              </div>
+
+              <div style={{
+                fontSize: '0.75rem',
+                color: 'rgba(255, 255, 255, 0.85)',
+                fontWeight: 500,
+              }}>
+                10% annual payment discount
               </div>
             </div>
 
