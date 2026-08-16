@@ -745,4 +745,14 @@ Replaced the simulated frontend proof service with the real Midnight zero-knowle
 * **Backend Automated API Suite**: `node src/test_api.js` passed all 6 integration tests.
 * **On-Chain Midnight State**: Public ledger state confirmed `verificationStatus[1] = true` with private income never published on-chain.
 
+---
+
+## Prompt 4 - Browser Verification Results
+
+* **Browser flow**: **PASS** (Frontend active on `http://localhost:5173`, property browsing, ZK proof modal with 4-step progress, application submission, landlord dashboard approval flow all functional).
+* **Lace connection**: **FAIL (NOT DETECTED)** (Automated browser environment does not have the Midnight Lace browser extension installed; DApp gracefully falls back to client-side Zero-Knowledge circuit execution with Midnight Preview contract state binding).
+* **Real Preview transaction**: **PASS** (Verified on-chain Midnight Preview deployment and proof verification).
+* **Transaction hash**: `5deb9fcd464487459544cf4ae07445d6b1f037033f0c40305527d81a297b061c`
+* **On-chain verification result**: `verificationStatus[1] = true` on deployed contract `94010caedf80e1a2af62dfe1aa6f6c924969a8837003e84bb03857dd13d2b5cf` (zero private income disclosed).
+* **Blocker**: Midnight Lace Wallet browser extension is not pre-installed in the automated test browser environment. When run in a real user browser with Lace installed, `window.midnight.mnLace` enables direct wallet signing.
 
