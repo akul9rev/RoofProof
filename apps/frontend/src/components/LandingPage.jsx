@@ -1,5 +1,5 @@
 import React from 'react';
-import { Star, Lock, Calendar, Building2, ShieldCheck, Sparkles, ArrowRight } from 'lucide-react';
+import { Star, Lock, Calendar, Edit3 } from 'lucide-react';
 
 export default function LandingPage({ properties = [], onApplyToProperty, onListProperty }) {
   const featuredProp = properties[0] || {
@@ -12,33 +12,18 @@ export default function LandingPage({ properties = [], onApplyToProperty, onList
   };
 
   return (
-    <div className="animate-fade-in" style={{ width: '100%' }}>
-      {/* RoofProof Hero Section - Crisp Text directly over background image */}
+    <div className="animate-fade-in" style={{ width: '100%', position: 'relative' }}>
+      {/* WoodNest / RoofProof Hero Section */}
       <div style={{
         display: 'grid',
         gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))',
         gap: '40px',
         alignItems: 'center',
-        padding: '10px 0 60px',
+        padding: '0 0 40px',
+        minHeight: '480px',
       }}>
-        {/* Left Column: Private Rental Verification */}
+        {/* Left Column: Hero Typography matching image 1 */}
         <div>
-          <div style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '8px',
-            background: 'rgba(255, 255, 255, 0.1)',
-            border: '1px solid rgba(255, 255, 255, 0.18)',
-            padding: '6px 14px',
-            borderRadius: '999px',
-            marginBottom: '20px',
-            fontSize: '0.8rem',
-            color: '#EBA834',
-            fontWeight: 600,
-          }}>
-            <Sparkles size={14} /> Zero-Knowledge Privacy on Midnight Network
-          </div>
-
           <h1 className="hero-title">
             Private <br />
             <span className="text-accent-slate">Rental</span> <br />
@@ -49,17 +34,17 @@ export default function LandingPage({ properties = [], onApplyToProperty, onList
             display: 'flex',
             alignItems: 'flex-start',
             gap: '40px',
-            marginTop: '2.2rem',
+            marginTop: '3rem',
             flexWrap: 'wrap',
           }}>
             <p style={{
-              maxWidth: '320px',
-              fontSize: '0.98rem',
+              maxWidth: '310px',
+              fontSize: '0.92rem',
               color: 'rgba(255, 255, 255, 0.85)',
-              lineHeight: 1.6,
-              textShadow: '0 2px 10px rgba(0, 0, 0, 0.7)',
+              lineHeight: 1.55,
+              textShadow: '0 2px 10px rgba(0, 0, 0, 0.8)',
             }}>
-              Discover handpicked luxury properties. Prove rent income eligibility privately via Form 16 Zero-Knowledge proofs — without sharing payslips or bank statements.
+              Discover handpicked luxury cabins in breathtaking locations. Unplug, verify privately with Form 16, and reconnect with what matters most.
             </p>
 
             <div>
@@ -67,128 +52,118 @@ export default function LandingPage({ properties = [], onApplyToProperty, onList
                 display: 'flex',
                 alignItems: 'center',
                 gap: '8px',
-                fontSize: '1.45rem',
-                fontWeight: 700,
+                fontSize: '1.4rem',
+                fontWeight: 600,
                 color: '#ffffff',
-                textShadow: '0 2px 10px rgba(0,0,0,0.8)',
+                textShadow: '0 2px 10px rgba(0,0,0,0.9)',
               }}>
-                <Star size={22} fill="#EBA834" color="#EBA834" />
-                4.9
+                <Star size={20} fill="#EBA834" color="#EBA834" />
+                4.7
               </div>
-              <span style={{ fontSize: '0.85rem', color: 'rgba(255, 255, 255, 0.7)', fontWeight: 500 }}>
-                from 1,800+ ZK proofs
+              <span style={{ fontSize: '0.82rem', color: 'rgba(255, 255, 255, 0.6)', fontWeight: 400 }}>
+                from 1,800+ stays
               </span>
             </div>
           </div>
         </div>
 
-        {/* Right Column: Floating Dark Glass Booking/Verification Card */}
+        {/* Right Column: Dark Glass Booking/Verification Card matching image 1 */}
         <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
           <div className="glass-card" style={{
-            maxWidth: '430px',
+            maxWidth: '410px',
             width: '100%',
-            padding: '28px',
-            borderRadius: '28px',
-            background: 'rgba(12, 19, 27, 0.88)',
-            border: '1px solid rgba(255, 255, 255, 0.15)',
+            padding: '26px',
+            borderRadius: '26px',
+            background: 'rgba(12, 18, 25, 0.88)',
+            border: '1px solid rgba(255, 255, 255, 0.14)',
           }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '20px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '18px' }}>
               <div>
                 <h3 style={{
-                  fontSize: '1.45rem',
-                  fontWeight: 600,
+                  fontSize: '1.4rem',
+                  fontWeight: 500,
                   color: '#ffffff',
-                  lineHeight: 1.2,
-                  marginBottom: '6px',
+                  lineHeight: 1.25,
+                  marginBottom: '4px',
                 }}>
                   {featuredProp.title}
                 </h3>
-                <span style={{ fontSize: '0.85rem', color: 'rgba(255, 255, 255, 0.6)' }}>
-                  {featuredProp.location}
-                </span>
               </div>
               <div style={{
-                width: '36px',
-                height: '36px',
+                width: '32px',
+                height: '32px',
                 borderRadius: '50%',
-                background: 'rgba(255, 255, 255, 0.1)',
+                background: 'rgba(255, 255, 255, 0.08)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
+                cursor: 'pointer',
               }}>
-                <Lock size={16} color="rgba(255,255,255,0.85)" />
+                <Edit3 size={15} color="rgba(255,255,255,0.7)" />
               </div>
             </div>
 
-            {/* Check-in / Check-out Input Pills */}
+            {/* Date / Check-in Pills */}
             <div style={{
               display: 'grid',
               gridTemplateColumns: '1fr 1fr',
-              gap: '12px',
-              marginBottom: '16px',
+              gap: '10px',
+              marginBottom: '14px',
             }}>
               <div style={{
-                background: 'rgba(255, 255, 255, 0.06)',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
-                borderRadius: '16px',
-                padding: '12px 14px',
+                background: 'rgba(255, 255, 255, 0.05)',
+                border: '1px solid rgba(255, 255, 255, 0.08)',
+                borderRadius: '14px',
+                padding: '10px 12px',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '10px',
+                gap: '8px',
               }}>
-                <Calendar size={16} color="rgba(255,255,255,0.6)" />
-                <div>
-                  <div style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.5)' }}>Check-in</div>
-                  <div style={{ fontSize: '0.85rem', fontWeight: 600, color: '#ffffff' }}>After 2:00 PM</div>
-                </div>
+                <Calendar size={15} color="rgba(255,255,255,0.5)" />
+                <span style={{ fontSize: '0.85rem', color: '#ffffff' }}>Feb 11</span>
               </div>
 
               <div style={{
-                background: 'rgba(255, 255, 255, 0.06)',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
-                borderRadius: '16px',
-                padding: '12px 14px',
+                background: 'rgba(255, 255, 255, 0.05)',
+                border: '1px solid rgba(255, 255, 255, 0.08)',
+                borderRadius: '14px',
+                padding: '10px 12px',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '10px',
+                gap: '8px',
               }}>
-                <Calendar size={16} color="rgba(255,255,255,0.6)" />
-                <div>
-                  <div style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.5)' }}>Check-out</div>
-                  <div style={{ fontSize: '0.85rem', fontWeight: 600, color: '#ffffff' }}>Until 12:00 PM</div>
-                </div>
+                <Calendar size={15} color="rgba(255,255,255,0.5)" />
+                <span style={{ fontSize: '0.85rem', color: '#ffffff' }}>Mar 25</span>
               </div>
             </div>
 
-            {/* Min Annual Income Requirement */}
+            {/* Check-in / Check-out Times */}
             <div style={{
-              background: 'rgba(235, 168, 52, 0.08)',
-              border: '1px solid rgba(235, 168, 52, 0.25)',
-              borderRadius: '16px',
-              padding: '14px 16px',
-              marginBottom: '22px',
-              display: 'flex',
-              justify: 'space-between',
-              alignItems: 'center',
+              display: 'grid',
+              gridTemplateColumns: '1fr 1fr',
+              gap: '10px',
+              background: 'rgba(255, 255, 255, 0.03)',
+              borderRadius: '14px',
+              padding: '12px 14px',
+              marginBottom: '20px',
             }}>
               <div>
-                <div style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.6)' }}>Min Income Threshold</div>
-                <div style={{ fontSize: '1rem', fontWeight: 700, color: '#EBA834' }}>
-                  ₹{(featuredProp.income_threshold || 225000).toLocaleString('en-IN')}/yr
-                </div>
+                <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.4)' }}>Check-in</div>
+                <div style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.85)' }}>After 2:00 PM</div>
               </div>
-              <span style={{ fontSize: '0.75rem', color: '#ffffff', background: 'rgba(255,255,255,0.12)', padding: '4px 12px', borderRadius: '999px', fontWeight: 600 }}>
-                Form 16 ZK
-              </span>
+              <div>
+                <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.4)' }}>Check-out</div>
+                <div style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.85)' }}>Until 12:00 PM</div>
+              </div>
             </div>
 
-            {/* Price & Action */}
+            {/* Price & Guests */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '20px' }}>
               <div>
-                <span style={{ fontSize: '1.85rem', fontWeight: 700, color: '#ffffff' }}>
+                <span style={{ fontSize: '1.75rem', fontWeight: 600, color: '#ffffff' }}>
                   ₹{(featuredProp.monthly_rent || 75000).toLocaleString('en-IN')}
                 </span>
-                <span style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.6)' }}> / month</span>
+                <span style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.5)' }}>/month</span>
               </div>
               <span style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.5)' }}>2–5 guests</span>
             </div>
@@ -198,19 +173,19 @@ export default function LandingPage({ properties = [], onApplyToProperty, onList
               className="btn-white-pill"
               style={{ width: '100%' }}
             >
-              Book Now (ZK Proof)
+              Reserve
             </button>
           </div>
         </div>
       </div>
 
       {/* Featured Properties Grid */}
-      <div style={{ marginTop: '40px' }}>
+      <div style={{ marginTop: '30px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
           <div>
-            <h2 style={{ fontSize: '2.2rem', fontWeight: 600, color: '#ffffff' }}>Available Locations</h2>
-            <p style={{ color: 'rgba(255, 255, 255, 0.7)', fontSize: '0.95rem' }}>
-              Select a luxury property to verify eligibility privately via Zero-Knowledge proof.
+            <h2 style={{ fontSize: '2rem', fontWeight: 500, color: '#ffffff' }}>Available Locations</h2>
+            <p style={{ color: 'rgba(255, 255, 255, 0.6)', fontSize: '0.9rem' }}>
+              Select a luxury property to verify eligibility privately via Form 16 Zero-Knowledge proof.
             </p>
           </div>
           <button onClick={onListProperty} className="btn-glass">
@@ -220,13 +195,13 @@ export default function LandingPage({ properties = [], onApplyToProperty, onList
 
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))',
+          gridTemplateColumns: 'repeat(auto-fill, minmax(330px, 1fr))',
           gap: '24px',
         }}>
           {properties.map((prop) => (
             <div key={prop.id} className="glass-card" style={{ padding: '20px', borderRadius: '24px' }}>
               <div style={{
-                height: '200px',
+                height: '190px',
                 borderRadius: '16px',
                 overflow: 'hidden',
                 marginBottom: '16px',
@@ -241,11 +216,11 @@ export default function LandingPage({ properties = [], onApplyToProperty, onList
                   position: 'absolute',
                   top: '12px',
                   right: '12px',
-                  background: 'rgba(12, 20, 29, 0.85)',
+                  background: 'rgba(12, 18, 25, 0.85)',
                   backdropFilter: 'blur(8px)',
-                  padding: '4px 12px',
+                  padding: '4px 10px',
                   borderRadius: '999px',
-                  fontSize: '0.75rem',
+                  fontSize: '0.72rem',
                   color: '#EBA834',
                   fontWeight: 600,
                 }}>
@@ -253,10 +228,10 @@ export default function LandingPage({ properties = [], onApplyToProperty, onList
                 </span>
               </div>
 
-              <h3 style={{ fontSize: '1.2rem', fontWeight: 600, color: '#ffffff', marginBottom: '4px' }}>
+              <h3 style={{ fontSize: '1.15rem', fontWeight: 500, color: '#ffffff', marginBottom: '4px' }}>
                 {prop.title}
               </h3>
-              <p style={{ fontSize: '0.85rem', color: 'rgba(255, 255, 255, 0.6)', marginBottom: '16px' }}>
+              <p style={{ fontSize: '0.82rem', color: 'rgba(255, 255, 255, 0.5)', marginBottom: '16px' }}>
                 {prop.location}
               </p>
 
@@ -265,18 +240,18 @@ export default function LandingPage({ properties = [], onApplyToProperty, onList
                 justify: 'space-between',
                 alignItems: 'center',
                 paddingTop: '12px',
-                borderTop: '1px solid rgba(255, 255, 255, 0.1)',
+                borderTop: '1px solid rgba(255, 255, 255, 0.08)',
               }}>
                 <div>
-                  <span style={{ fontSize: '1.2rem', fontWeight: 700, color: '#ffffff' }}>
+                  <span style={{ fontSize: '1.15rem', fontWeight: 600, color: '#ffffff' }}>
                     ₹{(prop.monthly_rent || 0).toLocaleString('en-IN')}
                   </span>
-                  <span style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.6)' }}> / mo</span>
+                  <span style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.5)' }}> / mo</span>
                 </div>
                 <button
                   onClick={() => onApplyToProperty(prop)}
                   className="btn-white-pill"
-                  style={{ padding: '8px 20px', fontSize: '0.85rem' }}
+                  style={{ padding: '8px 18px', fontSize: '0.82rem' }}
                 >
                   Book Now
                 </button>
