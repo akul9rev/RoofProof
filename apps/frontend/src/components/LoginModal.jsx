@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Shield, ArrowRight, UserCheck, CheckCircle2, Building, User } from 'lucide-react';
+import { X, Shield, ArrowRight, CheckCircle2, Building, User } from 'lucide-react';
 
 export default function LoginModal({ isOpen, onClose, currentRole, onLoginSuccess, currentUser }) {
   const [authMode, setAuthMode] = useState('signin'); // 'signin' | 'signup'
@@ -59,13 +59,13 @@ export default function LoginModal({ isOpen, onClose, currentRole, onLoginSucces
         position: 'fixed',
         inset: 0,
         background: 'rgba(5, 10, 16, 0.88)',
-        backdropFilter: 'blur(20px)',
-        WebkitBackdropFilter: 'blur(20px)',
+        backdropFilter: 'blur(16px)',
+        WebkitBackdropFilter: 'blur(16px)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         zIndex: 9999,
-        padding: '16px',
+        padding: '12px',
       }}
       onClick={onClose}
     >
@@ -73,16 +73,15 @@ export default function LoginModal({ isOpen, onClose, currentRole, onLoginSucces
         className="glass-card animate-fade-in"
         onClick={(e) => e.stopPropagation()}
         style={{
-          maxWidth: '440px',
+          maxWidth: '420px',
           width: '100%',
-          maxHeight: '92vh',
-          overflowY: 'auto',
-          padding: '24px 26px',
-          borderRadius: '28px',
+          padding: '20px 22px',
+          borderRadius: '24px',
           background: 'linear-gradient(165deg, rgba(16, 24, 34, 0.98) 0%, rgba(10, 16, 24, 0.99) 100%)',
           border: '1px solid rgba(255, 255, 255, 0.18)',
-          boxShadow: '0 40px 100px rgba(0, 0, 0, 0.85), inset 0 1px 1px rgba(255, 255, 255, 0.15)',
+          boxShadow: '0 30px 80px rgba(0, 0, 0, 0.85), inset 0 1px 1px rgba(255, 255, 255, 0.15)',
           position: 'relative',
+          overflow: 'hidden',
         }}
       >
         {/* Close Button */}
@@ -90,43 +89,42 @@ export default function LoginModal({ isOpen, onClose, currentRole, onLoginSucces
           onClick={onClose}
           style={{
             position: 'absolute',
-            top: '18px',
-            right: '18px',
+            top: '16px',
+            right: '16px',
             background: 'rgba(255, 255, 255, 0.08)',
             border: '1px solid rgba(255, 255, 255, 0.12)',
             borderRadius: '50%',
-            width: '30px',
-            height: '30px',
+            width: '28px',
+            height: '28px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             color: 'rgba(255, 255, 255, 0.7)',
             cursor: 'pointer',
-            transition: 'all 0.2s ease',
           }}
         >
-          <X size={15} />
+          <X size={14} />
         </button>
 
         {/* Header Logo */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '12px' }}>
           <div style={{
-            width: '36px',
-            height: '36px',
-            borderRadius: '12px',
+            width: '32px',
+            height: '32px',
+            borderRadius: '10px',
             background: 'linear-gradient(135deg, #EBA834 0%, #F59E0B 100%)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            boxShadow: '0 0 20px rgba(235, 168, 52, 0.4)',
+            boxShadow: '0 0 16px rgba(235, 168, 52, 0.4)',
           }}>
-            <Shield size={18} color="#0c141d" />
+            <Shield size={16} color="#0c141d" />
           </div>
           <div>
-            <h3 style={{ fontSize: '1.18rem', fontWeight: 600, color: '#ffffff', letterSpacing: '-0.02em', lineHeight: 1.1 }}>
+            <h3 style={{ fontSize: '1.1rem', fontWeight: 600, color: '#ffffff', letterSpacing: '-0.02em', lineHeight: 1.1 }}>
               RoofProof
             </h3>
-            <span style={{ fontSize: '0.72rem', color: 'rgba(255, 255, 255, 0.5)' }}>
+            <span style={{ fontSize: '0.7rem', color: 'rgba(255, 255, 255, 0.5)' }}>
               Midnight Zero-Knowledge Authentication
             </span>
           </div>
@@ -139,23 +137,22 @@ export default function LoginModal({ isOpen, onClose, currentRole, onLoginSucces
           gap: '4px',
           background: 'rgba(255, 255, 255, 0.05)',
           padding: '3px',
-          borderRadius: '14px',
-          marginBottom: '14px',
+          borderRadius: '12px',
+          marginBottom: '10px',
           border: '1px solid rgba(255, 255, 255, 0.08)',
         }}>
           <button
             type="button"
             onClick={() => setAuthMode('signin')}
             style={{
-              padding: '8px',
-              borderRadius: '10px',
+              padding: '6px',
+              borderRadius: '9px',
               background: authMode === 'signin' ? '#ffffff' : 'transparent',
               color: authMode === 'signin' ? '#0c141d' : 'rgba(255, 255, 255, 0.7)',
               fontWeight: 700,
-              fontSize: '0.82rem',
+              fontSize: '0.8rem',
               border: 'none',
               cursor: 'pointer',
-              transition: 'all 0.2s ease',
             }}
           >
             Sign In
@@ -164,15 +161,14 @@ export default function LoginModal({ isOpen, onClose, currentRole, onLoginSucces
             type="button"
             onClick={() => setAuthMode('signup')}
             style={{
-              padding: '8px',
-              borderRadius: '10px',
+              padding: '6px',
+              borderRadius: '9px',
               background: authMode === 'signup' ? '#ffffff' : 'transparent',
               color: authMode === 'signup' ? '#0c141d' : 'rgba(255, 255, 255, 0.7)',
               fontWeight: 700,
-              fontSize: '0.82rem',
+              fontSize: '0.8rem',
               border: 'none',
               cursor: 'pointer',
-              transition: 'all 0.2s ease',
             }}
           >
             Create Account
@@ -180,39 +176,38 @@ export default function LoginModal({ isOpen, onClose, currentRole, onLoginSucces
         </div>
 
         {/* Role Selector Cards */}
-        <div style={{ marginBottom: '14px' }}>
-          <div style={{ fontSize: '0.7rem', color: 'rgba(255, 255, 255, 0.45)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '8px', fontWeight: 600 }}>
+        <div style={{ marginBottom: '10px' }}>
+          <div style={{ fontSize: '0.68rem', color: 'rgba(255, 255, 255, 0.45)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '6px', fontWeight: 600 }}>
             Select Role:
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
             <div
               onClick={() => setSelectedRole('tenant')}
               style={{
                 background: selectedRole === 'tenant' ? 'rgba(235, 168, 52, 0.12)' : 'rgba(255, 255, 255, 0.03)',
                 border: `1px solid ${selectedRole === 'tenant' ? 'rgba(235, 168, 52, 0.4)' : 'rgba(255, 255, 255, 0.08)'}`,
-                borderRadius: '14px',
-                padding: '10px 12px',
+                borderRadius: '12px',
+                padding: '8px 10px',
                 cursor: 'pointer',
-                transition: 'all 0.2s ease',
               }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '2px' }}>
                 <div style={{
-                  width: '26px',
-                  height: '26px',
-                  borderRadius: '8px',
+                  width: '24px',
+                  height: '24px',
+                  borderRadius: '7px',
                   background: selectedRole === 'tenant' ? '#EBA834' : 'rgba(255,255,255,0.08)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                 }}>
-                  <User size={14} color={selectedRole === 'tenant' ? '#0c141d' : '#ffffff'} />
+                  <User size={13} color={selectedRole === 'tenant' ? '#0c141d' : '#ffffff'} />
                 </div>
-                {selectedRole === 'tenant' && <CheckCircle2 size={14} color="#EBA834" />}
+                {selectedRole === 'tenant' && <CheckCircle2 size={13} color="#EBA834" />}
               </div>
-              <div style={{ fontSize: '0.85rem', fontWeight: 600, color: '#ffffff' }}>Tenant</div>
-              <div style={{ fontSize: '0.68rem', color: 'rgba(255,255,255,0.5)' }}>Verify income privately</div>
+              <div style={{ fontSize: '0.82rem', fontWeight: 600, color: '#ffffff' }}>Tenant</div>
+              <div style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.5)' }}>Verify income privately</div>
             </div>
 
             <div
@@ -220,35 +215,34 @@ export default function LoginModal({ isOpen, onClose, currentRole, onLoginSucces
               style={{
                 background: selectedRole === 'landlord' ? 'rgba(107, 155, 118, 0.14)' : 'rgba(255, 255, 255, 0.03)',
                 border: `1px solid ${selectedRole === 'landlord' ? 'rgba(107, 155, 118, 0.4)' : 'rgba(255, 255, 255, 0.08)'}`,
-                borderRadius: '14px',
-                padding: '10px 12px',
+                borderRadius: '12px',
+                padding: '8px 10px',
                 cursor: 'pointer',
-                transition: 'all 0.2s ease',
               }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '2px' }}>
                 <div style={{
-                  width: '26px',
-                  height: '26px',
-                  borderRadius: '8px',
+                  width: '24px',
+                  height: '24px',
+                  borderRadius: '7px',
                   background: selectedRole === 'landlord' ? '#6B9B76' : 'rgba(255,255,255,0.08)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                 }}>
-                  <Building size={14} color={selectedRole === 'landlord' ? '#0c141d' : '#ffffff'} />
+                  <Building size={13} color={selectedRole === 'landlord' ? '#0c141d' : '#ffffff'} />
                 </div>
-                {selectedRole === 'landlord' && <CheckCircle2 size={14} color="#6B9B76" />}
+                {selectedRole === 'landlord' && <CheckCircle2 size={13} color="#6B9B76" />}
               </div>
-              <div style={{ fontSize: '0.85rem', fontWeight: 600, color: '#ffffff' }}>Landlord</div>
-              <div style={{ fontSize: '0.68rem', color: 'rgba(255,255,255,0.5)' }}>List & verify tenants</div>
+              <div style={{ fontSize: '0.82rem', fontWeight: 600, color: '#ffffff' }}>Landlord</div>
+              <div style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.5)' }}>List & verify tenants</div>
             </div>
           </div>
         </div>
 
         {/* 1-Click Quick Demo Sign-In Card */}
-        <div style={{ marginBottom: '14px' }}>
-          <div style={{ fontSize: '0.7rem', color: 'rgba(255, 255, 255, 0.45)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '6px', fontWeight: 600 }}>
+        <div style={{ marginBottom: '10px' }}>
+          <div style={{ fontSize: '0.68rem', color: 'rgba(255, 255, 255, 0.45)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '4px', fontWeight: 600 }}>
             Instant Demo Account:
           </div>
 
@@ -258,18 +252,18 @@ export default function LoginModal({ isOpen, onClose, currentRole, onLoginSucces
               style={{
                 background: 'rgba(235, 168, 52, 0.08)',
                 border: '1px solid rgba(235, 168, 52, 0.25)',
-                borderRadius: '14px',
-                padding: '10px 14px',
+                borderRadius: '12px',
+                padding: '8px 12px',
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
               }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <div style={{
-                  width: '32px',
-                  height: '32px',
+                  width: '28px',
+                  height: '28px',
                   borderRadius: '50%',
                   background: 'linear-gradient(135deg, #EBA834 0%, #F59E0B 100%)',
                   color: '#0c141d',
@@ -277,17 +271,17 @@ export default function LoginModal({ isOpen, onClose, currentRole, onLoginSucces
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  fontSize: '0.82rem',
+                  fontSize: '0.78rem',
                 }}>
                   RS
                 </div>
                 <div>
-                  <div style={{ fontSize: '0.85rem', fontWeight: 600, color: '#ffffff' }}>Rahul Sharma</div>
-                  <div style={{ fontSize: '0.7rem', color: '#EBA834' }}>{presetTenant.title}</div>
+                  <div style={{ fontSize: '0.82rem', fontWeight: 600, color: '#ffffff' }}>Rahul Sharma</div>
+                  <div style={{ fontSize: '0.68rem', color: '#EBA834' }}>{presetTenant.title}</div>
                 </div>
               </div>
-              <span className="btn-white-pill" style={{ padding: '5px 12px', fontSize: '0.72rem' }}>
-                Quick Login <ArrowRight size={11} />
+              <span className="btn-white-pill" style={{ padding: '4px 10px', fontSize: '0.7rem' }}>
+                Quick Login <ArrowRight size={10} />
               </span>
             </div>
           ) : (
@@ -296,18 +290,18 @@ export default function LoginModal({ isOpen, onClose, currentRole, onLoginSucces
               style={{
                 background: 'rgba(107, 155, 118, 0.12)',
                 border: '1px solid rgba(107, 155, 118, 0.3)',
-                borderRadius: '14px',
-                padding: '10px 14px',
+                borderRadius: '12px',
+                padding: '8px 12px',
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
               }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <div style={{
-                  width: '32px',
-                  height: '32px',
+                  width: '28px',
+                  height: '28px',
                   borderRadius: '50%',
                   background: 'linear-gradient(135deg, #6B9B76 0%, #4A7C59 100%)',
                   color: '#ffffff',
@@ -315,17 +309,17 @@ export default function LoginModal({ isOpen, onClose, currentRole, onLoginSucces
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  fontSize: '0.82rem',
+                  fontSize: '0.78rem',
                 }}>
                   AV
                 </div>
                 <div>
-                  <div style={{ fontSize: '0.85rem', fontWeight: 600, color: '#ffffff' }}>Ananya Verma</div>
-                  <div style={{ fontSize: '0.7rem', color: '#6B9B76' }}>{presetLandlord.title}</div>
+                  <div style={{ fontSize: '0.82rem', fontWeight: 600, color: '#ffffff' }}>Ananya Verma</div>
+                  <div style={{ fontSize: '0.68rem', color: '#6B9B76' }}>{presetLandlord.title}</div>
                 </div>
               </div>
-              <span className="btn-white-pill" style={{ padding: '5px 12px', fontSize: '0.72rem' }}>
-                Quick Login <ArrowRight size={11} />
+              <span className="btn-white-pill" style={{ padding: '4px 10px', fontSize: '0.7rem' }}>
+                Quick Login <ArrowRight size={10} />
               </span>
             </div>
           )}
@@ -333,7 +327,7 @@ export default function LoginModal({ isOpen, onClose, currentRole, onLoginSucces
 
         {/* Custom Form */}
         <form onSubmit={handleSubmit}>
-          <div style={{ marginBottom: '10px' }}>
+          <div style={{ marginBottom: '8px' }}>
             <input 
               type="text" 
               placeholder={selectedRole === 'tenant' ? 'Full Name (e.g. Rahul Sharma)' : 'Full Name (e.g. Ananya Verma)'} 
@@ -343,16 +337,16 @@ export default function LoginModal({ isOpen, onClose, currentRole, onLoginSucces
                 width: '100%',
                 background: 'rgba(255, 255, 255, 0.05)',
                 border: '1px solid rgba(255, 255, 255, 0.12)',
-                borderRadius: '12px',
-                padding: '10px 14px',
+                borderRadius: '10px',
+                padding: '8px 12px',
                 color: '#ffffff',
-                fontSize: '0.84rem',
+                fontSize: '0.82rem',
                 outline: 'none',
               }}
             />
           </div>
 
-          <div style={{ marginBottom: '14px' }}>
+          <div style={{ marginBottom: '12px' }}>
             <input 
               type="email" 
               placeholder={selectedRole === 'tenant' ? 'rahul.sharma@example.com' : 'ananya.verma@example.com'} 
@@ -362,23 +356,19 @@ export default function LoginModal({ isOpen, onClose, currentRole, onLoginSucces
                 width: '100%',
                 background: 'rgba(255, 255, 255, 0.05)',
                 border: '1px solid rgba(255, 255, 255, 0.12)',
-                borderRadius: '12px',
-                padding: '10px 14px',
+                borderRadius: '10px',
+                padding: '8px 12px',
                 color: '#ffffff',
-                fontSize: '0.84rem',
+                fontSize: '0.82rem',
                 outline: 'none',
               }}
             />
           </div>
 
-          <button type="submit" className="btn-white-pill" style={{ width: '100%', padding: '12px', fontSize: '0.85rem' }}>
+          <button type="submit" className="btn-white-pill" style={{ width: '100%', padding: '10px', fontSize: '0.82rem' }}>
             {authMode === 'signin' ? 'Sign In as ' : 'Create '} {selectedRole === 'tenant' ? 'Tenant Account' : 'Landlord Account'}
           </button>
         </form>
-
-        <div style={{ marginTop: '12px', textAlign: 'center', fontSize: '0.7rem', color: 'rgba(255, 255, 255, 0.4)' }}>
-          🔒 Powered by Midnight ZK Witness Engine • 100% Private Data
-        </div>
       </div>
     </div>
   );
