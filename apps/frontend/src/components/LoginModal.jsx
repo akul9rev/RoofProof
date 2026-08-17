@@ -28,27 +28,51 @@ export default function LoginModal({ isOpen, onClose, currentRole, onLoginSucces
 
   if (!isOpen) return null;
 
-  const presetTenant = {
-    id: 1,
-    name: 'Rahul Sharma',
-    email: 'rahul.sharma@example.com',
-    role: 'tenant',
-    phone: '+91 98765 43210',
-    city: 'Bangalore, KA',
-    occupation: 'Software Engineer',
-    title: 'Form 16 Ready (Gross: ₹9.2L)',
-  };
+  const presetLandlords = [
+    {
+      id: 1,
+      name: 'Rohan Mehta',
+      email: 'rohan.mehta@roofproof.demo',
+      role: 'landlord',
+      phone: '+91 98200 11223',
+      city: 'Coorg, KA',
+      organization: 'Mehta Luxury Estates',
+      title: 'Owner of 4 Luxury & Heritage Properties',
+    },
+    {
+      id: 2,
+      name: 'Priya Nair',
+      email: 'priya.nair@roofproof.demo',
+      role: 'landlord',
+      phone: '+91 98450 33445',
+      city: 'Jaipur, RJ',
+      organization: 'Heritage Living India',
+      title: 'Owner of 3 Palace & Courtyard Residences',
+    },
+  ];
 
-  const presetLandlord = {
-    id: 2,
-    name: 'Ananya Verma',
-    email: 'ananya.verma@example.com',
-    role: 'landlord',
-    phone: '+91 98123 45678',
-    city: 'Mumbai, MH',
-    organization: 'Verma Heritage Estates',
-    title: 'Verified Property Owner',
-  };
+  const presetTenants = [
+    {
+      id: 3,
+      name: 'Arjun Sharma',
+      email: 'arjun.sharma@roofproof.demo',
+      role: 'tenant',
+      phone: '+91 98765 43210',
+      city: 'Bangalore, KA',
+      occupation: 'Senior Software Engineer',
+      title: 'Form 16 Verified (Gross: ₹18.5L)',
+    },
+    {
+      id: 4,
+      name: 'Neha Kapoor',
+      email: 'neha.kapoor@roofproof.demo',
+      role: 'tenant',
+      phone: '+91 98111 22334',
+      city: 'Mumbai, MH',
+      occupation: 'Product Lead',
+      title: 'Form 16 Verified (Gross: ₹15.2L)',
+    },
+  ];
 
   const handleQuickLogin = (preset) => {
     onLoginSuccess(preset);
@@ -58,22 +82,31 @@ export default function LoginModal({ isOpen, onClose, currentRole, onLoginSucces
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
-    setIsSubmitting(true);
 
+    if (!email) {
+      setError('Please enter your email address');
+      return;
+    }
+    if (authMode === 'signup' && !name) {
+      setError('Please enter your full name');
+      return;
+    }
+
+    setIsSubmitting(true);
     try {
       const payload = {
-        name: name || (selectedRole === 'tenant' ? 'Rahul Sharma' : 'Ananya Verma'),
-        email: email || (selectedRole === 'tenant' ? 'rahul.sharma@example.com' : 'ananya.verma@example.com'),
+        name: name || (selectedRole === 'tenant' ? 'Arjun Sharma' : 'Rohan Mehta'),
+        email,
         role: selectedRole,
         phone,
         city,
-        occupation: selectedRole === 'tenant' ? occupation : null,
-        organization: selectedRole === 'landlord' ? organization : null,
+        occupation: selectedRole === 'tenant' ? occupation : undefined,
+        organization: selectedRole === 'landlord' ? organization : undefined,
       };
 
       const res = await loginOrRegister(payload);
       const userObj = res?.user || {
-        id: selectedRole === 'tenant' ? 1 : 2,
+        id: selectedRole === 'tenant' ? 3 : 1,
         ...payload,
       };
 
@@ -83,14 +116,14 @@ export default function LoginModal({ isOpen, onClose, currentRole, onLoginSucces
     } catch (err) {
       setIsSubmitting(false);
       onLoginSuccess({
-        id: selectedRole === 'tenant' ? 1 : 2,
-        name: name || (selectedRole === 'tenant' ? 'Rahul Sharma' : 'Ananya Verma'),
-        email: email || (selectedRole === 'tenant' ? 'rahul.sharma@example.com' : 'ananya.verma@example.com'),
+        id: selectedRole === 'tenant' ? 3 : 1,
+        name: name || (selectedRole === 'tenant' ? 'Arjun Sharma' : 'Rohan Mehta'),
+        email: email || (selectedRole === 'tenant' ? 'arjun.sharma@roofproof.demo' : 'rohan.mehta@roofproof.demo'),
         role: selectedRole,
         phone,
         city,
-        occupation,
-        organization,
+        occupation: selectedRole === 'tenant' ? occupation : undefined,
+        organization: selectedRole === 'landlord' ? organization : undefined,
       });
       onClose();
     }
@@ -121,7 +154,7 @@ export default function LoginModal({ isOpen, onClose, currentRole, onLoginSucces
         className="luxury-modal-container animate-modal-scale"
         onClick={(e) => e.stopPropagation()}
         style={{
-          maxWidth: '480px',
+          maxWidth: '520px',
           width: '100%',
           padding: '28px 30px',
           borderRadius: '26px',
@@ -129,7 +162,7 @@ export default function LoginModal({ isOpen, onClose, currentRole, onLoginSucces
           border: '1px solid rgba(255, 255, 255, 0.18)',
           boxShadow: '0 30px 80px rgba(0, 0, 0, 0.85), inset 0 1px 1px rgba(255, 255, 255, 0.15)',
           position: 'relative',
-          maxHeight: '92vh',
+          maxHeight: '90vh',
           overflowY: 'auto',
         }}
       >
@@ -270,197 +303,149 @@ export default function LoginModal({ isOpen, onClose, currentRole, onLoginSucces
         {authMode === 'signin' && (
           <div style={{ marginBottom: '18px' }}>
             <div style={{ fontSize: '0.78rem', color: 'rgba(255, 255, 255, 0.5)', marginBottom: '8px' }}>
-              Quick Demo Login:
+              Quick Demo Accounts:
             </div>
-            {selectedRole === 'tenant' ? (
-              <div
-                onClick={() => handleQuickLogin(presetTenant)}
-                style={{
-                  background: 'rgba(255, 255, 255, 0.04)',
-                  border: '1px solid rgba(255, 255, 255, 0.1)',
-                  borderRadius: '14px',
-                  padding: '10px 14px',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                }}
-              >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <div style={{
-                    width: '32px', height: '32px', borderRadius: '50%',
-                    background: 'linear-gradient(135deg, #EBA834 0%, #F59E0B 100%)',
-                    color: '#0c141d', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.82rem',
-                  }}>RS</div>
-                  <div>
-                    <div style={{ fontSize: '0.88rem', fontWeight: 600, color: '#ffffff' }}>Rahul Sharma</div>
-                    <div style={{ fontSize: '0.72rem', color: '#EBA834' }}>{presetTenant.title}</div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              {(selectedRole === 'landlord' ? presetLandlords : presetTenants).map((preset) => (
+                <div
+                  key={preset.id}
+                  onClick={() => handleQuickLogin(preset)}
+                  style={{
+                    background: 'rgba(255, 255, 255, 0.04)',
+                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                    borderRadius: '14px',
+                    padding: '10px 14px',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <div style={{
+                      width: '34px', height: '34px', borderRadius: '50%',
+                      background: preset.role === 'landlord'
+                        ? 'linear-gradient(135deg, #6B9B76 0%, #4A7C59 100%)'
+                        : 'linear-gradient(135deg, #EBA834 0%, #F59E0B 100%)',
+                      color: preset.role === 'landlord' ? '#ffffff' : '#0c141d',
+                      fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.82rem',
+                    }}>
+                      {preset.name.split(' ').map(n => n[0]).join('')}
+                    </div>
+                    <div>
+                      <div style={{ fontSize: '0.88rem', fontWeight: 600, color: '#ffffff' }}>{preset.name}</div>
+                      <div style={{ fontSize: '0.72rem', color: preset.role === 'landlord' ? '#6B9B76' : '#EBA834' }}>
+                        {preset.title}
+                      </div>
+                    </div>
                   </div>
+                  <span className="btn-white-pill" style={{ padding: '5px 12px', fontSize: '0.74rem' }}>
+                    Quick Login <ArrowRight size={11} />
+                  </span>
                 </div>
-                <span className="btn-white-pill" style={{ padding: '5px 12px', fontSize: '0.74rem' }}>
-                  Quick Login <ArrowRight size={11} />
-                </span>
-              </div>
-            ) : (
-              <div
-                onClick={() => handleQuickLogin(presetLandlord)}
-                style={{
-                  background: 'rgba(255, 255, 255, 0.04)',
-                  border: '1px solid rgba(255, 255, 255, 0.1)',
-                  borderRadius: '14px',
-                  padding: '10px 14px',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                }}
-              >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <div style={{
-                    width: '32px', height: '32px', borderRadius: '50%',
-                    background: 'linear-gradient(135deg, #6B9B76 0%, #4A7C59 100%)',
-                    color: '#ffffff', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.82rem',
-                  }}>AV</div>
-                  <div>
-                    <div style={{ fontSize: '0.88rem', fontWeight: 600, color: '#ffffff' }}>Ananya Verma</div>
-                    <div style={{ fontSize: '0.72rem', color: '#6B9B76' }}>{presetLandlord.title}</div>
-                  </div>
-                </div>
-                <span className="btn-white-pill" style={{ padding: '5px 12px', fontSize: '0.74rem' }}>
-                  Quick Login <ArrowRight size={11} />
-                </span>
-              </div>
-            )}
+              ))}
+            </div>
           </div>
         )}
 
-        {/* Detailed Account Registration / Sign In Form */}
-        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-          <div>
-            <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 600, color: 'rgba(255,255,255,0.7)', marginBottom: '4px' }}>Full Name *</label>
-            <input 
-              type="text" 
-              placeholder={selectedRole === 'tenant' ? 'Rahul Sharma' : 'Ananya Verma'} 
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-              style={{
-                width: '100%',
-                background: 'rgba(255, 255, 255, 0.05)',
-                border: '1px solid rgba(255, 255, 255, 0.12)',
-                borderRadius: '12px',
-                padding: '10px 14px',
-                color: '#ffffff',
-                fontSize: '0.86rem',
-                outline: 'none',
-              }}
-            />
-          </div>
+        {/* Custom Input Form */}
+        <form onSubmit={handleSubmit}>
+          {error && (
+            <div style={{
+              background: 'rgba(239, 68, 68, 0.15)',
+              border: '1px solid rgba(239, 68, 68, 0.3)',
+              borderRadius: '12px',
+              padding: '10px 14px',
+              color: '#f87171',
+              fontSize: '0.82rem',
+              marginBottom: '14px',
+            }}>
+              {error}
+            </div>
+          )}
 
-          <div>
-            <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 600, color: 'rgba(255,255,255,0.7)', marginBottom: '4px' }}>Email Address *</label>
-            <input 
-              type="email" 
-              placeholder={selectedRole === 'tenant' ? 'rahul.sharma@example.com' : 'ananya.verma@example.com'} 
+          {authMode === 'signup' && (
+            <div style={{ marginBottom: '14px' }}>
+              <label style={{ display: 'block', fontSize: '0.78rem', color: 'rgba(255,255,255,0.7)', marginBottom: '4px' }}>
+                Full Name *
+              </label>
+              <input
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder={selectedRole === 'tenant' ? 'e.g. Arjun Sharma' : 'e.g. Rohan Mehta'}
+                className="luxury-input"
+              />
+            </div>
+          )}
+
+          <div style={{ marginBottom: '14px' }}>
+            <label style={{ display: 'block', fontSize: '0.78rem', color: 'rgba(255,255,255,0.7)', marginBottom: '4px' }}>
+              Email Address *
+            </label>
+            <input
+              type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              required
-              style={{
-                width: '100%',
-                background: 'rgba(255, 255, 255, 0.05)',
-                border: '1px solid rgba(255, 255, 255, 0.12)',
-                borderRadius: '12px',
-                padding: '10px 14px',
-                color: '#ffffff',
-                fontSize: '0.86rem',
-                outline: 'none',
-              }}
+              placeholder={selectedRole === 'tenant' ? 'arjun.sharma@roofproof.demo' : 'rohan.mehta@roofproof.demo'}
+              className="luxury-input"
             />
           </div>
 
-          {/* Additional Profile Details when creating account */}
           {authMode === 'signup' && (
             <>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '14px' }}>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: 'rgba(255,255,255,0.7)', marginBottom: '4px' }}>Phone / WhatsApp</label>
-                  <input 
-                    type="text" 
-                    placeholder="+91 98765 43210" 
+                  <label style={{ display: 'block', fontSize: '0.78rem', color: 'rgba(255,255,255,0.7)', marginBottom: '4px' }}>
+                    Phone Number
+                  </label>
+                  <input
+                    type="text"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
-                    style={{
-                      width: '100%',
-                      background: 'rgba(255, 255, 255, 0.05)',
-                      border: '1px solid rgba(255, 255, 255, 0.12)',
-                      borderRadius: '12px',
-                      padding: '9px 12px',
-                      color: '#ffffff',
-                      fontSize: '0.82rem',
-                      outline: 'none',
-                    }}
+                    placeholder="+91 98765 43210"
+                    className="luxury-input"
                   />
                 </div>
 
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: 'rgba(255,255,255,0.7)', marginBottom: '4px' }}>City / Region</label>
-                  <input 
-                    type="text" 
-                    placeholder="Bangalore, KA" 
+                  <label style={{ display: 'block', fontSize: '0.78rem', color: 'rgba(255,255,255,0.7)', marginBottom: '4px' }}>
+                    City
+                  </label>
+                  <input
+                    type="text"
                     value={city}
                     onChange={(e) => setCity(e.target.value)}
-                    style={{
-                      width: '100%',
-                      background: 'rgba(255, 255, 255, 0.05)',
-                      border: '1px solid rgba(255, 255, 255, 0.12)',
-                      borderRadius: '12px',
-                      padding: '9px 12px',
-                      color: '#ffffff',
-                      fontSize: '0.82rem',
-                      outline: 'none',
-                    }}
+                    placeholder="e.g. Bangalore"
+                    className="luxury-input"
                   />
                 </div>
               </div>
 
               {selectedRole === 'tenant' ? (
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: 'rgba(255,255,255,0.7)', marginBottom: '4px' }}>Occupation / Job Title</label>
-                  <input 
-                    type="text" 
-                    placeholder="e.g. Senior Software Engineer" 
+                <div style={{ marginBottom: '16px' }}>
+                  <label style={{ display: 'block', fontSize: '0.78rem', color: 'rgba(255,255,255,0.7)', marginBottom: '4px' }}>
+                    Occupation / Role
+                  </label>
+                  <input
+                    type="text"
                     value={occupation}
                     onChange={(e) => setOccupation(e.target.value)}
-                    style={{
-                      width: '100%',
-                      background: 'rgba(255, 255, 255, 0.05)',
-                      border: '1px solid rgba(255, 255, 255, 0.12)',
-                      borderRadius: '12px',
-                      padding: '9px 12px',
-                      color: '#ffffff',
-                      fontSize: '0.82rem',
-                      outline: 'none',
-                    }}
+                    placeholder="e.g. Senior Software Engineer"
+                    className="luxury-input"
                   />
                 </div>
               ) : (
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: 'rgba(255,255,255,0.7)', marginBottom: '4px' }}>Realty / Business Name</label>
-                  <input 
-                    type="text" 
-                    placeholder="e.g. Verma Heritage Estates" 
+                <div style={{ marginBottom: '16px' }}>
+                  <label style={{ display: 'block', fontSize: '0.78rem', color: 'rgba(255,255,255,0.7)', marginBottom: '4px' }}>
+                    Realty Organization / Company
+                  </label>
+                  <input
+                    type="text"
                     value={organization}
                     onChange={(e) => setOrganization(e.target.value)}
-                    style={{
-                      width: '100%',
-                      background: 'rgba(255, 255, 255, 0.05)',
-                      border: '1px solid rgba(255, 255, 255, 0.12)',
-                      borderRadius: '12px',
-                      padding: '9px 12px',
-                      color: '#ffffff',
-                      fontSize: '0.82rem',
-                      outline: 'none',
-                    }}
+                    placeholder="e.g. Mehta Luxury Estates"
+                    className="luxury-input"
                   />
                 </div>
               )}
@@ -471,9 +456,21 @@ export default function LoginModal({ isOpen, onClose, currentRole, onLoginSucces
             type="submit"
             disabled={isSubmitting}
             className="btn-white-pill"
-            style={{ width: '100%', padding: '12px', fontSize: '0.88rem', marginTop: '6px' }}
+            style={{
+              width: '100%',
+              padding: '12px',
+              fontSize: '0.9rem',
+              fontWeight: 700,
+              background: selectedRole === 'landlord'
+                ? 'linear-gradient(135deg, #6B9B76 0%, #4A7C59 100%)'
+                : 'linear-gradient(135deg, #EBA834 0%, #F59E0B 100%)',
+              color: selectedRole === 'landlord' ? '#ffffff' : '#0c141d',
+              boxShadow: selectedRole === 'landlord'
+                ? '0 6px 20px rgba(107, 155, 118, 0.4)'
+                : '0 6px 20px rgba(235, 168, 52, 0.4)',
+            }}
           >
-            {authMode === 'signin' ? 'Sign In as ' : 'Create '} {selectedRole === 'tenant' ? 'Tenant Account' : 'Landlord Account'}
+            {isSubmitting ? 'Authenticating...' : (authMode === 'signin' ? 'Sign In Now' : 'Create & Sign In')}
           </button>
         </form>
       </div>
