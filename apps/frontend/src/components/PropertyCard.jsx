@@ -1,23 +1,30 @@
 import React from 'react';
 import { MapPin, ShieldCheck, ArrowRight, AlertCircle, Info, XCircle, Trash2, User, CheckCircle2 } from 'lucide-react';
 
-const UNSPLASH_IMAGES = [
-  'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800&q=80',
-  'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=800&q=80',
-  'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=800&q=80',
-  'https://images.unsplash.com/photo-1567496898669-ee935f5f647a?auto=format&fit=crop&w=800&q=80',
-  'https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?auto=format&fit=crop&w=800&q=80',
-  'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80',
-  'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80',
-  'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80',
+const HOUSE_IMAGES = [
+  '/houses/house1.jpg',
+  '/houses/house2.jpg',
+  '/houses/house3.jpg',
+  '/houses/house4.jpg',
+  '/houses/house5.jpg',
+  '/houses/house6.jpg',
+  '/houses/house7.jpg',
 ];
 
 export default function PropertyCard({ property, onApply, onDelete, hasApplied, isDenied, onViewDenial, onWithdraw, application, userRole }) {
   const formattedRent = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(property.monthly_rent);
   const formattedThreshold = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(property.income_threshold);
 
-  const imageUrl = property.image_url || UNSPLASH_IMAGES[(property.id || 0) % UNSPLASH_IMAGES.length];
-  const landlordName = property.landlord_name || 'Ananya Verma';
+  const getImageUrl = (prop) => {
+    if (prop.image_url && prop.image_url.startsWith('/houses/')) {
+      return prop.image_url;
+    }
+    const idx = Math.max(0, ((prop.id || 1) - 1) % HOUSE_IMAGES.length);
+    return HOUSE_IMAGES[idx];
+  };
+
+  const imageUrl = getImageUrl(property);
+  const landlordName = property.landlord_name || (property.landlord_id === 2 ? 'Priya Nair' : 'Rohan Mehta');
 
   const isApprovedStatus = application?.status === 'approved';
   const isRejectedStatus = application?.status === 'rejected' || isDenied;
@@ -53,7 +60,7 @@ export default function PropertyCard({ property, onApply, onDelete, hasApplied, 
       borderRadius: '24px',
     }}>
       <div>
-        {/* Compact Property Photo Header */}
+        {/* House Photo Header */}
         <div style={{
           height: '150px',
           borderRadius: '16px',
