@@ -15,7 +15,7 @@ export default function PropertyCard({ property, onApply, onDelete, hasApplied, 
   const formattedThreshold = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(property.income_threshold);
 
   const getImageUrl = (prop) => {
-    if (prop.image_url && prop.image_url.startsWith('/houses/')) {
+    if (prop.image_url && (prop.image_url.startsWith('http://') || prop.image_url.startsWith('https://') || prop.image_url.startsWith('/houses/'))) {
       return prop.image_url;
     }
     const idx = Math.max(0, ((prop.id || 1) - 1) % HOUSE_IMAGES.length);
@@ -70,6 +70,10 @@ export default function PropertyCard({ property, onApply, onDelete, hasApplied, 
           <img
             src={imageUrl}
             alt={property.title}
+            onError={(e) => {
+              const idx = Math.max(0, ((property.id || 1) - 1) % HOUSE_IMAGES.length);
+              e.target.src = HOUSE_IMAGES[idx];
+            }}
             style={{ width: '100%', height: '100%', objectFit: 'cover' }}
           />
           <span style={{

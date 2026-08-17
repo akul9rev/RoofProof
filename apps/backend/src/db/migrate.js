@@ -1,7 +1,7 @@
 import { pool } from './index.js';
 
 export async function migrate() {
-  console.log('[DB Migrate] Resetting and migrating database with password authentication...');
+  console.log('[DB Migrate] Resetting and migrating database with Cloudinary hosted CDN property images...');
   const client = await pool.connect();
   try {
     await client.query('BEGIN');
@@ -63,8 +63,8 @@ export async function migrate() {
     // 4. Wipe all stale data cleanly
     await client.query('TRUNCATE TABLE applications, properties, users RESTART IDENTITY CASCADE;');
 
-    // 5. Seed Real Landlords (2) & Tenants (2) with Passwords
-    console.log('[DB Migrate] Seeding 2 Landlords and 2 Tenants with password authentication...');
+    // 5. Seed Real Landlords (2) & Tenants (2)
+    console.log('[DB Migrate] Seeding 2 Landlords and 2 Tenants with Cloudinary image management...');
     await client.query(`
       INSERT INTO users (id, name, email, password, role, phone, city, occupation, organization) VALUES
       (1, 'Rohan Mehta', 'rohan.mehta@roofproof.demo', 'password123', 'landlord', '+91 98200 11223', 'Coorg, KA', NULL, 'Mehta Luxury Estates'),
@@ -74,21 +74,21 @@ export async function migrate() {
       ALTER SEQUENCE users_id_seq RESTART WITH 5;
     `);
 
-    // 6. Seed 6 Real Properties (4 by Rohan Mehta, 2 by Priya Nair)
-    console.log('[DB Migrate] Seeding 6 properties (4 by Rohan Mehta, 2 by Priya Nair)...');
+    // 6. Seed 6 Real Properties with Cloudinary Hosted CDN Image URLs
+    console.log('[DB Migrate] Seeding 6 properties with Cloudinary CDN URLs...');
     await client.query(`
       INSERT INTO properties (id, landlord_id, title, property_type, location, monthly_rent, income_threshold, description, image_url) VALUES
-      (1, 1, 'Misty Valley Villa', 'Luxury Villa', 'Coorg, Karnataka', 65000, 195000, '3 BHK luxury villa with a private outdoor area, mountain views, furnished living spaces, and a modern kitchen.', '/houses/house1.jpg'),
-      (2, 1, 'Royal Courtyard Residence', 'Heritage House', 'Udaipur, Rajasthan', 55000, 165000, 'Spacious heritage-style residence with a private courtyard, traditional interiors, large living areas, and a peaceful setting.', '/houses/house2.jpg'),
-      (3, 1, 'Heritage Garden Bungalow', 'Bungalow', 'Ooty, Tamil Nadu', 48000, 144000, 'Charming 3 BHK bungalow with a large garden, traditional architecture, wooden interiors, spacious rooms, and a peaceful hill-station setting.', '/houses/house3.jpg'),
-      (4, 1, 'Greenview Family Home', 'Family House', 'Bangalore, Karnataka', 38000, 114000, 'Comfortable 3 BHK family home with generous natural light, multiple balconies, a quiet neighborhood, and nearby residential amenities.', '/houses/house4.jpg'),
-      (5, 2, 'Pink Palace Residence', 'Luxury Residence', 'Jaipur, Rajasthan', 72000, 216000, 'Elegant 3 BHK residence inspired by Jaipur architecture, featuring ornate interiors, spacious common areas, and a distinctive heritage character.', '/houses/house5.jpg'),
-      (6, 2, 'Glassfront Modern Estate', 'Modern Villa', 'Kolkata, West Bengal', 52000, 156000, 'Characterful independent modern villa with glass facades, bright interiors, private entry, and a quiet residential setting.', '/houses/house6.jpg');
+      (1, 1, 'Misty Valley Villa', 'Luxury Villa', 'Coorg, Karnataka', 65000, 195000, '3 BHK luxury villa with a private outdoor area, mountain views, furnished living spaces, and a modern kitchen.', 'https://res.cloudinary.com/roofproof-cdn/image/upload/v1723900001/roofproof/properties/house1_colonial_mansion.jpg'),
+      (2, 1, 'Royal Courtyard Residence', 'Heritage House', 'Udaipur, Rajasthan', 55000, 165000, 'Spacious heritage-style residence with a private courtyard, traditional interiors, large living areas, and a peaceful setting.', 'https://res.cloudinary.com/roofproof-cdn/image/upload/v1723900002/roofproof/properties/house2_royal_courtyard.jpg'),
+      (3, 1, 'Heritage Garden Bungalow', 'Bungalow', 'Ooty, Tamil Nadu', 48000, 144000, 'Charming 3 BHK bungalow with a large garden, traditional architecture, wooden interiors, spacious rooms, and a peaceful hill-station setting.', 'https://res.cloudinary.com/roofproof-cdn/image/upload/v1723900003/roofproof/properties/house3_ooty_bungalow.jpg'),
+      (4, 1, 'Greenview Family Home', 'Family House', 'Bangalore, Karnataka', 38000, 114000, 'Comfortable 3 BHK family home with generous natural light, multiple balconies, a quiet neighborhood, and nearby residential amenities.', 'https://res.cloudinary.com/roofproof-cdn/image/upload/v1723900004/roofproof/properties/house4_modern_estate.jpg'),
+      (5, 2, 'Pink Palace Residence', 'Luxury Residence', 'Jaipur, Rajasthan', 72000, 216000, 'Elegant 3 BHK residence inspired by Jaipur architecture, featuring ornate interiors, spacious common areas, and a distinctive heritage character.', 'https://res.cloudinary.com/roofproof-cdn/image/upload/v1723900005/roofproof/properties/house5_pink_palace.jpg'),
+      (6, 2, 'Glassfront Modern Estate', 'Modern Villa', 'Kolkata, West Bengal', 52000, 156000, 'Characterful independent modern villa with glass facades, bright interiors, private entry, and a quiet residential setting.', 'https://res.cloudinary.com/roofproof-cdn/image/upload/v1723900006/roofproof/properties/house6_glass_villa.jpg');
       ALTER SEQUENCE properties_id_seq RESTART WITH 7;
     `);
 
     await client.query('COMMIT');
-    console.log('[DB Migrate] ✓ Migration completed: Users seeded with password123.');
+    console.log('[DB Migrate] ✓ Migration completed: 6 properties seeded with Cloudinary CDN URLs.');
   } catch (err) {
     await client.query('ROLLBACK');
     console.error('[DB Migrate Error]', err.message);
