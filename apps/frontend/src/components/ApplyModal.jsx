@@ -162,7 +162,7 @@ export default function ApplyModal({ property, tenant, onClose, onSuccess }) {
       padding: '16px',
     }} onClick={onClose}>
       <div
-        className="glass-card animate-fade-in"
+        className="luxury-modal-container animate-modal-scale"
         onClick={(e) => e.stopPropagation()}
         style={{
           maxWidth: '480px',

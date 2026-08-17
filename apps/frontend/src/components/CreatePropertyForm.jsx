@@ -70,7 +70,7 @@ export default function CreatePropertyForm({ landlord, onClose, onSuccess }) {
 
   return (
     <div
-      className="animate-fade-in"
+      className="luxury-modal-container animate-modal-scale"
       style={{
         width: '100%',
         background: 'linear-gradient(165deg, #0e1722 0%, #080e15 100%)',

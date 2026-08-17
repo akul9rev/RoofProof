@@ -118,7 +118,7 @@ export default function LoginModal({ isOpen, onClose, currentRole, onLoginSucces
       onClick={onClose}
     >
       <div 
-        className="glass-card animate-fade-in"
+        className="luxury-modal-container animate-modal-scale"
         onClick={(e) => e.stopPropagation()}
         style={{
           maxWidth: '480px',
