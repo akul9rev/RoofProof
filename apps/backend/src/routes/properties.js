@@ -92,7 +92,13 @@ router.post('/', async (req, res) => {
       property_type || 'Family Apartment',
     ]);
 
-    res.status(201).json({ success: true, property: result.rows[0], message: 'Property listing published successfully to database.' });
+    const createdProperty = result.rows[0];
+    const userRes = await query(`SELECT name FROM users WHERE id = $1`, [landlordId]);
+    if (userRes.rows.length > 0) {
+      createdProperty.landlord_name = userRes.rows[0].name;
+    }
+
+    res.status(201).json({ success: true, property: createdProperty, message: 'Property listing published successfully to database.' });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }
