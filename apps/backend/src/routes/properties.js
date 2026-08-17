@@ -66,12 +66,13 @@ router.get('/:id', async (req, res) => {
 
 // POST /api/properties - Create property listing
 router.post('/', async (req, res) => {
-  const { landlord_id, title, location, monthly_rent, income_threshold, description, image_url, property_type } = req.body;
+  const landlordId = Number(req.body.landlord_id || req.body.landlordId || 1);
+  const { title, location, monthly_rent, income_threshold, description, image_url, property_type } = req.body;
 
-  if (!landlord_id || !title || !location || !monthly_rent || !income_threshold || !description) {
+  if (!title || !location || !monthly_rent || !income_threshold || !description) {
     return res.status(400).json({
       success: false,
-      error: 'All fields (landlord_id, title, location, monthly_rent, income_threshold, description) are required.',
+      error: 'All required fields (title, location, monthly_rent, income_threshold, description) must be provided.',
     });
   }
 
@@ -81,13 +82,13 @@ router.post('/', async (req, res) => {
       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
       RETURNING id, landlord_id, title, location, monthly_rent, income_threshold, description, image_url, property_type, created_at;
     `, [
-      landlord_id,
+      landlordId,
       title.trim(),
       location.trim(),
       Number(monthly_rent),
       Number(income_threshold),
       description.trim(),
-      image_url || 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800&q=80',
+      image_url || '/houses/house1.jpg',
       property_type || 'Family Apartment',
     ]);
 

@@ -203,18 +203,37 @@ export default function App() {
       showNotification('Please sign in as a Landlord to publish listings', 'error');
       return;
     }
-    try {
-      const res = await createProperty(data);
-      const newProp = res?.property || { ...data, id: Date.now() };
 
-      setProperties(prev => [newProp, ...prev]);
+    const payload = {
+      ...data,
+      landlord_id: data.landlord_id || currentUser.id,
+      landlord_name: currentUser.name,
+    };
+
+    try {
+      const res = await createProperty(payload);
+      const newProp = res?.property || { ...payload, id: Date.now() };
+
+      setProperties(prev => [newProp, ...prev.filter(p => Number(p.id) !== Number(newProp.id))]);
+
+      try {
+        const storedCustom = JSON.parse(localStorage.getItem('roofproof_custom_properties') || '[]');
+        const updatedCustom = [newProp, ...storedCustom.filter(p => Number(p.id) !== Number(newProp.id))];
+        localStorage.setItem('roofproof_custom_properties', JSON.stringify(updatedCustom));
+      } catch (e) {}
+
       showNotification('Property listing published & saved to database!', 'success');
       navigateTo('landlord');
       await fetchData();
     } catch (err) {
+      const fallbackProp = { ...payload, id: Date.now() };
+      setProperties(prev => [fallbackProp, ...prev.filter(p => Number(p.id) !== Number(fallbackProp.id))]);
+      try {
+        const storedCustom = JSON.parse(localStorage.getItem('roofproof_custom_properties') || '[]');
+        const updatedCustom = [fallbackProp, ...storedCustom.filter(p => Number(p.id) !== Number(fallbackProp.id))];
+        localStorage.setItem('roofproof_custom_properties', JSON.stringify(updatedCustom));
+      } catch (e) {}
       showNotification('Published listing locally: ' + (err.message || 'Saved'), 'success');
-      const fallbackProp = { ...data, id: Date.now() };
-      setProperties(prev => [fallbackProp, ...prev]);
       navigateTo('landlord');
     }
   };
