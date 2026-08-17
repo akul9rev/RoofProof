@@ -54,9 +54,9 @@ router.get('/', async (req, res) => {
 router.post('/', async (req, res) => {
   const { property_id, propertyId, tenant_id, tenantId, verification_status, zk_tx_hash } = req.body;
   const propId = Number(property_id || propertyId);
-  const tenId = Number(tenant_id || tenantId || 2);
+  const tenId = Number(tenant_id || tenantId || 3);
   const status = 'pending';
-  const verifStatus = verification_status || 'eligible';
+  const verifStatus = verification_status || 'verified_pass';
   const txHash = zk_tx_hash || '5deb9fcd464487459544cf4ae07445d6b1f037033f0c40305527d81a297b061c';
 
   if (!propId || !tenId) {
@@ -64,27 +64,50 @@ router.post('/', async (req, res) => {
   }
 
   try {
-    // Check if application already exists for this tenant and property
+    let appId;
     const existing = await query(`SELECT id FROM applications WHERE property_id = $1 AND tenant_id = $2;`, [propId, tenId]);
     if (existing.rows.length > 0) {
-      // Update existing application
-      const updated = await query(`
+      appId = existing.rows[0].id;
+      await query(`
         UPDATE applications
         SET status = $1, verification_status = $2, zk_tx_hash = $3, rejection_reason = NULL
-        WHERE id = $4
-        RETURNING id, property_id, tenant_id, status, verification_status, zk_tx_hash, created_at;
-      `, [status, verifStatus, txHash, existing.rows[0].id]);
-      return res.json({ success: true, application: updated.rows[0], message: 'Application updated successfully.' });
+        WHERE id = $4;
+      `, [status, verifStatus, txHash, appId]);
+    } else {
+      const inserted = await query(`
+        INSERT INTO applications (property_id, tenant_id, status, verification_status, zk_tx_hash)
+        VALUES ($1, $2, $3, $4, $5)
+        RETURNING id;
+      `, [propId, tenId, status, verifStatus, txHash]);
+      appId = inserted.rows[0].id;
     }
 
-    // Insert new application
-    const result = await query(`
-      INSERT INTO applications (property_id, tenant_id, status, verification_status, zk_tx_hash)
-      VALUES ($1, $2, $3, $4, $5)
-      RETURNING id, property_id, tenant_id, status, verification_status, zk_tx_hash, created_at;
-    `, [propId, tenId, status, verifStatus, txHash]);
+    const fullApp = await query(`
+      SELECT 
+        a.id, 
+        a.property_id, 
+        a.tenant_id, 
+        u.name AS tenant_name,
+        u.email AS tenant_email,
+        p.landlord_id,
+        l.name AS landlord_name,
+        p.title AS property_title,
+        p.location AS property_location,
+        p.monthly_rent,
+        p.income_threshold,
+        a.status, 
+        a.verification_status, 
+        a.zk_tx_hash,
+        a.rejection_reason,
+        a.created_at
+      FROM applications a
+      JOIN properties p ON a.property_id = p.id
+      JOIN users u ON a.tenant_id = u.id
+      JOIN users l ON p.landlord_id = l.id
+      WHERE a.id = $1;
+    `, [appId]);
 
-    return res.status(201).json({ success: true, application: result.rows[0], message: 'Application submitted successfully.' });
+    return res.status(201).json({ success: true, application: fullApp.rows[0], message: 'Application submitted successfully.' });
   } catch (err) {
     return res.status(500).json({ success: false, error: err.message });
   }
@@ -99,46 +122,30 @@ router.patch('/:id/status', async (req, res) => {
     return res.status(400).json({ success: false, error: "Invalid status. Must be 'approved', 'rejected', or 'pending'." });
   }
 
-  const reason = status === 'rejected' ? (rejection_reason?.trim() || 'Owner Denied: Property requirements or profile criteria not met.') : null;
-
   try {
     const result = await query(`
       UPDATE applications
       SET status = $1, rejection_reason = $2
       WHERE id = $3
       RETURNING id, property_id, tenant_id, status, verification_status, zk_tx_hash, rejection_reason, created_at;
-    `, [status, reason, applicationId]);
+    `, [status, rejection_reason || null, applicationId]);
 
     if (result.rows.length === 0) {
       return res.status(404).json({ success: false, error: 'Application not found.' });
     }
 
-    res.json({ success: true, application: result.rows[0], message: `Application marked as ${status}.` });
+    res.json({ success: true, application: result.rows[0], message: `Application status updated to ${status}.` });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }
 });
 
-// DELETE /api/applications/:id - Tenant withdraws / takes back application
+// DELETE /api/applications/:id - Withdraw application
 router.delete('/:id', async (req, res) => {
   const applicationId = Number(req.params.id);
-
   try {
-    const result = await query(`
-      DELETE FROM applications
-      WHERE id = $1
-      RETURNING id, property_id, tenant_id;
-    `, [applicationId]);
-
-    if (result.rows.length === 0) {
-      return res.status(404).json({ success: false, error: 'Application not found.' });
-    }
-
-    res.json({
-      success: true,
-      message: 'Application successfully taken back. You can now re-verify your private income and re-apply.',
-      withdrawnApplication: result.rows[0],
-    });
+    await query('DELETE FROM applications WHERE id = $1;', [applicationId]);
+    res.json({ success: true, message: 'Application withdrawn successfully.' });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }
