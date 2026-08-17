@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Shield, ArrowRight, CheckCircle2, Building, User, Phone, MapPin, Briefcase } from 'lucide-react';
+import { X, Shield, Building, User } from 'lucide-react';
 import { loginOrRegister } from '../services/api';
 
 export default function LoginModal({ isOpen, onClose, currentRole, onLoginSuccess, currentUser }) {
@@ -28,63 +28,12 @@ export default function LoginModal({ isOpen, onClose, currentRole, onLoginSucces
 
   if (!isOpen) return null;
 
-  const presetLandlords = [
-    {
-      id: 1,
-      name: 'Rohan Mehta',
-      email: 'rohan.mehta@roofproof.demo',
-      role: 'landlord',
-      phone: '+91 98200 11223',
-      city: 'Coorg, KA',
-      organization: 'Mehta Luxury Estates',
-      title: 'Owner of 4 Luxury & Heritage Properties',
-    },
-    {
-      id: 2,
-      name: 'Priya Nair',
-      email: 'priya.nair@roofproof.demo',
-      role: 'landlord',
-      phone: '+91 98450 33445',
-      city: 'Jaipur, RJ',
-      organization: 'Heritage Living India',
-      title: 'Owner of 3 Palace & Courtyard Residences',
-    },
-  ];
-
-  const presetTenants = [
-    {
-      id: 3,
-      name: 'Arjun Sharma',
-      email: 'arjun.sharma@roofproof.demo',
-      role: 'tenant',
-      phone: '+91 98765 43210',
-      city: 'Bangalore, KA',
-      occupation: 'Senior Software Engineer',
-      title: 'Form 16 Verified (Gross: ₹18.5L)',
-    },
-    {
-      id: 4,
-      name: 'Neha Kapoor',
-      email: 'neha.kapoor@roofproof.demo',
-      role: 'tenant',
-      phone: '+91 98111 22334',
-      city: 'Mumbai, MH',
-      occupation: 'Product Lead',
-      title: 'Form 16 Verified (Gross: ₹15.2L)',
-    },
-  ];
-
-  const handleQuickLogin = (preset) => {
-    onLoginSuccess(preset);
-    onClose();
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
 
     if (!email) {
-      setError('Please enter your email address');
+      setError('Please enter your registered email address');
       return;
     }
     if (authMode === 'signup' && !name) {
@@ -96,7 +45,7 @@ export default function LoginModal({ isOpen, onClose, currentRole, onLoginSucces
     try {
       const payload = {
         name: name || (selectedRole === 'tenant' ? 'Arjun Sharma' : 'Rohan Mehta'),
-        email,
+        email: email.trim(),
         role: selectedRole,
         phone,
         city,
@@ -115,17 +64,7 @@ export default function LoginModal({ isOpen, onClose, currentRole, onLoginSucces
       onClose();
     } catch (err) {
       setIsSubmitting(false);
-      onLoginSuccess({
-        id: selectedRole === 'tenant' ? 3 : 1,
-        name: name || (selectedRole === 'tenant' ? 'Arjun Sharma' : 'Rohan Mehta'),
-        email: email || (selectedRole === 'tenant' ? 'arjun.sharma@roofproof.demo' : 'rohan.mehta@roofproof.demo'),
-        role: selectedRole,
-        phone,
-        city,
-        occupation: selectedRole === 'tenant' ? occupation : undefined,
-        organization: selectedRole === 'landlord' ? organization : undefined,
-      });
-      onClose();
+      setError(err.message || 'Failed to authenticate user account.');
     }
   };
 
@@ -154,7 +93,7 @@ export default function LoginModal({ isOpen, onClose, currentRole, onLoginSucces
         className="luxury-modal-container animate-modal-scale"
         onClick={(e) => e.stopPropagation()}
         style={{
-          maxWidth: '520px',
+          maxWidth: '480px',
           width: '100%',
           padding: '28px 30px',
           borderRadius: '26px',
@@ -189,7 +128,7 @@ export default function LoginModal({ isOpen, onClose, currentRole, onLoginSucces
         </button>
 
         {/* Modal Header */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '18px' }}>
           <div style={{
             width: '38px',
             height: '38px',
@@ -204,7 +143,7 @@ export default function LoginModal({ isOpen, onClose, currentRole, onLoginSucces
           </div>
           <div>
             <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: '#ffffff', margin: 0 }}>
-              {authMode === 'signin' ? 'Sign In to RoofProof' : 'Create RoofProof Account'}
+              {authMode === 'signin' ? 'Sign In to Account' : 'Create RoofProof Account'}
             </h3>
             <p style={{ fontSize: '0.78rem', color: 'rgba(255, 255, 255, 0.6)', margin: 0 }}>
               Midnight Zero-Knowledge Identity Protection
@@ -299,56 +238,7 @@ export default function LoginModal({ isOpen, onClose, currentRole, onLoginSucces
           </div>
         </div>
 
-        {/* Quick Demo Logins in Sign In mode */}
-        {authMode === 'signin' && (
-          <div style={{ marginBottom: '18px' }}>
-            <div style={{ fontSize: '0.78rem', color: 'rgba(255, 255, 255, 0.5)', marginBottom: '8px' }}>
-              Quick Demo Accounts:
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              {(selectedRole === 'landlord' ? presetLandlords : presetTenants).map((preset) => (
-                <div
-                  key={preset.id}
-                  onClick={() => handleQuickLogin(preset)}
-                  style={{
-                    background: 'rgba(255, 255, 255, 0.04)',
-                    border: '1px solid rgba(255, 255, 255, 0.1)',
-                    borderRadius: '14px',
-                    padding: '10px 14px',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                  }}
-                >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                    <div style={{
-                      width: '34px', height: '34px', borderRadius: '50%',
-                      background: preset.role === 'landlord'
-                        ? 'linear-gradient(135deg, #6B9B76 0%, #4A7C59 100%)'
-                        : 'linear-gradient(135deg, #EBA834 0%, #F59E0B 100%)',
-                      color: preset.role === 'landlord' ? '#ffffff' : '#0c141d',
-                      fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.82rem',
-                    }}>
-                      {preset.name.split(' ').map(n => n[0]).join('')}
-                    </div>
-                    <div>
-                      <div style={{ fontSize: '0.88rem', fontWeight: 600, color: '#ffffff' }}>{preset.name}</div>
-                      <div style={{ fontSize: '0.72rem', color: preset.role === 'landlord' ? '#6B9B76' : '#EBA834' }}>
-                        {preset.title}
-                      </div>
-                    </div>
-                  </div>
-                  <span className="btn-white-pill" style={{ padding: '5px 12px', fontSize: '0.74rem' }}>
-                    Quick Login <ArrowRight size={11} />
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Custom Input Form */}
+        {/* Real User Input Form */}
         <form onSubmit={handleSubmit}>
           {error && (
             <div style={{

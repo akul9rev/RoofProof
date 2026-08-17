@@ -8,6 +8,7 @@ import PdfExtractTestUI from './components/PdfExtractTestUI.jsx';
 import ApplyModal from './components/ApplyModal.jsx';
 import CreatePropertyPage from './components/CreatePropertyPage.jsx';
 import LoginModal from './components/LoginModal.jsx';
+import ErrorPage from './components/ErrorPage.jsx';
 import { fetchProperties, fetchApplications, applyForProperty, updateApplicationStatus, createProperty, deleteProperty } from './services/api.js';
 
 export default function App() {
@@ -17,6 +18,10 @@ export default function App() {
     if (path.includes('/landlord')) return 'landlord';
     if (path.includes('/privacy')) return 'privacy';
     if (path.includes('/list')) return 'list-property';
+    if (path.includes('/403')) return '403';
+    if (path.includes('/401')) return '401';
+    if (path.includes('/500')) return '500';
+    if (path !== '/' && path !== '') return '404';
     return 'landing';
   };
 
@@ -30,9 +35,14 @@ export default function App() {
     else if (view === 'landlord') path = '/landlord';
     else if (view === 'privacy') path = '/privacy';
     else if (view === 'list-property') path = '/list-property';
-    try {
+    else if (view === '403') path = '/403';
+    else if (view === '404') path = '/404';
+    else if (view === '401') path = '/401';
+    else if (view === '500') path = '/500';
+
+    if (window.location.pathname !== path) {
       window.history.pushState({}, '', path);
-    } catch (e) {}
+    }
   };
 
   useEffect(() => {
@@ -44,17 +54,28 @@ export default function App() {
   }, []);
 
   const [currentUser, setCurrentUser] = useState({
-    id: 1,
-    name: 'Rahul Sharma',
-    email: 'rahul.sharma@example.com',
+    id: 3,
+    name: 'Arjun Sharma',
+    email: 'arjun.sharma@roofproof.demo',
     role: 'tenant',
+    phone: '+91 98765 43210',
+    city: 'Bangalore, KA',
+    occupation: 'Senior Software Engineer',
   });
 
-  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [properties, setProperties] = useState([]);
   const [applications, setApplications] = useState([]);
-  const [selectedPropertyForApply, setSelectedPropertyForApply] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedPropertyForApply, setSelectedPropertyForApply] = useState(null);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [deletedPropertyIds, setDeletedPropertyIds] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem('roofproof_deleted_props') || '[]');
+    } catch (e) {
+      return [];
+    }
+  });
+
   const [notification, setNotification] = useState(null);
 
   const showNotification = (message, type = 'success') => {
@@ -97,7 +118,7 @@ export default function App() {
       const newApp = res?.application || {
         id: Date.now(),
         property_id: payload.property_id,
-        tenant_id: payload.tenant_id || currentUser?.id || 1,
+        tenant_id: payload.tenant_id || currentUser?.id || 3,
         status: 'pending',
         verification_status: payload.verification_status,
         zk_tx_hash: payload.zk_tx_hash,
@@ -117,7 +138,7 @@ export default function App() {
       const fallbackApp = {
         id: Date.now(),
         property_id: payload.property_id,
-        tenant_id: payload.tenant_id || currentUser?.id || 1,
+        tenant_id: payload.tenant_id || currentUser?.id || 3,
         status: 'pending',
         verification_status: payload.verification_status,
         zk_tx_hash: payload.zk_tx_hash,
@@ -178,21 +199,8 @@ export default function App() {
       console.log('Backend sync withdraw');
     }
     setApplications(prev => prev.filter(a => a.id !== appId && a.property_id !== appId));
-    try {
-      const stored = JSON.parse(localStorage.getItem('roofproof_my_apps') || '[]');
-      const filtered = stored.filter(a => a.id !== appId && a.property_id !== appId);
-      localStorage.setItem('roofproof_my_apps', JSON.stringify(filtered));
-    } catch (e) {}
-    showNotification('Rental application withdrawn successfully', 'success');
+    showNotification('Application withdrawn successfully', 'success');
   };
-
-  const [deletedPropertyIds, setDeletedPropertyIds] = useState(() => {
-    try {
-      return JSON.parse(localStorage.getItem('roofproof_deleted_props') || '[]');
-    } catch {
-      return [];
-    }
-  });
 
   const handleDeleteProperty = async (propId) => {
     try {
@@ -216,7 +224,8 @@ export default function App() {
     showNotification('Property listing deleted successfully', 'success');
   };
 
-  const isPortalView = activeView === 'tenant' || activeView === 'landlord' || activeView === 'list-property';
+  // Role Access Guard: Tenant attempting to access Landlord Portal or Create Property
+  const isTenantRestricted = currentRole === 'tenant' && (activeView === 'landlord' || activeView === 'list-property');
 
   return (
     <div className="app-viewport-frame">
@@ -228,8 +237,12 @@ export default function App() {
         currentUser={currentUser}
         onOpenLogin={() => setIsLoginModalOpen(true)}
         onListProperty={() => {
-          setCurrentRole('landlord');
-          navigateTo('list-property');
+          if (currentRole === 'tenant') {
+            showNotification('Access Denied: Please sign in as a Landlord to list properties', 'error');
+            navigateTo('403');
+          } else {
+            navigateTo('list-property');
+          }
         }}
       />
 
@@ -240,9 +253,9 @@ export default function App() {
           bottom: '24px',
           right: '24px',
           zIndex: 99999,
-          background: notification.type === 'success' ? 'var(--bg-secondary)' : 'var(--danger-bg)',
-          border: `1px solid ${notification.type === 'success' ? 'var(--success-border)' : 'var(--danger-border)'}`,
-          color: notification.type === 'success' ? 'var(--success-text)' : 'var(--danger-text)',
+          background: notification.type === 'success' ? 'var(--bg-secondary)' : 'rgba(239, 68, 68, 0.95)',
+          border: `1px solid ${notification.type === 'success' ? 'var(--success-border)' : 'rgba(239, 68, 68, 0.5)'}`,
+          color: notification.type === 'success' ? 'var(--success-text)' : '#ffffff',
           padding: '16px 24px',
           borderRadius: 'var(--radius-md)',
           boxShadow: '0 20px 50px rgba(0,0,0,0.5)',
@@ -250,65 +263,90 @@ export default function App() {
           fontWeight: 600,
           animation: 'slideUp 0.3s ease-out',
         }}>
-          ✓ {notification.message}
+          {notification.type === 'success' ? '✓' : '⚠️'} {notification.message}
         </div>
       )}
 
       {/* Main Content Area */}
       <main style={{ flex: 1 }}>
-        {activeView === 'landing' && (
-          <LandingPage
-            properties={properties}
-            onApplyToProperty={(prop) => setSelectedPropertyForApply(prop)}
-            onListProperty={() => {
-              setCurrentRole('landlord');
-              navigateTo('list-property');
-            }}
+        {isTenantRestricted ? (
+          <ErrorPage
+            type="403"
+            onNavigate={navigateTo}
+            onOpenLogin={() => setIsLoginModalOpen(true)}
+            currentRole={currentRole}
           />
-        )}
+        ) : (
+          <>
+            {activeView === 'landing' && (
+              <LandingPage
+                properties={properties}
+                onApplyToProperty={(prop) => setSelectedPropertyForApply(prop)}
+                onListProperty={() => {
+                  if (currentRole === 'tenant') {
+                    navigateTo('403');
+                  } else {
+                    navigateTo('list-property');
+                  }
+                }}
+              />
+            )}
 
-        {activeView === 'tenant' && (
-          <TenantDashboard
-            properties={properties}
-            applications={applications}
-            deletedPropertyIds={deletedPropertyIds}
-            onApply={(property) => setSelectedPropertyForApply(property)}
-            onWithdraw={handleWithdrawApplication}
-            currentUser={currentUser}
-          />
-        )}
+            {activeView === 'tenant' && (
+              <TenantDashboard
+                properties={properties}
+                applications={applications}
+                deletedPropertyIds={deletedPropertyIds}
+                onApply={(property) => setSelectedPropertyForApply(property)}
+                onWithdraw={handleWithdrawApplication}
+                currentUser={currentUser}
+              />
+            )}
 
-        {activeView === 'landlord' && (
-          <LandlordDashboard
-            properties={properties}
-            applications={applications}
-            deletedPropertyIds={deletedPropertyIds}
-            onOpenCreateModal={() => navigateTo('list-property')}
-            onCreateProperty={handleCreateProperty}
-            onUpdateStatus={handleUpdateStatus}
-            onDeleteProperty={handleDeleteProperty}
-            currentUser={currentUser}
-          />
-        )}
+            {activeView === 'landlord' && (
+              <LandlordDashboard
+                properties={properties}
+                applications={applications}
+                deletedPropertyIds={deletedPropertyIds}
+                onOpenCreateModal={() => navigateTo('list-property')}
+                onCreateProperty={handleCreateProperty}
+                onUpdateStatus={handleUpdateStatus}
+                onDeleteProperty={handleDeleteProperty}
+                currentUser={currentUser}
+              />
+            )}
 
-        {activeView === 'list-property' && (
-          <CreatePropertyPage
-            landlord={currentUser}
-            onBack={() => navigateTo('landlord')}
-            onSuccess={handleCreateProperty}
-          />
-        )}
+            {activeView === 'list-property' && (
+              <CreatePropertyPage
+                landlord={currentUser}
+                onBack={() => navigateTo('landlord')}
+                onSuccess={handleCreateProperty}
+              />
+            )}
 
-        {activeView === 'privacy' && (
-          <PrivacyVerificationView />
-        )}
-
-        {activeView === 'testui' && (
-          <PdfExtractTestUI />
+            {(activeView === '403' || activeView === '404' || activeView === '401' || activeView === '500') && (
+              <ErrorPage
+                type={activeView}
+                onNavigate={navigateTo}
+                onOpenLogin={() => setIsLoginModalOpen(true)}
+                currentRole={currentRole}
+              />
+            )}
+          </>
         )}
       </main>
 
-      {/* Modals */}
+      {/* Apply with ZK Proof Modal */}
+      {selectedPropertyForApply && (
+        <ApplyModal
+          property={selectedPropertyForApply}
+          onClose={() => setSelectedPropertyForApply(null)}
+          onSubmit={handleApplySubmit}
+          currentUser={currentUser}
+        />
+      )}
+
+      {/* Sign In / Account Registration Modal */}
       <LoginModal
         isOpen={isLoginModalOpen}
         onClose={() => setIsLoginModalOpen(false)}
@@ -316,15 +354,6 @@ export default function App() {
         currentUser={currentUser}
         onLoginSuccess={handleLoginSuccess}
       />
-
-      {selectedPropertyForApply && (
-        <ApplyModal
-          property={selectedPropertyForApply}
-          tenant={currentUser}
-          onClose={() => setSelectedPropertyForApply(null)}
-          onSuccess={handleApplySubmit}
-        />
-      )}
     </div>
   );
 }
