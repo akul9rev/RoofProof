@@ -15,8 +15,16 @@ export default function PropertyCard({ property, onApply, onDelete, hasApplied, 
   const formattedThreshold = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(property.income_threshold);
 
   const getImageUrl = (prop) => {
-    if (prop.image_url && (prop.image_url.startsWith('http://') || prop.image_url.startsWith('https://') || prop.image_url.startsWith('/houses/'))) {
-      return prop.image_url;
+    if (prop.image_url && typeof prop.image_url === 'string' && prop.image_url.trim().length > 5) {
+      if (
+        prop.image_url.startsWith('http://') ||
+        prop.image_url.startsWith('https://') ||
+        prop.image_url.startsWith('data:image/') ||
+        prop.image_url.startsWith('blob:') ||
+        prop.image_url.startsWith('/houses/')
+      ) {
+        return prop.image_url;
+      }
     }
     const idx = Math.max(0, ((prop.id || 1) - 1) % HOUSE_IMAGES.length);
     return HOUSE_IMAGES[idx];

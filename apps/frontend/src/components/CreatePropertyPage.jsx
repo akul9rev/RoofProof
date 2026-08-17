@@ -53,20 +53,20 @@ export default function CreatePropertyPage({ landlord, onBack, onSuccess }) {
     }
 
     setIsSubmitting(true);
-    let finalImageUrl = 'https://res.cloudinary.com/omfiswpt/image/upload/v1723900001/roofproof/properties/house1_colonial_mansion.jpg';
+    let finalImageUrl = imagePreview || 'https://res.cloudinary.com/omfiwspt/image/upload/v1723900001/roofproof/properties/house1_colonial_mansion.jpg';
 
     try {
       if (imageFile || imagePreview) {
         try {
           const uploadRes = await uploadImageToCloudinaryApi(imageFile || imagePreview);
-          if (uploadRes?.success && uploadRes?.url) {
+          if (uploadRes?.url && !uploadRes.isFallback) {
             finalImageUrl = uploadRes.url;
-          } else if (imagePreview && imagePreview.startsWith('http')) {
+          } else if (imagePreview) {
             finalImageUrl = imagePreview;
           }
         } catch (uploadErr) {
           console.warn('[Cloudinary Upload Fallback]', uploadErr);
-          if (imagePreview && imagePreview.startsWith('http')) {
+          if (imagePreview) {
             finalImageUrl = imagePreview;
           }
         }
