@@ -289,13 +289,25 @@ export default function App() {
     } catch (err) {
       console.log('Backend sync delete');
     }
-    const nextDeleted = Array.from(new Set([...deletedPropertyIds, propId]));
+    const nextDeleted = Array.from(new Set([...deletedPropertyIds, propId, Number(propId)]));
     setDeletedPropertyIds(nextDeleted);
     try {
       localStorage.setItem('roofproof_deleted_props', JSON.stringify(nextDeleted));
     } catch (e) {}
 
-    setProperties(prev => prev.filter(p => p.id !== propId));
+    try {
+      const custom = JSON.parse(localStorage.getItem('roofproof_custom_properties') || '[]');
+      const filteredCustom = custom.filter(p => Number(p.id) !== Number(propId));
+      localStorage.setItem('roofproof_custom_properties', JSON.stringify(filteredCustom));
+    } catch (e) {}
+
+    try {
+      const storedApps = JSON.parse(localStorage.getItem('roofproof_my_apps') || '[]');
+      const filteredApps = storedApps.filter(a => Number(a.property_id) !== Number(propId));
+      localStorage.setItem('roofproof_my_apps', JSON.stringify(filteredApps));
+    } catch (e) {}
+
+    setProperties(prev => prev.filter(p => Number(p.id) !== Number(propId)));
     showNotification('Property listing deleted successfully', 'success');
   };
 
@@ -372,6 +384,7 @@ export default function App() {
             {activeView === 'landing' && (
               <LandingPage
                 properties={properties}
+                deletedPropertyIds={deletedPropertyIds}
                 onApplyToProperty={(prop) => {
                   if (!currentUser) {
                     setIsLoginModalOpen(true);

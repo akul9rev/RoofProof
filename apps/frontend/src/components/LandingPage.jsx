@@ -1,13 +1,25 @@
 import React from 'react';
 import { Edit3, MapPin, Home, ShieldCheck, Cpu, Lock } from 'lucide-react';
 
-export default function LandingPage({ properties = [], onApplyToProperty }) {
-  const featuredProp = properties[0] || {
+export default function LandingPage({ properties = [], deletedPropertyIds = [], onApplyToProperty }) {
+  const customProps = (() => {
+    try {
+      return JSON.parse(localStorage.getItem('roofproof_custom_properties') || '[]');
+    } catch {
+      return [];
+    }
+  })();
+
+  const merged = [...properties, ...customProps];
+  const uniqueProps = Array.from(new Map(merged.map(p => [Number(p.id), p])).values());
+  const activeProperties = uniqueProps.filter(p => !deletedPropertyIds.includes(p.id) && !deletedPropertyIds.includes(Number(p.id)));
+
+  const featuredProp = activeProperties[0] || {
     id: 1,
-    title: 'Evergreen Pine Luxury Villa',
-    location: 'Manali, Himachal Pradesh',
-    monthly_rent: 75000,
-    income_threshold: 225000,
+    title: 'Misty Valley Villa',
+    location: 'Coorg, Karnataka',
+    monthly_rent: 65000,
+    income_threshold: 195000,
   };
 
   return (
