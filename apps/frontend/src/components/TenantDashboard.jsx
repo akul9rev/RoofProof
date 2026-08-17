@@ -41,8 +41,8 @@ export default function TenantDashboard({ properties = [], applications = [], de
     }
   })();
 
-  const mergedProperties = [...properties, ...customProps];
-  const uniqueProperties = Array.from(new Map(mergedProperties.map(p => [p.id, p])).values());
+  const mergedProperties = [...customProps, ...properties];
+  const uniqueProperties = Array.from(new Map(mergedProperties.map(p => [Number(p.id), p])).values());
   const catalogue = uniqueProperties.filter(p => !deletedPropertyIds.includes(p.id) && !deletedPropertyIds.includes(Number(p.id)) && !deletedPropertyIds.includes(String(p.id)));
 
   const filteredProperties = catalogue.filter(p => {
