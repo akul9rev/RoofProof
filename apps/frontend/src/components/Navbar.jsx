@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { Shield } from 'lucide-react';
+import { Shield, User as UserIcon } from 'lucide-react';
 
 export default function Navbar({ activeView, setActiveView, currentRole, onListProperty, currentUser, onOpenLogin }) {
   const isLandlord = currentRole === 'landlord';
   const [hoveredNav, setHoveredNav] = useState(null);
 
   const getUserInitials = (name) => {
-    if (!name) return 'RP';
+    if (!name) return '';
     const parts = name.trim().split(' ');
     if (parts.length >= 2) {
       return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
@@ -78,7 +78,7 @@ export default function Navbar({ activeView, setActiveView, currentRole, onListP
         </span>
       </div>
 
-      {/* Navigation Links & Controls - Clean & Transparent */}
+      {/* Navigation Links & Controls */}
       <div style={{
         display: 'flex',
         alignItems: 'center',
@@ -153,10 +153,10 @@ export default function Navbar({ activeView, setActiveView, currentRole, onListP
           </button>
         </nav>
 
-        {/* Profile Avatar Only - Clean 0-Blur Circle */}
+        {/* Profile Avatar: Empty User Icon if Not Logged In, Initials if Logged In */}
         <div
           onClick={onOpenLogin}
-          title={`Logged in as ${currentUser?.name || 'User'} (${currentRole}) - Click to sign in or switch account`}
+          title={currentUser ? `Logged in as ${currentUser.name} (${currentRole}) - Click to switch account` : 'Sign In to RoofProof'}
           style={{
             position: 'relative',
             cursor: 'pointer',
@@ -165,34 +165,53 @@ export default function Navbar({ activeView, setActiveView, currentRole, onListP
             justifyContent: 'center',
           }}
         >
-          <div style={{
-            width: '38px',
-            height: '38px',
-            borderRadius: '50%',
-            background: isLandlord
-              ? 'linear-gradient(135deg, #6B9B76 0%, #4A7C59 100%)'
-              : 'linear-gradient(135deg, #EBA834 0%, #F59E0B 100%)',
-            color: isLandlord ? '#ffffff' : '#0c141d',
-            fontWeight: 800,
-            fontSize: '0.9rem',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            boxShadow: isLandlord ? '0 0 14px rgba(107, 155, 118, 0.4)' : '0 0 14px rgba(235, 168, 52, 0.4)',
-            border: '2px solid rgba(255, 255, 255, 0.3)',
-          }}>
-            {initials}
-          </div>
-          <span style={{
-            position: 'absolute',
-            bottom: '0',
-            right: '0',
-            width: '10px',
-            height: '10px',
-            borderRadius: '50%',
-            background: '#22c55e',
-            border: '2px solid #09121a',
-          }}></span>
+          {currentUser ? (
+            <>
+              <div style={{
+                width: '38px',
+                height: '38px',
+                borderRadius: '50%',
+                background: isLandlord
+                  ? 'linear-gradient(135deg, #6B9B76 0%, #4A7C59 100%)'
+                  : 'linear-gradient(135deg, #EBA834 0%, #F59E0B 100%)',
+                color: isLandlord ? '#ffffff' : '#0c141d',
+                fontWeight: 800,
+                fontSize: '0.9rem',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: isLandlord ? '0 0 14px rgba(107, 155, 118, 0.4)' : '0 0 14px rgba(235, 168, 52, 0.4)',
+                border: '2px solid rgba(255, 255, 255, 0.3)',
+              }}>
+                {initials}
+              </div>
+              <span style={{
+                position: 'absolute',
+                bottom: '0',
+                right: '0',
+                width: '10px',
+                height: '10px',
+                borderRadius: '50%',
+                background: '#22c55e',
+                border: '2px solid #09121a',
+              }}></span>
+            </>
+          ) : (
+            <div style={{
+              width: '38px',
+              height: '38px',
+              borderRadius: '50%',
+              background: 'rgba(255, 255, 255, 0.08)',
+              color: 'rgba(255, 255, 255, 0.85)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              border: '1.5px solid rgba(255, 255, 255, 0.25)',
+              transition: 'all 0.2s ease',
+            }}>
+              <UserIcon size={18} />
+            </div>
+          )}
         </div>
 
         {/* Action Button: Landlord sees 'List Now', Tenant sees 'Find a Home' */}

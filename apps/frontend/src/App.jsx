@@ -28,6 +28,9 @@ export default function App() {
   const [activeView, setActiveView] = useState(getViewFromPath);
   const [currentRole, setCurrentRole] = useState('tenant');
 
+  // Unauthenticated by default when app loads
+  const [currentUser, setCurrentUser] = useState(null);
+
   const navigateTo = (view) => {
     setActiveView(view);
     let path = '/';
@@ -52,16 +55,6 @@ export default function App() {
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
   }, []);
-
-  const [currentUser, setCurrentUser] = useState({
-    id: 3,
-    name: 'Arjun Sharma',
-    email: 'arjun.sharma@roofproof.demo',
-    role: 'tenant',
-    phone: '+91 98765 43210',
-    city: 'Bangalore, KA',
-    occupation: 'Senior Software Engineer',
-  });
 
   const [properties, setProperties] = useState([]);
   const [applications, setApplications] = useState([]);
@@ -113,12 +106,17 @@ export default function App() {
   };
 
   const handleApplySubmit = async (payload) => {
+    if (!currentUser) {
+      setIsLoginModalOpen(true);
+      showNotification('Please sign in to submit your ZK rental application', 'error');
+      return;
+    }
     try {
       const res = await applyForProperty(payload.property_id, payload);
       const newApp = res?.application || {
         id: Date.now(),
         property_id: payload.property_id,
-        tenant_id: payload.tenant_id || currentUser?.id || 3,
+        tenant_id: payload.tenant_id || currentUser.id,
         status: 'pending',
         verification_status: payload.verification_status,
         zk_tx_hash: payload.zk_tx_hash,
@@ -126,11 +124,6 @@ export default function App() {
       };
 
       setApplications(prev => [newApp, ...prev]);
-      try {
-        const stored = JSON.parse(localStorage.getItem('roofproof_my_apps') || '[]');
-        localStorage.setItem('roofproof_my_apps', JSON.stringify([newApp, ...stored]));
-      } catch (e) {}
-
       showNotification('Privacy proof generated and application submitted!', 'success');
       setSelectedPropertyForApply(null);
       await fetchData();
@@ -138,34 +131,29 @@ export default function App() {
       const fallbackApp = {
         id: Date.now(),
         property_id: payload.property_id,
-        tenant_id: payload.tenant_id || currentUser?.id || 3,
+        tenant_id: payload.tenant_id || currentUser.id,
         status: 'pending',
         verification_status: payload.verification_status,
         zk_tx_hash: payload.zk_tx_hash,
         created_at: new Date().toISOString(),
       };
       setApplications(prev => [fallbackApp, ...prev]);
-      try {
-        const stored = JSON.parse(localStorage.getItem('roofproof_my_apps') || '[]');
-        localStorage.setItem('roofproof_my_apps', JSON.stringify([fallbackApp, ...stored]));
-      } catch (e) {}
       showNotification('Application submitted with ZK proof!', 'success');
       setSelectedPropertyForApply(null);
     }
   };
 
   const handleCreateProperty = async (data) => {
+    if (!currentUser || currentRole !== 'landlord') {
+      setIsLoginModalOpen(true);
+      showNotification('Please sign in as a Landlord to publish listings', 'error');
+      return;
+    }
     try {
       const res = await createProperty(data);
       const newProp = res?.property || { ...data, id: Date.now() };
 
       setProperties(prev => [newProp, ...prev]);
-
-      try {
-        const storedCustom = JSON.parse(localStorage.getItem('roofproof_custom_properties') || '[]');
-        localStorage.setItem('roofproof_custom_properties', JSON.stringify([newProp, ...storedCustom]));
-      } catch (e) {}
-
       showNotification('Property listing published & saved to database!', 'success');
       navigateTo('landlord');
       await fetchData();
@@ -173,10 +161,6 @@ export default function App() {
       showNotification('Published listing locally: ' + (err.message || 'Saved'), 'success');
       const fallbackProp = { ...data, id: Date.now() };
       setProperties(prev => [fallbackProp, ...prev]);
-      try {
-        const storedCustom = JSON.parse(localStorage.getItem('roofproof_custom_properties') || '[]');
-        localStorage.setItem('roofproof_custom_properties', JSON.stringify([fallbackProp, ...storedCustom]));
-      } catch (e) {}
       navigateTo('landlord');
     }
   };
@@ -214,18 +198,15 @@ export default function App() {
       localStorage.setItem('roofproof_deleted_props', JSON.stringify(nextDeleted));
     } catch (e) {}
 
-    try {
-      const storedCustom = JSON.parse(localStorage.getItem('roofproof_custom_properties') || '[]');
-      const filteredCustom = storedCustom.filter(p => p.id !== propId);
-      localStorage.setItem('roofproof_custom_properties', JSON.stringify(filteredCustom));
-    } catch (e) {}
-
     setProperties(prev => prev.filter(p => p.id !== propId));
     showNotification('Property listing deleted successfully', 'success');
   };
 
-  // Role Access Guard: Tenant attempting to access Landlord Portal or Create Property
-  const isTenantRestricted = currentRole === 'tenant' && (activeView === 'landlord' || activeView === 'list-property');
+  // 1. Unauthenticated Security Guard: User NOT signed in attempting to access Tenant/Landlord portals
+  const isUnauthenticatedRestricted = !currentUser && (activeView === 'tenant' || activeView === 'landlord' || activeView === 'list-property');
+
+  // 2. Tenant Role Security Guard: Tenant attempting to access Landlord Portal or Create Property
+  const isTenantRestricted = currentUser && currentRole === 'tenant' && (activeView === 'landlord' || activeView === 'list-property');
 
   return (
     <div className="app-viewport-frame">
@@ -237,8 +218,10 @@ export default function App() {
         currentUser={currentUser}
         onOpenLogin={() => setIsLoginModalOpen(true)}
         onListProperty={() => {
-          if (currentRole === 'tenant') {
-            showNotification('Access Denied: Please sign in as a Landlord to list properties', 'error');
+          if (!currentUser) {
+            setIsLoginModalOpen(true);
+            showNotification('Please sign in as a Landlord to list properties', 'error');
+          } else if (currentRole === 'tenant') {
             navigateTo('403');
           } else {
             navigateTo('list-property');
@@ -269,7 +252,14 @@ export default function App() {
 
       {/* Main Content Area */}
       <main style={{ flex: 1 }}>
-        {isTenantRestricted ? (
+        {isUnauthenticatedRestricted ? (
+          <ErrorPage
+            type="401"
+            onNavigate={navigateTo}
+            onOpenLogin={() => setIsLoginModalOpen(true)}
+            currentRole={currentRole}
+          />
+        ) : isTenantRestricted ? (
           <ErrorPage
             type="403"
             onNavigate={navigateTo}
@@ -281,9 +271,19 @@ export default function App() {
             {activeView === 'landing' && (
               <LandingPage
                 properties={properties}
-                onApplyToProperty={(prop) => setSelectedPropertyForApply(prop)}
+                onApplyToProperty={(prop) => {
+                  if (!currentUser) {
+                    setIsLoginModalOpen(true);
+                    showNotification('Please sign in to apply for properties', 'error');
+                  } else {
+                    setSelectedPropertyForApply(prop);
+                  }
+                }}
                 onListProperty={() => {
-                  if (currentRole === 'tenant') {
+                  if (!currentUser) {
+                    setIsLoginModalOpen(true);
+                    showNotification('Please sign in as a Landlord to list properties', 'error');
+                  } else if (currentRole === 'tenant') {
                     navigateTo('403');
                   } else {
                     navigateTo('list-property');
@@ -297,7 +297,14 @@ export default function App() {
                 properties={properties}
                 applications={applications}
                 deletedPropertyIds={deletedPropertyIds}
-                onApply={(property) => setSelectedPropertyForApply(property)}
+                onApply={(property) => {
+                  if (!currentUser) {
+                    setIsLoginModalOpen(true);
+                    showNotification('Please sign in to apply for properties', 'error');
+                  } else {
+                    setSelectedPropertyForApply(property);
+                  }
+                }}
                 onWithdraw={handleWithdrawApplication}
                 currentUser={currentUser}
               />
