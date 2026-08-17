@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Building2, Plus, ShieldCheck, CheckCircle2, Users, Sparkles } from 'lucide-react';
+import { Building2, Plus, ShieldCheck, CheckCircle2, Users, Sparkles, ChevronLeft, ChevronRight } from 'lucide-react';
 import { EXACT_USER_DATASET } from './TenantDashboard';
 import PropertyCard from './PropertyCard';
 
@@ -7,12 +7,32 @@ export default function LandlordDashboard({ properties = [], applications = [], 
   const [activeTab, setActiveTab] = useState('listings'); // 'listings' | 'applicants'
   const [selectedAppForDenial, setSelectedAppForDenial] = useState(null);
   const [denialReason, setDenialReason] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 9;
 
-  const activeDataset = EXACT_USER_DATASET.filter(p => !deletedPropertyIds.includes(p.id));
-  const myProperties = properties.filter(p => p.landlord_id === currentUser?.id && !deletedPropertyIds.includes(p.id));
-  const displayListings = myProperties.length > 0 ? myProperties.slice(0, 9) : activeDataset.slice(0, 9);
+  const customProps = (() => {
+    try {
+      return JSON.parse(localStorage.getItem('roofproof_custom_properties') || '[]');
+    } catch {
+      return [];
+    }
+  })();
 
-  const myPropertyIds = displayListings.map(p => p.id);
+  const mergedProps = [...properties, ...customProps, ...EXACT_USER_DATASET];
+  const uniqueProps = Array.from(new Map(mergedProps.map(p => [p.id, p])).values());
+  // Strictly filter out deleted properties permanently
+  const allActiveListings = uniqueProps.filter(p => !deletedPropertyIds.includes(p.id));
+
+  // Filter listings belonging to current landlord or demo catalogue
+  const myProperties = allActiveListings.filter(p => p.landlord_id === currentUser?.id || !p.landlord_id);
+
+  const totalPages = Math.ceil(myProperties.length / ITEMS_PER_PAGE) || 1;
+  const displayListings = myProperties.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
+
+  const myPropertyIds = myProperties.map(p => p.id);
   const receivedApplications = applications.filter(a => myPropertyIds.includes(a.property_id));
 
   const handleDenySubmit = (e) => {
@@ -107,7 +127,7 @@ export default function LandlordDashboard({ properties = [], applications = [], 
           </div>
           <h2 style={{ fontSize: '2.4rem', fontWeight: 600, color: '#ffffff' }}>Property Listings & Applicants</h2>
           <p style={{ color: 'rgba(255, 255, 255, 0.75)', fontSize: '0.92rem', marginTop: '4px' }}>
-            Welcome back, <strong style={{ color: '#ffffff' }}>{currentUser?.name || 'Ananya Verma'}</strong> • Showing up to 9 managed properties per page.
+            Welcome back, <strong style={{ color: '#ffffff' }}>{currentUser?.name || 'Ananya Verma'}</strong> • Managed properties ({myProperties.length} active).
           </p>
         </div>
 
@@ -143,7 +163,7 @@ export default function LandlordDashboard({ properties = [], applications = [], 
             transition: 'all 0.2s ease',
           }}
         >
-          My Listings ({displayListings.length})
+          My Listings ({myProperties.length})
         </button>
         <button
           onClick={() => setActiveTab('applicants')}
@@ -164,20 +184,65 @@ export default function LandlordDashboard({ properties = [], applications = [], 
       </div>
 
       {activeTab === 'listings' ? (
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(330px, 1fr))',
-          gap: '24px',
-        }}>
-          {displayListings.map(property => (
-            <PropertyCard
-              key={property.id}
-              property={property}
-              onDelete={onDeleteProperty}
-              userRole="landlord"
-            />
-          ))}
-        </div>
+        <>
+          {myProperties.length === 0 ? (
+            <div className="glass-card" style={{ padding: '48px', textAlign: 'center', borderRadius: '24px', background: '#ffffff', color: '#1a221b' }}>
+              <p style={{ color: '#555', fontSize: '1.05rem', marginBottom: '20px' }}>
+                All property listings have been deleted or none exist.
+              </p>
+              <button className="btn-white-pill" onClick={onOpenCreateModal}>
+                <Plus size={16} /> List New Property
+              </button>
+            </div>
+          ) : (
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fill, minmax(330px, 1fr))',
+              gap: '24px',
+              marginBottom: '32px',
+            }}>
+              {displayListings.map(property => (
+                <PropertyCard
+                  key={property.id}
+                  property={property}
+                  onDelete={onDeleteProperty}
+                  userRole="landlord"
+                />
+              ))}
+            </div>
+          )}
+
+          {/* Pagination control for Landlord */}
+          {totalPages > 1 && (
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '16px',
+              marginTop: '16px',
+            }}>
+              <button
+                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                disabled={currentPage === 1}
+                className="btn-white-pill"
+                style={{ padding: '8px 18px', fontSize: '0.82rem', opacity: currentPage === 1 ? 0.4 : 1, cursor: currentPage === 1 ? 'not-allowed' : 'pointer' }}
+              >
+                <ChevronLeft size={16} /> Prev
+              </button>
+              <span style={{ fontSize: '0.88rem', color: 'rgba(255, 255, 255, 0.8)', fontWeight: 600 }}>
+                Page {currentPage} of {totalPages}
+              </span>
+              <button
+                onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                disabled={currentPage === totalPages}
+                className="btn-white-pill"
+                style={{ padding: '8px 18px', fontSize: '0.82rem', opacity: currentPage === totalPages ? 0.4 : 1, cursor: currentPage === totalPages ? 'not-allowed' : 'pointer' }}
+              >
+                Next <ChevronRight size={16} />
+              </button>
+            </div>
+          )}
+        </>
       ) : (
         /* Received Applications Tab */
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
