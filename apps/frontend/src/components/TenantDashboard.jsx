@@ -1,66 +1,217 @@
 import React, { useState } from 'react';
 import PropertyCard from './PropertyCard';
-import { Search, Filter, ShieldCheck, Sparkles, AlertCircle, XCircle, Info, X } from 'lucide-react';
+import { Search, Filter, ShieldCheck, Sparkles, AlertCircle, XCircle, Info, X, ChevronLeft, ChevronRight } from 'lucide-react';
 
 export default function TenantDashboard({ properties = [], applications = [], onApply, onWithdraw, currentUser }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [maxRent, setMaxRent] = useState('');
   const [activeTab, setActiveTab] = useState('browse'); // 'browse' | 'my-applications'
   const [viewingDenialApp, setViewingDenialApp] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 8;
 
   const myApplications = applications.filter(a => a.tenant_id === currentUser.id);
 
-  // Unsplash fallback properties if database is empty
+  // 20 Diverse India-Specific Properties across various budgets and home types
   const defaultProperties = [
     {
       id: 1,
-      title: 'Evergreen Pine Luxury Villa',
+      title: 'Himalayan Pine Wooden Villa',
       location: 'Manali, Himachal Pradesh',
-      monthly_rent: 75000,
-      income_threshold: 225000,
-      description: 'Handpicked 3 BHK luxury wooden sanctuary surrounded by pine tree forests with private balcony and heated floors.',
+      monthly_rent: 45000,
+      income_threshold: 135000,
+      description: 'Cozy 2 BHK pine wood villa with mountain view balcony, fireplace, and private apple orchard yard.',
       image_url: 'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=800&q=80',
     },
     {
       id: 2,
-      title: 'Skyline Glass Penthouse',
-      location: 'Gurugram, Haryana',
-      monthly_rent: 120000,
-      income_threshold: 360000,
-      description: 'Ultra-modern 4 BHK duplex penthouse with 360-degree glass wrap-around views and private infinity plunge pool.',
-      image_url: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=800&q=80',
+      title: 'Cozy 1 BHK Bachelor Pad',
+      location: 'Koramangala, Bangalore',
+      monthly_rent: 18000,
+      income_threshold: 54000,
+      description: 'Compact fully-furnished 1 BHK apartment close to tech parks with high-speed fiber internet and power backup.',
+      image_url: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=800&q=80',
     },
     {
       id: 3,
-      title: 'Modern Serenity Studio',
-      location: 'Bangalore, Karnataka',
-      monthly_rent: 45000,
-      income_threshold: 135000,
-      description: 'Sleek eco-friendly studio apartment in Indiranagar featuring smart home controls and private garden patio.',
-      image_url: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80',
+      title: 'Seaside Portuguese Villa',
+      location: 'Anjuna, Goa',
+      monthly_rent: 65000,
+      income_threshold: 195000,
+      description: 'Vibrant restored Portuguese bungalow with high ceilings, private swimming pool, and 5-min walk to beach.',
+      image_url: 'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80',
     },
     {
       id: 4,
-      title: 'Heritage Courtyard Residence',
-      location: 'Udaipur, Rajasthan',
-      monthly_rent: 85000,
-      income_threshold: 255000,
-      description: 'Restored royal courtyard villa overlooking Lake Pichola with marble archways and private terrace.',
+      title: 'Comfortable 2 BHK Family Home',
+      location: 'Viman Nagar, Pune',
+      monthly_rent: 25000,
+      income_threshold: 75000,
+      description: 'Spacious 2 BHK family flat in gated society with children play park, gym, covered parking, and 24/7 security.',
+      image_url: 'https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?auto=format&fit=crop&w=800&q=80',
+    },
+    {
+      id: 5,
+      title: 'Modern Techie Studio Room',
+      location: 'HSR Layout, Bangalore',
+      monthly_rent: 15000,
+      income_threshold: 45000,
+      description: 'Sleek budget studio room with kitchenette, balcony, and walking distance to cafes and workspace hubs.',
+      image_url: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=800&q=80',
+    },
+    {
+      id: 6,
+      title: 'Traditional Kerala Courtyard House',
+      location: 'Wayanad, Kerala',
+      monthly_rent: 35000,
+      income_threshold: 105000,
+      description: 'Authentic Nalukettu style 3 BHK home surrounded by tea plantations and peaceful green valleys.',
       image_url: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80',
+    },
+    {
+      id: 7,
+      title: '3 BHK High-Rise Family Apartment',
+      location: 'Andheri West, Mumbai',
+      monthly_rent: 70000,
+      income_threshold: 210000,
+      description: 'Bright 3 BHK apartment on the 18th floor with city skyline views, sea breeze, and modern modular kitchen.',
+      image_url: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800&q=80',
+    },
+    {
+      id: 8,
+      title: 'Independent Garden Bungalow',
+      location: 'Banjara Hills, Hyderabad',
+      monthly_rent: 55000,
+      income_threshold: 165000,
+      description: 'Charming 3 BHK independent bungalow featuring private lawn, verandah, servant quarter, and solar heating.',
+      image_url: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=800&q=80',
+    },
+    {
+      id: 9,
+      title: 'Compact 1 RK Student Studio',
+      location: 'North Campus, Delhi',
+      monthly_rent: 12000,
+      income_threshold: 36000,
+      description: 'Affordable 1 Room-Kitchen studio unit near Delhi University, fully air-conditioned with study desk.',
+      image_url: 'https://images.unsplash.com/photo-1554995207-c18c203602cb?auto=format&fit=crop&w=800&q=80',
+    },
+    {
+      id: 10,
+      title: 'Heritage Lake View House',
+      location: 'Udaipur, Rajasthan',
+      monthly_rent: 40000,
+      income_threshold: 120000,
+      description: 'Traditional Rajasthani stone home with Jharokha windows overlooking Lake Pichola.',
+      image_url: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80',
+    },
+    {
+      id: 11,
+      title: '2 BHK Gated Society Flat',
+      location: 'Noida Sector 62, Uttar Pradesh',
+      monthly_rent: 22000,
+      income_threshold: 66000,
+      description: 'Well-ventilated 2 BHK flat near metro station with clubhouse access, swimming pool, and grocery store inside.',
+      image_url: 'https://images.unsplash.com/photo-1570129477492-45c003edd2be?auto=format&fit=crop&w=800&q=80',
+    },
+    {
+      id: 12,
+      title: 'Luxury Glass Penthouse',
+      location: 'Golf Course Road, Gurugram',
+      monthly_rent: 110000,
+      income_threshold: 330000,
+      description: '4 BHK luxury duplex penthouse with floor-to-ceiling glass windows and private rooftop terrace garden.',
+      image_url: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=800&q=80',
+    },
+    {
+      id: 13,
+      title: 'Quiet Hilltop Cottage',
+      location: 'Kodaikanal, Tamil Nadu',
+      monthly_rent: 30000,
+      income_threshold: 90000,
+      description: 'Serene 2 BHK stone cottage surrounded by eucalyptus trees with cozy fireplace and private driveway.',
+      image_url: 'https://images.unsplash.com/photo-1510798831971-661eb04b3739?auto=format&fit=crop&w=800&q=80',
+    },
+    {
+      id: 14,
+      title: '1 BHK Working Professional Flat',
+      location: 'Gachibowli, Hyderabad',
+      monthly_rent: 20000,
+      income_threshold: 60000,
+      description: 'Furnished 1 BHK apartment close to IT hubs, with modern kitchen fittings, gym, and 24-hr water supply.',
+      image_url: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=800&q=80',
+    },
+    {
+      id: 15,
+      title: 'Colonial Style Villa',
+      location: 'Whitefield, Bangalore',
+      monthly_rent: 60000,
+      income_threshold: 180000,
+      description: 'Spacious colonial style 3 BHK villa with wooden flooring, large backyard lawn, and garage space.',
+      image_url: 'https://images.unsplash.com/photo-1600566753376-12c8ab7fb75b?auto=format&fit=crop&w=800&q=80',
+    },
+    {
+      id: 16,
+      title: 'Compact 2 BHK Apartment',
+      location: 'Salt Lake City, Kolkata',
+      monthly_rent: 19000,
+      income_threshold: 57000,
+      description: 'Charming 2 BHK flat near IT park, quiet green neighborhood with dual balconies.',
+      image_url: 'https://images.unsplash.com/photo-1493809842364-78817add7ffb?auto=format&fit=crop&w=800&q=80',
+    },
+    {
+      id: 17,
+      title: 'Beachside Studio Room',
+      location: 'ECR Chennai, Tamil Nadu',
+      monthly_rent: 24000,
+      income_threshold: 72000,
+      description: 'Cozy beachside studio apartment with sea views, rooftop access, and 24/7 security guard.',
+      image_url: 'https://images.unsplash.com/photo-1502005229762-cf1b2da7c5d6?auto=format&fit=crop&w=800&q=80',
+    },
+    {
+      id: 18,
+      title: 'Spacious 3 BHK Duplex House',
+      location: 'C-Scheme, Jaipur',
+      monthly_rent: 38000,
+      income_threshold: 114000,
+      description: 'Elegant 3 BHK duplex home with traditional pink-city stonework and terrace garden.',
+      image_url: 'https://images.unsplash.com/photo-1600585152220-90363fe7e115?auto=format&fit=crop&w=800&q=80',
+    },
+    {
+      id: 19,
+      title: 'Budget 1 BHK Bachelor Flat',
+      location: 'Kalyani Nagar, Pune',
+      monthly_rent: 16000,
+      income_threshold: 48000,
+      description: 'Clean 1 BHK apartment for bachelors or young couples near software parks and dining spots.',
+      image_url: 'https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?auto=format&fit=crop&w=800&q=80',
+    },
+    {
+      id: 20,
+      title: 'Luxury Lake View Villa',
+      location: 'Lavasa, Maharashtra',
+      monthly_rent: 50000,
+      income_threshold: 150000,
+      description: 'Picturesque 3 BHK waterfront villa with private garden, barbecue pit, and lake panorama.',
+      image_url: 'https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=800&q=80',
     },
   ];
 
-  const allAvailableProperties = properties.length > 0 ? properties : defaultProperties;
-  // Reduce listing from 50 to max 8 listings
-  const displayProperties = allAvailableProperties.slice(0, 8);
+  const catalogue = properties.length >= 20 ? properties : defaultProperties;
 
-  const filteredProperties = displayProperties.filter(p => {
+  const filteredProperties = catalogue.filter(p => {
     const matchesSearch = p.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                           p.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
                           (p.description || '').toLowerCase().includes(searchTerm.toLowerCase());
     const matchesRent = !maxRent || Number(p.monthly_rent) <= Number(maxRent);
     return matchesSearch && matchesRent;
   });
+
+  // Calculate pagination: 8 items per page
+  const totalPages = Math.ceil(filteredProperties.length / ITEMS_PER_PAGE) || 1;
+  const currentListings = filteredProperties.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
 
   return (
     <div className="animate-fade-in" style={{ padding: '10px 0 50px', width: '100%' }}>
@@ -160,9 +311,9 @@ export default function TenantDashboard({ properties = [], applications = [], on
           }}>
             <Sparkles size={13} /> TENANT PRIVACY PORTAL
           </div>
-          <h2 style={{ fontSize: '2.4rem', fontWeight: 600, color: '#ffffff' }}>Browse & Verify Luxury Rentals</h2>
+          <h2 style={{ fontSize: '2.4rem', fontWeight: 600, color: '#ffffff' }}>Browse & Verify Rental Homes</h2>
           <p style={{ color: 'rgba(255, 255, 255, 0.75)', fontSize: '0.92rem', marginTop: '4px' }}>
-            Logged in as <strong style={{ color: '#ffffff' }}>{currentUser?.name || 'Rahul Sharma'}</strong> • Showing up to 8 exclusive properties.
+            Logged in as <strong style={{ color: '#ffffff' }}>{currentUser?.name || 'Rahul Sharma'}</strong> • 20 curated homes (bachelor rooms, flats, cottages & villas).
           </p>
         </div>
 
@@ -189,7 +340,7 @@ export default function TenantDashboard({ properties = [], applications = [], on
               transition: 'all 0.2s ease',
             }}
           >
-            Available Homes ({displayProperties.length})
+            Available Homes ({filteredProperties.length})
           </button>
           <button
             onClick={() => setActiveTab('my-applications')}
@@ -228,9 +379,12 @@ export default function TenantDashboard({ properties = [], applications = [], on
               <Search size={16} color="rgba(255,255,255,0.5)" />
               <input
                 type="text"
-                placeholder="Search location, title, or amenities..."
+                placeholder="Search bachelor rooms, 2 BHK, villa, Manali, Mumbai..."
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={(e) => {
+                  setSearchTerm(e.target.value);
+                  setCurrentPage(1);
+                }}
                 style={{
                   background: 'transparent',
                   border: 'none',
@@ -248,7 +402,10 @@ export default function TenantDashboard({ properties = [], applications = [], on
                 type="number"
                 placeholder="Max Rent (₹)"
                 value={maxRent}
-                onChange={(e) => setMaxRent(e.target.value)}
+                onChange={(e) => {
+                  setMaxRent(e.target.value);
+                  setCurrentPage(1);
+                }}
                 style={{
                   background: 'transparent',
                   border: 'none',
@@ -261,13 +418,14 @@ export default function TenantDashboard({ properties = [], applications = [], on
             </div>
           </div>
 
-          {/* Properties Grid with White Cards */}
+          {/* Properties Grid with Max 8 Items Per Page */}
           <div style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fill, minmax(330px, 1fr))',
             gap: '24px',
+            marginBottom: '32px',
           }}>
-            {filteredProperties.map(property => {
+            {currentListings.map(property => {
               const app = myApplications.find(a => a.property_id === property.id);
               const hasApplied = app && (app.status === 'pending' || app.status === 'approved');
               const isDenied = app && app.status === 'rejected';
@@ -287,6 +445,37 @@ export default function TenantDashboard({ properties = [], applications = [], on
               );
             })}
           </div>
+
+          {/* Clean Pagination Bar (8 items per page) */}
+          {totalPages > 1 && (
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '16px',
+              marginTop: '16px',
+            }}>
+              <button
+                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                disabled={currentPage === 1}
+                className="btn-white-pill"
+                style={{ padding: '8px 18px', fontSize: '0.82rem', opacity: currentPage === 1 ? 0.4 : 1, cursor: currentPage === 1 ? 'not-allowed' : 'pointer' }}
+              >
+                <ChevronLeft size={16} /> Prev
+              </button>
+              <span style={{ fontSize: '0.88rem', color: 'rgba(255, 255, 255, 0.8)', fontWeight: 600 }}>
+                Page {currentPage} of {totalPages}
+              </span>
+              <button
+                onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                disabled={currentPage === totalPages}
+                className="btn-white-pill"
+                style={{ padding: '8px 18px', fontSize: '0.82rem', opacity: currentPage === totalPages ? 0.4 : 1, cursor: currentPage === totalPages ? 'totalPages' : 'pointer' }}
+              >
+                Next <ChevronRight size={16} />
+              </button>
+            </div>
+          )}
         </>
       ) : (
         /* My Applications Tab showing Available Applied Properties */
@@ -307,7 +496,7 @@ export default function TenantDashboard({ properties = [], applications = [], on
               gap: '24px',
             }}>
               {myApplications.map(app => {
-                const targetProp = allAvailableProperties.find(p => p.id === app.property_id) || {
+                const targetProp = catalogue.find(p => p.id === app.property_id) || {
                   id: app.property_id,
                   title: app.property_title || `Property Listing #${app.property_id}`,
                   location: app.property_location || 'Prime Location',
