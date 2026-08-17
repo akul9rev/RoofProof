@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Shield, Building, User, Info, ArrowRight, AlertTriangle } from 'lucide-react';
+import { X, Shield, Building, User, Lock, ArrowRight, AlertTriangle } from 'lucide-react';
 import { loginOrRegister } from '../services/api';
 
 export default function LoginModal({ isOpen, onClose, currentRole, onLoginSuccess, currentUser }) {
@@ -8,13 +8,13 @@ export default function LoginModal({ isOpen, onClose, currentRole, onLoginSucces
   const [selectedRole, setSelectedRole] = useState(currentRole || 'tenant');
   const [name, setName] = useState(currentUser?.name || '');
   const [email, setEmail] = useState(currentUser?.email || '');
+  const [password, setPassword] = useState('');
   const [phone, setPhone] = useState('');
   const [city, setCity] = useState('');
   const [occupation, setOccupation] = useState('');
   const [organization, setOrganization] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
-  const [showCredentialsGuide, setShowCredentialsGuide] = useState(true);
 
   useEffect(() => {
     if (isOpen) {
@@ -29,25 +29,16 @@ export default function LoginModal({ isOpen, onClose, currentRole, onLoginSucces
 
   if (!isOpen) return null;
 
-  const registeredCredentials = [
-    { name: 'Rohan Mehta', email: 'rohan.mehta@roofproof.demo', role: 'landlord', info: 'Landlord (4 Properties)' },
-    { name: 'Priya Nair', email: 'priya.nair@roofproof.demo', role: 'landlord', info: 'Landlord (2 Properties)' },
-    { name: 'Arjun Sharma', email: 'arjun.sharma@roofproof.demo', role: 'tenant', info: 'Tenant (Software Eng)' },
-    { name: 'Neha Kapoor', email: 'neha.kapoor@roofproof.demo', role: 'tenant', info: 'Tenant (Product Lead)' },
-  ];
-
-  const handleFillEmail = (userEmail, userRole) => {
-    setEmail(userEmail);
-    setSelectedRole(userRole);
-    setError(null);
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
 
     if (!email) {
-      setError('Please enter your registered email address');
+      setError('Please enter your email address');
+      return;
+    }
+    if (!password) {
+      setError('Please enter your account password');
       return;
     }
     if (authMode === 'signup' && !name) {
@@ -59,13 +50,14 @@ export default function LoginModal({ isOpen, onClose, currentRole, onLoginSucces
     try {
       const payload = {
         mode: authMode,
-        name: name || undefined,
+        name: authMode === 'signup' ? name : undefined,
         email: email.trim(),
-        role: selectedRole,
-        phone: phone || undefined,
-        city: city || undefined,
-        occupation: selectedRole === 'tenant' ? occupation : undefined,
-        organization: selectedRole === 'landlord' ? organization : undefined,
+        password: password.trim(),
+        role: authMode === 'signup' ? selectedRole : undefined,
+        phone: authMode === 'signup' ? phone : undefined,
+        city: authMode === 'signup' ? city : undefined,
+        occupation: (authMode === 'signup' && selectedRole === 'tenant') ? occupation : undefined,
+        organization: (authMode === 'signup' && selectedRole === 'landlord') ? organization : undefined,
       };
 
       const res = await loginOrRegister(payload);
@@ -73,7 +65,7 @@ export default function LoginModal({ isOpen, onClose, currentRole, onLoginSucces
         id: selectedRole === 'tenant' ? 3 : 1,
         name: name || (selectedRole === 'tenant' ? 'Arjun Sharma' : 'Rohan Mehta'),
         email: email.trim(),
-        role: selectedRole,
+        role: res?.user?.role || selectedRole,
       };
 
       onLoginSuccess(userObj);
@@ -81,7 +73,7 @@ export default function LoginModal({ isOpen, onClose, currentRole, onLoginSucces
       onClose();
     } catch (err) {
       setIsSubmitting(false);
-      setError(err.message || 'Authentication failed. Please verify your email.');
+      setError(err.message || 'Authentication failed. Please verify your credentials.');
     }
   };
 
@@ -110,7 +102,7 @@ export default function LoginModal({ isOpen, onClose, currentRole, onLoginSucces
         className="luxury-modal-container animate-modal-scale"
         onClick={(e) => e.stopPropagation()}
         style={{
-          maxWidth: '500px',
+          maxWidth: '460px',
           width: '100%',
           padding: '28px 30px',
           borderRadius: '26px',
@@ -145,7 +137,7 @@ export default function LoginModal({ isOpen, onClose, currentRole, onLoginSucces
         </button>
 
         {/* Modal Header */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '18px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px' }}>
           <div style={{
             width: '38px',
             height: '38px',
@@ -160,10 +152,10 @@ export default function LoginModal({ isOpen, onClose, currentRole, onLoginSucces
           </div>
           <div>
             <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: '#ffffff', margin: 0 }}>
-              {authMode === 'signin' ? 'Sign In to Account' : 'Create RoofProof Account'}
+              {authMode === 'signin' ? 'Sign In to RoofProof' : 'Create RoofProof Account'}
             </h3>
             <p style={{ fontSize: '0.78rem', color: 'rgba(255, 255, 255, 0.6)', margin: 0 }}>
-              Midnight Zero-Knowledge Database Verification
+              Midnight Zero-Knowledge Account Authentication
             </p>
           </div>
         </div>
@@ -174,7 +166,7 @@ export default function LoginModal({ isOpen, onClose, currentRole, onLoginSucces
           background: 'rgba(255, 255, 255, 0.06)',
           borderRadius: '999px',
           padding: '3px',
-          marginBottom: '20px',
+          marginBottom: '22px',
           border: '1px solid rgba(255, 255, 255, 0.1)',
         }}>
           <button
@@ -213,109 +205,67 @@ export default function LoginModal({ isOpen, onClose, currentRole, onLoginSucces
           </button>
         </div>
 
-        {/* Registered DB Credentials Reference Guide */}
-        <div style={{
-          background: 'rgba(255, 255, 255, 0.04)',
-          border: '1px solid rgba(255, 255, 255, 0.1)',
-          borderRadius: '16px',
-          padding: '12px 14px',
-          marginBottom: '20px',
-        }}>
-          <div 
-            onClick={() => setShowCredentialsGuide(!showCredentialsGuide)}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              cursor: 'pointer',
-              userSelect: 'none',
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <Info size={15} color="#EBA834" />
-              <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#ffffff' }}>
-                Registered DB Accounts (Click to Fill)
-              </span>
-            </div>
-            <span style={{ fontSize: '0.72rem', color: '#EBA834', fontWeight: 600 }}>
-              {showCredentialsGuide ? 'Hide ▲' : 'Show ▼'}
-            </span>
-          </div>
-
-          {showCredentialsGuide && (
+        {/* Compact Role Selection Pill during Account Creation */}
+        {authMode === 'signup' && (
+          <div style={{ marginBottom: '18px' }}>
+            <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 600, color: 'rgba(255, 255, 255, 0.7)', marginBottom: '6px' }}>
+              Account Type
+            </label>
             <div style={{
-              display: 'grid',
-              gridTemplateColumns: '1fr 1fr',
-              gap: '8px',
-              marginTop: '10px',
+              display: 'inline-flex',
+              background: 'rgba(255, 255, 255, 0.05)',
+              borderRadius: '999px',
+              padding: '3px',
+              border: '1px solid rgba(255, 255, 255, 0.12)',
+              width: '100%',
             }}>
-              {registeredCredentials.map((cred) => (
-                <div
-                  key={cred.email}
-                  onClick={() => handleFillEmail(cred.email, cred.role)}
-                  style={{
-                    background: email === cred.email ? 'rgba(235, 168, 52, 0.15)' : 'rgba(255, 255, 255, 0.05)',
-                    border: `1px solid ${email === cred.email ? 'rgba(235, 168, 52, 0.4)' : 'rgba(255, 255, 255, 0.08)'}`,
-                    borderRadius: '10px',
-                    padding: '8px 10px',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s ease',
-                  }}
-                >
-                  <div style={{ fontSize: '0.78rem', fontWeight: 700, color: '#ffffff' }}>{cred.name}</div>
-                  <div style={{ fontSize: '0.68rem', color: cred.role === 'landlord' ? '#6B9B76' : '#EBA834' }}>
-                    {cred.info}
-                  </div>
-                  <div style={{ fontSize: '0.66rem', color: 'rgba(255,255,255,0.45)', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                    {cred.email}
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Role Selector Tabs */}
-        <div style={{ marginBottom: '20px' }}>
-          <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 600, color: 'rgba(255, 255, 255, 0.7)', marginBottom: '8px' }}>
-            Select Account Role
-          </label>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-            <div
-              onClick={() => setSelectedRole('tenant')}
-              style={{
-                background: selectedRole === 'tenant' ? 'rgba(235, 168, 52, 0.15)' : 'rgba(255, 255, 255, 0.04)',
-                border: `1px solid ${selectedRole === 'tenant' ? 'rgba(235, 168, 52, 0.4)' : 'rgba(255, 255, 255, 0.1)'}`,
-                borderRadius: '14px',
-                padding: '12px',
-                cursor: 'pointer',
-                textAlign: 'center',
-                transition: 'all 0.2s ease',
-              }}
-            >
-              <User size={20} color={selectedRole === 'tenant' ? '#EBA834' : 'rgba(255, 255, 255, 0.6)'} style={{ margin: '0 auto 4px' }} />
-              <div style={{ fontSize: '0.88rem', fontWeight: 700, color: selectedRole === 'tenant' ? '#EBA834' : '#ffffff' }}>Tenant</div>
-              <div style={{ fontSize: '0.7rem', color: 'rgba(255, 255, 255, 0.5)' }}>Verify Income</div>
-            </div>
-
-            <div
-              onClick={() => setSelectedRole('landlord')}
-              style={{
-                background: selectedRole === 'landlord' ? 'rgba(107, 155, 118, 0.15)' : 'rgba(255, 255, 255, 0.04)',
-                border: `1px solid ${selectedRole === 'landlord' ? 'rgba(107, 155, 118, 0.4)' : 'rgba(255, 255, 255, 0.1)'}`,
-                borderRadius: '14px',
-                padding: '12px',
-                cursor: 'pointer',
-                textAlign: 'center',
-                transition: 'all 0.2s ease',
-              }}
-            >
-              <Building size={20} color={selectedRole === 'landlord' ? '#6B9B76' : 'rgba(255, 255, 255, 0.6)'} style={{ margin: '0 auto 4px' }} />
-              <div style={{ fontSize: '0.88rem', fontWeight: 700, color: selectedRole === 'landlord' ? '#6B9B76' : '#ffffff' }}>Landlord</div>
-              <div style={{ fontSize: '0.7rem', color: 'rgba(255, 255, 255, 0.5)' }}>List Properties</div>
+              <button
+                type="button"
+                onClick={() => setSelectedRole('tenant')}
+                style={{
+                  flex: 1,
+                  padding: '6px 14px',
+                  borderRadius: '999px',
+                  background: selectedRole === 'tenant' ? 'rgba(235, 168, 52, 0.25)' : 'transparent',
+                  color: selectedRole === 'tenant' ? '#EBA834' : 'rgba(255, 255, 255, 0.7)',
+                  border: selectedRole === 'tenant' ? '1px solid rgba(235, 168, 52, 0.4)' : '1px solid transparent',
+                  fontSize: '0.78rem',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '5px',
+                  transition: 'all 0.2s ease',
+                }}
+              >
+                <User size={13} /> Tenant
+              </button>
+              <button
+                type="button"
+                onClick={() => setSelectedRole('landlord')}
+                style={{
+                  flex: 1,
+                  padding: '6px 14px',
+                  borderRadius: '999px',
+                  background: selectedRole === 'landlord' ? 'rgba(107, 155, 118, 0.25)' : 'transparent',
+                  color: selectedRole === 'landlord' ? '#6B9B76' : 'rgba(255, 255, 255, 0.7)',
+                  border: selectedRole === 'landlord' ? '1px solid rgba(107, 155, 118, 0.4)' : '1px solid transparent',
+                  fontSize: '0.78rem',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '5px',
+                  transition: 'all 0.2s ease',
+                }}
+              >
+                <Building size={13} /> Landlord
+              </button>
             </div>
           </div>
-        </div>
+        )}
 
         {/* Real User Input Form */}
         <form onSubmit={handleSubmit}>
@@ -372,7 +322,7 @@ export default function LoginModal({ isOpen, onClose, currentRole, onLoginSucces
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder={selectedRole === 'tenant' ? 'e.g. Arjun Sharma' : 'e.g. Rohan Mehta'}
+                placeholder="e.g. Arjun Sharma"
                 className="luxury-input"
               />
             </div>
@@ -386,7 +336,21 @@ export default function LoginModal({ isOpen, onClose, currentRole, onLoginSucces
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder={selectedRole === 'tenant' ? 'arjun.sharma@roofproof.demo' : 'rohan.mehta@roofproof.demo'}
+              placeholder="e.g. arjun.sharma@roofproof.demo"
+              className="luxury-input"
+            />
+          </div>
+
+          {/* Password Field for both Sign In and Create Account */}
+          <div style={{ marginBottom: '18px' }}>
+            <label style={{ display: 'block', fontSize: '0.78rem', color: 'rgba(255,255,255,0.7)', marginBottom: '4px' }}>
+              Password *
+            </label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="••••••••"
               className="luxury-input"
             />
           </div>
@@ -422,7 +386,7 @@ export default function LoginModal({ isOpen, onClose, currentRole, onLoginSucces
               </div>
 
               {selectedRole === 'tenant' ? (
-                <div style={{ marginBottom: '16px' }}>
+                <div style={{ marginBottom: '18px' }}>
                   <label style={{ display: 'block', fontSize: '0.78rem', color: 'rgba(255,255,255,0.7)', marginBottom: '4px' }}>
                     Occupation / Role
                   </label>
@@ -435,7 +399,7 @@ export default function LoginModal({ isOpen, onClose, currentRole, onLoginSucces
                   />
                 </div>
               ) : (
-                <div style={{ marginBottom: '16px' }}>
+                <div style={{ marginBottom: '18px' }}>
                   <label style={{ display: 'block', fontSize: '0.78rem', color: 'rgba(255,255,255,0.7)', marginBottom: '4px' }}>
                     Realty Organization / Company
                   </label>
@@ -460,16 +424,12 @@ export default function LoginModal({ isOpen, onClose, currentRole, onLoginSucces
               padding: '12px',
               fontSize: '0.9rem',
               fontWeight: 700,
-              background: selectedRole === 'landlord'
-                ? 'linear-gradient(135deg, #6B9B76 0%, #4A7C59 100%)'
-                : 'linear-gradient(135deg, #EBA834 0%, #F59E0B 100%)',
-              color: selectedRole === 'landlord' ? '#ffffff' : '#0c141d',
-              boxShadow: selectedRole === 'landlord'
-                ? '0 6px 20px rgba(107, 155, 118, 0.4)'
-                : '0 6px 20px rgba(235, 168, 52, 0.4)',
+              background: 'linear-gradient(135deg, #EBA834 0%, #F59E0B 100%)',
+              color: '#0c141d',
+              boxShadow: '0 6px 20px rgba(235, 168, 52, 0.4)',
             }}
           >
-            {isSubmitting ? 'Authenticating with DB...' : (authMode === 'signin' ? 'Sign In Now' : 'Create & Sign In')}
+            {isSubmitting ? 'Authenticating with DB...' : (authMode === 'signin' ? 'Sign In' : 'Create & Sign In')}
           </button>
         </form>
       </div>

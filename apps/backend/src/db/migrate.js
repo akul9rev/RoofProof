@@ -1,7 +1,7 @@
 import { pool } from './index.js';
 
 export async function migrate() {
-  console.log('[DB Migrate] Resetting and migrating database with 6 properties (deleted 7th card)...');
+  console.log('[DB Migrate] Resetting and migrating database with password authentication...');
   const client = await pool.connect();
   try {
     await client.query('BEGIN');
@@ -12,6 +12,7 @@ export async function migrate() {
         id SERIAL PRIMARY KEY,
         name VARCHAR(255) NOT NULL,
         email VARCHAR(255) UNIQUE NOT NULL,
+        password VARCHAR(255) NOT NULL DEFAULT 'password123',
         role VARCHAR(50) NOT NULL CHECK (role IN ('tenant', 'landlord')),
         phone VARCHAR(50),
         city VARCHAR(100),
@@ -19,6 +20,7 @@ export async function migrate() {
         organization VARCHAR(100),
         created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
       );
+      ALTER TABLE users ADD COLUMN IF NOT EXISTS password VARCHAR(255) DEFAULT 'password123';
       ALTER TABLE users ADD COLUMN IF NOT EXISTS phone VARCHAR(50);
       ALTER TABLE users ADD COLUMN IF NOT EXISTS city VARCHAR(100);
       ALTER TABLE users ADD COLUMN IF NOT EXISTS occupation VARCHAR(100);
@@ -61,14 +63,14 @@ export async function migrate() {
     // 4. Wipe all stale data cleanly
     await client.query('TRUNCATE TABLE applications, properties, users RESTART IDENTITY CASCADE;');
 
-    // 5. Seed Real Landlords (2) & Tenants (2)
-    console.log('[DB Migrate] Seeding 2 Landlords and 2 Tenants...');
+    // 5. Seed Real Landlords (2) & Tenants (2) with Passwords
+    console.log('[DB Migrate] Seeding 2 Landlords and 2 Tenants with password authentication...');
     await client.query(`
-      INSERT INTO users (id, name, email, role, phone, city, occupation, organization) VALUES
-      (1, 'Rohan Mehta', 'rohan.mehta@roofproof.demo', 'landlord', '+91 98200 11223', 'Coorg, KA', NULL, 'Mehta Luxury Estates'),
-      (2, 'Priya Nair', 'priya.nair@roofproof.demo', 'landlord', '+91 98450 33445', 'Jaipur, RJ', NULL, 'Heritage Living India'),
-      (3, 'Arjun Sharma', 'arjun.sharma@roofproof.demo', 'tenant', '+91 98765 43210', 'Bangalore, KA', 'Senior Software Engineer', NULL),
-      (4, 'Neha Kapoor', 'neha.kapoor@roofproof.demo', 'tenant', '+91 98111 22334', 'Mumbai, MH', 'Product Lead', NULL);
+      INSERT INTO users (id, name, email, password, role, phone, city, occupation, organization) VALUES
+      (1, 'Rohan Mehta', 'rohan.mehta@roofproof.demo', 'password123', 'landlord', '+91 98200 11223', 'Coorg, KA', NULL, 'Mehta Luxury Estates'),
+      (2, 'Priya Nair', 'priya.nair@roofproof.demo', 'password123', 'landlord', '+91 98450 33445', 'Jaipur, RJ', NULL, 'Heritage Living India'),
+      (3, 'Arjun Sharma', 'arjun.sharma@roofproof.demo', 'password123', 'tenant', '+91 98765 43210', 'Bangalore, KA', 'Senior Software Engineer', NULL),
+      (4, 'Neha Kapoor', 'neha.kapoor@roofproof.demo', 'password123', 'tenant', '+91 98111 22334', 'Mumbai, MH', 'Product Lead', NULL);
       ALTER SEQUENCE users_id_seq RESTART WITH 5;
     `);
 
@@ -86,7 +88,7 @@ export async function migrate() {
     `);
 
     await client.query('COMMIT');
-    console.log('[DB Migrate] ✓ Clean reset completed: 6 properties created (last card deleted).');
+    console.log('[DB Migrate] ✓ Migration completed: Users seeded with password123.');
   } catch (err) {
     await client.query('ROLLBACK');
     console.error('[DB Migrate Error]', err.message);

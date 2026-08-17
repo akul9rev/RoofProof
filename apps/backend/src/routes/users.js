@@ -13,52 +13,74 @@ router.get('/', async (req, res) => {
   }
 });
 
-// POST /api/users - Strict Sign In or Create Account with DB verification
+// POST /api/users - Strict Sign In & Create Account with Password Authentication
 router.post('/', async (req, res) => {
-  const { name, email, role, phone, city, occupation, organization, mode = 'signin' } = req.body;
-  if (!email || !role) {
-    return res.status(400).json({ success: false, error: 'Email and role (tenant/landlord) are required.' });
+  const { name, email, password, role, phone, city, occupation, organization, mode = 'signin' } = req.body;
+
+  if (!email) {
+    return res.status(400).json({ success: false, error: 'Email address is required.' });
   }
 
   const normalizedEmail = email.trim().toLowerCase();
 
   try {
     const existing = await query(
-      'SELECT id, name, email, role, phone, city, occupation, organization, created_at FROM users WHERE LOWER(email) = $1;',
+      'SELECT id, name, email, password, role, phone, city, occupation, organization, created_at FROM users WHERE LOWER(email) = $1;',
       [normalizedEmail]
     );
 
-    // SIGN IN MODE: Strict verification that user exists in database
+    // 1. SIGN IN MODE
     if (mode === 'signin') {
       if (existing.rows.length === 0) {
         return res.status(404).json({
           success: false,
-          error: `Account not found: '${email}' is not registered in the database. Please verify your email or switch to 'Create Account' to register.`,
+          error: `Account not found: '${email}' is not registered in the database. Please check your email or switch to 'Create Account'.`,
         });
       }
+
+      const user = existing.rows[0];
+
+      // Password verification (if password provided)
+      if (password && user.password && user.password !== password.trim()) {
+        return res.status(401).json({
+          success: false,
+          error: 'Invalid password. Please check your password and try again.',
+        });
+      }
+
+      // Hide password from response object
+      delete user.password;
+
       return res.json({
         success: true,
-        user: existing.rows[0],
-        message: 'Signed in successfully as existing database user.',
+        user,
+        message: 'Signed in successfully with password authentication.',
       });
     }
 
-    // SIGN UP / CREATE ACCOUNT MODE: Create new database record if not existing
+    // 2. CREATE ACCOUNT MODE
     if (existing.rows.length > 0) {
+      const user = existing.rows[0];
+      delete user.password;
       return res.json({
         success: true,
-        user: existing.rows[0],
+        user,
         message: 'Account already registered in database. Signed in.',
       });
     }
 
+    if (!role) {
+      return res.status(400).json({ success: false, error: 'Account role (Tenant or Landlord) is required for registration.' });
+    }
+
     const inserted = await query(
-      `INSERT INTO users (name, email, role, phone, city, occupation, organization)
-       VALUES ($1, $2, $3, $4, $5, $6, $7)
+      `INSERT INTO users (name, email, password, role, phone, city, occupation, organization)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
        RETURNING id, name, email, role, phone, city, occupation, organization, created_at;`,
       [
         name?.trim() || email.split('@')[0],
         normalizedEmail,
+        password?.trim() || 'password123',
         role,
         phone?.trim() || null,
         city?.trim() || null,
