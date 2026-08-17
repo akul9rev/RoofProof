@@ -16,23 +16,21 @@ export default function Navbar({ activeView, setActiveView, currentRole, onListP
 
   const initials = getUserInitials(currentUser?.name);
 
-  const navItemStyle = (viewKey, isTargetActive) => ({
-    background: isTargetActive 
-      ? 'rgba(255, 255, 255, 0.12)' 
-      : (hoveredNav === viewKey ? 'rgba(255, 255, 255, 0.07)' : 'transparent'),
-    color: isTargetActive || hoveredNav === viewKey ? '#ffffff' : 'rgba(255, 255, 255, 0.78)',
-    fontWeight: isTargetActive ? 700 : 500,
-    fontSize: '0.88rem',
+  const navLinkStyle = (viewKey, isActive) => ({
+    background: 'transparent',
+    color: isActive 
+      ? '#ffffff' 
+      : (hoveredNav === viewKey ? '#ffffff' : 'rgba(255, 255, 255, 0.85)'),
+    fontWeight: isActive ? 700 : 500,
+    fontSize: '0.92rem',
     letterSpacing: '-0.01em',
     border: 'none',
-    padding: '7px 16px',
-    borderRadius: '999px',
+    padding: '6px 12px',
     cursor: 'pointer',
-    transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
+    transition: 'all 0.2s ease',
+    position: 'relative',
     display: 'inline-flex',
     alignItems: 'center',
-    gap: '6px',
-    backdropFilter: 'blur(4px)',
   });
 
   return (
@@ -40,16 +38,11 @@ export default function Navbar({ activeView, setActiveView, currentRole, onListP
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'space-between',
-      padding: '10px 24px',
+      padding: '4px 0 20px',
       width: '100%',
-      marginBottom: '24px',
-      background: 'rgba(255, 255, 255, 0.04)',
-      backdropFilter: 'blur(20px)',
-      WebkitBackdropFilter: 'blur(20px)',
-      border: '1px solid rgba(255, 255, 255, 0.14)',
-      borderRadius: '999px',
-      boxShadow: '0 12px 40px rgba(0, 0, 0, 0.28), inset 0 1px 1px rgba(255, 255, 255, 0.15)',
-      transition: 'all 0.3s ease',
+      background: 'transparent',
+      border: 'none',
+      boxShadow: 'none',
     }}>
       {/* Brand Logo - RoofProof */}
       <div 
@@ -57,55 +50,51 @@ export default function Navbar({ activeView, setActiveView, currentRole, onListP
         style={{
           display: 'flex',
           alignItems: 'center',
-          gap: '12px',
+          gap: '10px',
           cursor: 'pointer',
           userSelect: 'none',
         }}
       >
         <div style={{
-          width: '38px',
-          height: '38px',
-          borderRadius: '12px',
+          width: '36px',
+          height: '36px',
+          borderRadius: '10px',
           background: 'linear-gradient(135deg, #EBA834 0%, #F59E0B 100%)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          boxShadow: '0 0 24px rgba(235, 168, 52, 0.5)',
-          transition: 'transform 0.3s ease',
+          boxShadow: '0 0 16px rgba(235, 168, 52, 0.4)',
         }}>
-          <Shield size={20} color="#0c141d" />
+          <Shield size={19} color="#0c141d" />
         </div>
         <span style={{
           fontSize: '1.4rem',
           fontWeight: 700,
-          letterSpacing: '-0.03em',
+          letterSpacing: '-0.025em',
           color: '#ffffff',
           fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
-          background: 'linear-gradient(180deg, #ffffff 0%, rgba(255,255,255,0.85) 100%)',
-          WebkitBackgroundClip: 'text',
-          WebkitTextFillColor: 'transparent',
         }}>
           RoofProof
         </span>
       </div>
 
-      {/* Navigation Links & User Controls */}
+      {/* Navigation Links & Controls - Clean & Transparent */}
       <div style={{
         display: 'flex',
         alignItems: 'center',
-        gap: '20px',
+        gap: '24px',
         marginLeft: 'auto',
       }}>
         <nav style={{
           display: 'flex',
           alignItems: 'center',
-          gap: '6px',
+          gap: '16px',
         }}>
           <button
             onClick={() => setActiveView('landing')}
             onMouseEnter={() => setHoveredNav('home')}
             onMouseLeave={() => setHoveredNav(null)}
-            style={navItemStyle('home', activeView === 'landing')}
+            style={navLinkStyle('home', activeView === 'landing')}
           >
             Home
           </button>
@@ -116,7 +105,7 @@ export default function Navbar({ activeView, setActiveView, currentRole, onListP
               onClick={() => setActiveView('landlord')}
               onMouseEnter={() => setHoveredNav('landlord')}
               onMouseLeave={() => setHoveredNav(null)}
-              style={navItemStyle('landlord', activeView === 'landlord')}
+              style={navLinkStyle('landlord', activeView === 'landlord')}
             >
               Landlord Portal
             </button>
@@ -125,7 +114,7 @@ export default function Navbar({ activeView, setActiveView, currentRole, onListP
               onClick={() => setActiveView('tenant')}
               onMouseEnter={() => setHoveredNav('tenant')}
               onMouseLeave={() => setHoveredNav(null)}
-              style={navItemStyle('tenant', activeView === 'tenant')}
+              style={navLinkStyle('tenant', activeView === 'tenant')}
             >
               Tenant Portal
             </button>
@@ -142,7 +131,7 @@ export default function Navbar({ activeView, setActiveView, currentRole, onListP
             }}
             onMouseEnter={() => setHoveredNav('about')}
             onMouseLeave={() => setHoveredNav(null)}
-            style={navItemStyle('about', false)}
+            style={navLinkStyle('about', false)}
           >
             About
           </button>
@@ -158,13 +147,13 @@ export default function Navbar({ activeView, setActiveView, currentRole, onListP
             }}
             onMouseEnter={() => setHoveredNav('reviews')}
             onMouseLeave={() => setHoveredNav(null)}
-            style={navItemStyle('reviews', false)}
+            style={navLinkStyle('reviews', false)}
           >
             Reviews
           </button>
         </nav>
 
-        {/* Profile Avatar Only - Glowing Glass Pill */}
+        {/* Profile Avatar Only - Clean 0-Blur Circle */}
         <div
           onClick={onOpenLogin}
           title={`Logged in as ${currentUser?.name || 'User'} (${currentRole}) - Click to sign in or switch account`}
@@ -174,23 +163,22 @@ export default function Navbar({ activeView, setActiveView, currentRole, onListP
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            transition: 'transform 0.2s ease',
           }}
         >
           <div style={{
-            width: '40px',
-            height: '40px',
+            width: '38px',
+            height: '38px',
             borderRadius: '50%',
             background: isLandlord
               ? 'linear-gradient(135deg, #6B9B76 0%, #4A7C59 100%)'
               : 'linear-gradient(135deg, #EBA834 0%, #F59E0B 100%)',
             color: isLandlord ? '#ffffff' : '#0c141d',
             fontWeight: 800,
-            fontSize: '0.92rem',
+            fontSize: '0.9rem',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            boxShadow: isLandlord ? '0 0 20px rgba(107, 155, 118, 0.45)' : '0 0 20px rgba(235, 168, 52, 0.45)',
+            boxShadow: isLandlord ? '0 0 14px rgba(107, 155, 118, 0.4)' : '0 0 14px rgba(235, 168, 52, 0.4)',
             border: '2px solid rgba(255, 255, 255, 0.3)',
           }}>
             {initials}
@@ -199,12 +187,11 @@ export default function Navbar({ activeView, setActiveView, currentRole, onListP
             position: 'absolute',
             bottom: '0',
             right: '0',
-            width: '11px',
-            height: '11px',
+            width: '10px',
+            height: '10px',
             borderRadius: '50%',
             background: '#22c55e',
             border: '2px solid #09121a',
-            boxShadow: '0 0 8px #22c55e',
           }}></span>
         </div>
 
@@ -218,8 +205,7 @@ export default function Navbar({ activeView, setActiveView, currentRole, onListP
                 padding: '9px 22px',
                 fontSize: '0.86rem',
                 fontWeight: 700,
-                boxShadow: '0 6px 20px rgba(255, 255, 255, 0.25)',
-                transition: 'all 0.25s ease',
+                boxShadow: '0 4px 16px rgba(0, 0, 0, 0.2)',
               }}
             >
               List Now
@@ -232,8 +218,7 @@ export default function Navbar({ activeView, setActiveView, currentRole, onListP
                 padding: '9px 22px',
                 fontSize: '0.86rem',
                 fontWeight: 700,
-                boxShadow: '0 6px 20px rgba(255, 255, 255, 0.25)',
-                transition: 'all 0.25s ease',
+                boxShadow: '0 4px 16px rgba(0, 0, 0, 0.2)',
               }}
             >
               Find a Home
