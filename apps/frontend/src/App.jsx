@@ -219,7 +219,7 @@ export default function App() {
   const isPortalView = activeView === 'tenant' || activeView === 'landlord' || activeView === 'list-property';
 
   return (
-    <div className={`app-viewport-frame ${isPortalView ? 'portal-solid-frame' : ''}`}>
+    <div className="app-viewport-frame">
       <Navbar
         activeView={activeView}
         setActiveView={navigateTo}

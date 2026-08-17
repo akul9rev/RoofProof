@@ -50,7 +50,7 @@ body {
   width: 92%;
   margin: 1.8rem auto;
   border-radius: var(--radius-xl);
-  background: rgba(8, 14, 20, 0.25);
+  background: rgba(8, 14, 20, 0.45);
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
   border: 1.5px solid var(--border-glass);
@@ -60,12 +60,6 @@ body {
   min-height: calc(100vh - 3.6rem);
   display: flex;
   flex-direction: column;
-}
-
-/* Solid non-transparent container for Tenant & Landlord Dashboards */
-.app-viewport-frame.portal-solid-frame {
-  background: #09121a !important;
-  border: 1.5px solid rgba(255, 255, 255, 0.15) !important;
 }
 
 @media (max-width: 768px) {
