@@ -249,6 +249,7 @@ export default function App() {
             applications={applications}
             deletedPropertyIds={deletedPropertyIds}
             onOpenCreateModal={() => setIsCreateModalOpen(true)}
+            onCreateProperty={handleCreateProperty}
             onUpdateStatus={handleUpdateStatus}
             onDeleteProperty={handleDeleteProperty}
             currentUser={currentUser}

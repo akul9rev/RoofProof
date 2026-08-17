@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
-import { Building2, Plus, ShieldCheck, CheckCircle2, Users, Sparkles, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Building2, Plus, ShieldCheck, CheckCircle2, Users, Sparkles, ChevronLeft, ChevronRight, X } from 'lucide-react';
 import { EXACT_USER_DATASET } from './TenantDashboard';
 import PropertyCard from './PropertyCard';
+import CreatePropertyForm from './CreatePropertyForm';
 
-export default function LandlordDashboard({ properties = [], applications = [], deletedPropertyIds = [], onOpenCreateModal, onUpdateStatus, onDeleteProperty, currentUser }) {
+export default function LandlordDashboard({ properties = [], applications = [], deletedPropertyIds = [], onOpenCreateModal, onUpdateStatus, onDeleteProperty, currentUser, onCreateProperty }) {
   const [activeTab, setActiveTab] = useState('listings'); // 'listings' | 'applicants'
+  const [showCreateForm, setShowCreateForm] = useState(false);
   const [selectedAppForDenial, setSelectedAppForDenial] = useState(null);
   const [denialReason, setDenialReason] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
@@ -41,6 +43,10 @@ export default function LandlordDashboard({ properties = [], applications = [], 
     onUpdateStatus(selectedAppForDenial.id, 'rejected', denialReason);
     setSelectedAppForDenial(null);
     setDenialReason('');
+  };
+
+  const handleToggleCreateForm = () => {
+    setShowCreateForm(prev => !prev);
   };
 
   return (
@@ -132,11 +138,28 @@ export default function LandlordDashboard({ properties = [], applications = [], 
         </div>
 
         <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-          <button className="btn-white-pill" onClick={onOpenCreateModal}>
-            <Plus size={16} /> List New Property
+          <button className="btn-white-pill" onClick={handleToggleCreateForm}>
+            {showCreateForm ? <X size={16} /> : <Plus size={16} />}
+            {showCreateForm ? 'Close Form' : 'List New Property'}
           </button>
         </div>
       </div>
+
+      {/* Inline Rectangular Property Creation Form */}
+      {showCreateForm && (
+        <CreatePropertyForm
+          landlord={currentUser}
+          onClose={() => setShowCreateForm(false)}
+          onSuccess={async (data) => {
+            if (typeof onCreateProperty === 'function') {
+              await onCreateProperty(data);
+            } else if (typeof onOpenCreateModal === 'function') {
+              await onOpenCreateModal(data);
+            }
+            setShowCreateForm(false);
+          }}
+        />
+      )}
 
       {/* Tabs */}
       <div style={{
@@ -190,7 +213,7 @@ export default function LandlordDashboard({ properties = [], applications = [], 
               <p style={{ color: '#555', fontSize: '1.05rem', marginBottom: '20px' }}>
                 All property listings have been deleted or none exist.
               </p>
-              <button className="btn-white-pill" onClick={onOpenCreateModal}>
+              <button className="btn-white-pill" onClick={handleToggleCreateForm}>
                 <Plus size={16} /> List New Property
               </button>
             </div>
@@ -296,7 +319,7 @@ export default function LandlordDashboard({ properties = [], applications = [], 
                           className="btn-white-pill"
                           style={{ padding: '8px 18px', fontSize: '0.82rem', background: '#141a15', color: '#ffffff' }}
                         >
-                          <CheckCircle2 size={14} /> Approve Applicant
+                          <CheckCircle2 size={14} /> Accept Applicant
                         </button>
                         <button
                           onClick={() => setSelectedAppForDenial(app)}
@@ -313,7 +336,7 @@ export default function LandlordDashboard({ properties = [], applications = [], 
                         color: app.status === 'approved' ? '#22c55e' : '#ef4444',
                         textTransform: 'capitalize',
                       }}>
-                        Status: {app.status}
+                        Status: {app.status === 'approved' ? 'Accepted' : 'Declined'}
                       </span>
                     )}
                   </div>
