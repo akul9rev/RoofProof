@@ -14,7 +14,8 @@ export default function LandlordDashboard({ properties = [], applications = [], 
 
   const customProps = (() => {
     try {
-      return JSON.parse(localStorage.getItem('roofproof_custom_properties') || '[]');
+      const parsed = JSON.parse(localStorage.getItem('roofproof_custom_properties') || '[]');
+      return parsed.map(p => ({ ...p, isCustom: true }));
     } catch {
       return [];
     }
@@ -28,6 +29,7 @@ export default function LandlordDashboard({ properties = [], applications = [], 
   // Filter listings belonging to current landlord
   const myProperties = allActiveListings.filter(p => {
     if (!currentUser) return true;
+    if (p.isCustom) return true; // Custom properties created in this browser session ALWAYS display
     const matchesId = Number(p.landlord_id) === Number(currentUser.id);
     const matchesName = p.landlord_name && p.landlord_name.toLowerCase() === currentUser.name.toLowerCase();
     const isRohanDefault = (!p.landlord_id || Number(p.landlord_id) === 1) && Number(currentUser.id) === 1;

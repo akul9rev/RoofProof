@@ -212,7 +212,7 @@ export default function App() {
 
     try {
       const res = await createProperty(payload);
-      const newProp = res?.property || { ...payload, id: Date.now() };
+      const newProp = res?.property ? { ...payload, ...res.property, landlord_name: currentUser.name, landlord_id: currentUser.id } : { ...payload, id: Date.now() };
 
       setProperties(prev => [newProp, ...prev.filter(p => Number(p.id) !== Number(newProp.id))]);
 
