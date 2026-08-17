@@ -947,6 +947,53 @@ Replaced the simulated frontend proof service with the real Midnight zero-knowle
   - Backend API Integration Suite: **9/9 PASS (100%)**.
   - Smart Contract ZK Unit Tests: **4/4 PASS (100%)**.
 
+---
+
+## Prompt 26 - Database Authentication Guards, Password Authentication & Error Page Suite
+
+### 1. User Security & Access Control
+* Added strict password authentication for all registered users in PostgreSQL database (`users` table).
+* Created modular `ErrorPage.jsx` component supporting **403 Forbidden**, **404 Not Found**, **401 Unauthorized**, and **500 Internal Server Error**.
+* Enforced 403 Forbidden Access Restricted error page when Landlord accounts attempt to access Tenant Portal (`/tenant`) and when Tenant accounts attempt to access Landlord Management (`/landlord`).
+* Enforced 401 Authentication Required page when unauthenticated visitors attempt to access private portal views.
+
+---
+
+## Prompt 27 - Session Persistence & Sync Across Browser Refresh
+
+### 1. User Persistence & Deduplication
+* Saved authenticated user object (`currentUser`) and role (`currentRole`) in `localStorage` (`roofproof_logged_user`) to survive page reloads.
+* Updated ZK application submission and withdrawal logic in `App.jsx` to update state and `localStorage` (`roofproof_my_apps`) synchronously.
+* Property cards immediately switch to **Applied with ZK Proof** & **Withdraw Application** status upon submission, and revert to **Apply** upon withdrawal.
+
+---
+
+## Prompt 28 - Applications Sync & Status Precedence
+
+### 1. Received Applications Sync
+* Merged database API applications and `localStorage` (`roofproof_my_apps`) application records in `LandlordDashboard.jsx` using `Number(a.landlord_id) === Number(currentUser.id)`.
+* Updated Map deduplication in `TenantDashboard` and `LandlordDashboard` so that `approved` or `rejected` status always takes precedence over `pending`.
+* Clicking **Accept Applicant** in the Landlord Portal instantly updates status to **Status: Accepted** across both Landlord and Tenant dashboards.
+
+---
+
+## Prompt 29 - Cloudinary CDN Image Hosting Service
+
+### 1. Cloudinary Integration
+* Installed `cloudinary` (v2.10.0) SDK in `apps/backend` and configured `utils/cloudinary.js` with Cloud Name `omfiswpt`.
+* Mounted REST API endpoint `POST /api/upload/image` for image uploads to Cloudinary CDN folder `roofproof/properties`.
+* Connected `CreatePropertyPage.jsx` form to `uploadImageToCloudinaryApi`, uploading property photos directly to Cloudinary CDN.
+* Seeded default properties in database with Cloudinary CDN URLs (`https://res.cloudinary.com/...`) and added `onError` fallback handlers in `PropertyCard.jsx`.
+
+---
+
+## Prompt 30 - Deep System Audit & Codebase Hardening
+
+### 1. Final System Audit
+* Hardened property deletion cleanup (`handleDeleteProperty` in `App.jsx`), purging deleted IDs from memory and `localStorage` (`roofproof_custom_properties` and `roofproof_my_apps`).
+* Robust `deletedPropertyIds` filtering across `LandingPage`, `TenantDashboard`, and `LandlordDashboard` covering `Number`, `String`, and direct object equality.
+* Verified 100% clean production build (`npm run build --workspace=apps/frontend` $\rightarrow$ 0 errors in 1.94s).
+
 
 
 
