@@ -44,20 +44,21 @@ export default function PropertyCard({ property, onApply, onDelete, hasApplied, 
 
   return (
     <div className="white-property-card" style={{
-      padding: '20px',
+      padding: '16px',
       display: 'flex',
       flexDirection: 'column',
       justifyContent: 'space-between',
       position: 'relative',
       overflow: 'hidden',
+      borderRadius: '24px',
     }}>
       <div>
-        {/* Unsplash Property Photo Header */}
+        {/* Compact Property Photo Header */}
         <div style={{
-          height: '210px',
-          borderRadius: '20px',
+          height: '150px',
+          borderRadius: '16px',
           overflow: 'hidden',
-          marginBottom: '16px',
+          marginBottom: '12px',
           position: 'relative',
         }}>
           <img
@@ -67,22 +68,22 @@ export default function PropertyCard({ property, onApply, onDelete, hasApplied, 
           />
           <span style={{
             position: 'absolute',
-            top: '12px',
-            right: '12px',
+            top: '8px',
+            right: '8px',
             background: 'rgba(12, 18, 25, 0.88)',
             backdropFilter: 'blur(8px)',
-            padding: '6px 14px',
+            padding: '4px 10px',
             borderRadius: '999px',
-            fontSize: '0.78rem',
+            fontSize: '0.72rem',
             color: '#EBA834',
             fontWeight: 700,
             display: 'flex',
             alignItems: 'center',
-            gap: '5px',
+            gap: '4px',
             border: '1px solid rgba(235, 168, 52, 0.35)',
-            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
+            boxShadow: '0 4px 10px rgba(0, 0, 0, 0.3)',
           }}>
-            <ShieldCheck size={14} /> ZK Eligible
+            <ShieldCheck size={13} /> ZK Eligible
           </span>
 
           {/* Landlord Delete Button Overlay */}
@@ -98,73 +99,82 @@ export default function PropertyCard({ property, onApply, onDelete, hasApplied, 
               title="Delete Listing"
               style={{
                 position: 'absolute',
-                top: '12px',
-                left: '12px',
+                top: '8px',
+                left: '8px',
                 background: 'rgba(239, 68, 68, 0.9)',
                 color: '#ffffff',
                 border: 'none',
                 borderRadius: '999px',
-                padding: '6px 12px',
-                fontSize: '0.75rem',
+                padding: '4px 10px',
+                fontSize: '0.72rem',
                 fontWeight: 700,
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '4px',
-                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
+                boxShadow: '0 4px 10px rgba(0, 0, 0, 0.3)',
               }}
             >
-              <Trash2 size={13} /> Delete
+              <Trash2 size={12} /> Delete
             </button>
           )}
         </div>
 
-        <h3 style={{ fontSize: '1.3rem', marginBottom: '4px', lineHeight: 1.25, color: '#1a221b', fontWeight: 700 }}>
+        <h3 style={{ fontSize: '1.15rem', marginBottom: '3px', lineHeight: 1.25, color: '#1a221b', fontWeight: 700 }}>
           {property.title}
         </h3>
 
         {/* Listed By Landlord Badge */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '5px', color: '#555e56', fontSize: '0.8rem', marginBottom: '8px' }}>
-          <User size={13} color="#4A7C59" />
+        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#555e56', fontSize: '0.78rem', marginBottom: '4px' }}>
+          <User size={12} color="#4A7C59" />
           <span>Listed by: <strong style={{ color: '#1a221b', fontWeight: 700 }}>{landlordName}</strong></span>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#555e56', fontSize: '0.85rem', marginBottom: '14px' }}>
-          <MapPin size={15} color="#4A7C59" />
+        <div style={{ display: 'flex', alignItems: 'center', gap: '5px', color: '#555e56', fontSize: '0.8rem', marginBottom: '8px' }}>
+          <MapPin size={13} color="#4A7C59" />
           <span>{property.location}</span>
         </div>
 
-        <p style={{ color: '#4a524b', fontSize: '0.88rem', marginBottom: '16px', lineHeight: 1.45 }}>
+        <p style={{
+          color: '#4a524b',
+          fontSize: '0.82rem',
+          marginBottom: '10px',
+          lineHeight: 1.35,
+          display: '-webkit-box',
+          WebkitLineClamp: 2,
+          WebkitBoxOrient: 'vertical',
+          overflow: 'hidden',
+        }}>
           {property.description}
         </p>
       </div>
 
       <div>
-        {/* Pricing & Requirement Box */}
+        {/* Compact Pricing & Requirement Box */}
         <div style={{
           background: '#FAF9F5',
           border: '1px solid rgba(0, 0, 0, 0.08)',
-          borderRadius: '16px',
-          padding: '14px 16px',
-          marginBottom: '16px',
+          borderRadius: '14px',
+          padding: '10px 12px',
+          marginBottom: '10px',
           display: 'grid',
           gridTemplateColumns: '1fr 1fr',
-          gap: '12px',
+          gap: '8px',
         }}>
           <div>
-            <div style={{ fontSize: '0.72rem', color: '#666', textTransform: 'uppercase', fontWeight: 700 }}>
+            <div style={{ fontSize: '0.68rem', color: '#666', textTransform: 'uppercase', fontWeight: 700 }}>
               Monthly Rent
             </div>
-            <div style={{ fontSize: '1.18rem', fontWeight: 800, color: '#1a221b' }}>
+            <div style={{ fontSize: '1.05rem', fontWeight: 800, color: '#1a221b' }}>
               {formattedRent}
             </div>
           </div>
 
           <div>
-            <div style={{ fontSize: '0.72rem', color: '#666', textTransform: 'uppercase', fontWeight: 700 }}>
+            <div style={{ fontSize: '0.68rem', color: '#666', textTransform: 'uppercase', fontWeight: 700 }}>
               Min. Income Req.
             </div>
-            <div style={{ fontSize: '1.18rem', fontWeight: 800, color: '#4A7C59' }}>
+            <div style={{ fontSize: '1.05rem', fontWeight: 800, color: '#4A7C59' }}>
               {formattedThreshold}
             </div>
           </div>
@@ -187,8 +197,8 @@ export default function PropertyCard({ property, onApply, onDelete, hasApplied, 
                   color: '#ef4444',
                   border: '1px solid rgba(239, 68, 68, 0.3)',
                   fontWeight: 700,
-                  fontSize: '0.85rem',
-                  padding: '12px',
+                  fontSize: '0.82rem',
+                  padding: '10px',
                   borderRadius: '999px',
                   cursor: 'pointer',
                   display: 'flex',
@@ -197,7 +207,7 @@ export default function PropertyCard({ property, onApply, onDelete, hasApplied, 
                   gap: '6px',
                 }}
               >
-                <Trash2 size={15} /> Delete Listing
+                <Trash2 size={14} /> Delete Listing
               </button>
             )}
           </div>
@@ -205,7 +215,7 @@ export default function PropertyCard({ property, onApply, onDelete, hasApplied, 
           /* Approved State - Locked, No Actions Allowed */
           <div style={{
             width: '100%',
-            padding: '12px',
+            padding: '10px',
             borderRadius: '999px',
             background: 'linear-gradient(135deg, #15803d 0%, #166534 100%)',
             color: '#ffffff',
@@ -213,18 +223,18 @@ export default function PropertyCard({ property, onApply, onDelete, hasApplied, 
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            gap: '8px',
-            fontSize: '0.9rem',
-            boxShadow: '0 6px 18px rgba(22, 101, 52, 0.3)',
+            gap: '6px',
+            fontSize: '0.85rem',
+            boxShadow: '0 4px 14px rgba(22, 101, 52, 0.3)',
           }}>
-            <CheckCircle2 size={18} color="#ffffff" /> Application Accepted
+            <CheckCircle2 size={16} color="#ffffff" /> Application Accepted
           </div>
         ) : isRejectedStatus ? (
           /* Rejected State - Locked with Small Reason Box */
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
             <div style={{
               width: '100%',
-              padding: '10px 14px',
+              padding: '8px 12px',
               borderRadius: '999px',
               background: 'rgba(239, 68, 68, 0.12)',
               color: '#ef4444',
@@ -234,28 +244,28 @@ export default function PropertyCard({ property, onApply, onDelete, hasApplied, 
               justifyContent: 'center',
               gap: '6px',
               border: '1px solid rgba(239, 68, 68, 0.3)',
-              fontSize: '0.86rem',
+              fontSize: '0.82rem',
             }}>
-              <AlertCircle size={16} /> Application Declined
+              <AlertCircle size={15} /> Application Declined
             </div>
             <div style={{
-              fontSize: '0.78rem',
+              fontSize: '0.75rem',
               color: '#dc2626',
               background: 'rgba(239, 68, 68, 0.06)',
               border: '1px solid rgba(239, 68, 68, 0.2)',
-              borderRadius: '12px',
-              padding: '8px 12px',
-              lineHeight: 1.4,
+              borderRadius: '10px',
+              padding: '6px 10px',
+              lineHeight: 1.3,
             }}>
-              <strong>Landlord Note:</strong> {application?.rejection_reason || 'Owner Denied: Property requirements or move-in timeline criteria not met.'}
+              <strong>Landlord Note:</strong> {application?.rejection_reason || 'Owner Denied: Move-in timeline criteria not met.'}
             </div>
           </div>
         ) : isPendingStatus ? (
           /* Pending State - Show Applied Pill + Withdraw Button */
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
             <div style={{
               width: '100%',
-              padding: '10px 14px',
+              padding: '8px 12px',
               borderRadius: '999px',
               background: 'rgba(74, 124, 89, 0.12)',
               color: '#4A7C59',
@@ -265,22 +275,22 @@ export default function PropertyCard({ property, onApply, onDelete, hasApplied, 
               justifyContent: 'center',
               gap: '6px',
               border: '1px solid rgba(74, 124, 89, 0.3)',
-              fontSize: '0.85rem',
+              fontSize: '0.82rem',
             }}>
-              <ShieldCheck size={16} /> Applied with ZK Proof
+              <ShieldCheck size={15} /> Applied with ZK Proof
             </div>
             <button
               type="button"
               onClick={handleWithdrawClick}
               style={{
                 width: '100%',
-                padding: '9px',
+                padding: '8px',
                 borderRadius: '999px',
                 background: 'rgba(239, 68, 68, 0.08)',
                 color: '#ef4444',
                 border: '1px solid rgba(239, 68, 68, 0.25)',
                 fontWeight: 700,
-                fontSize: '0.82rem',
+                fontSize: '0.78rem',
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
@@ -289,7 +299,7 @@ export default function PropertyCard({ property, onApply, onDelete, hasApplied, 
                 transition: 'all 0.2s ease',
               }}
             >
-              <XCircle size={14} /> Withdraw Application
+              <XCircle size={13} /> Withdraw Application
             </button>
           </div>
         ) : (
@@ -302,21 +312,21 @@ export default function PropertyCard({ property, onApply, onDelete, hasApplied, 
               background: '#141a15',
               color: '#ffffff',
               fontFamily: 'var(--font-body)',
-              fontSize: '0.92rem',
+              fontSize: '0.88rem',
               fontWeight: 700,
-              padding: '14px',
+              padding: '10px 14px',
               borderRadius: '999px',
               border: 'none',
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              gap: '8px',
-              boxShadow: '0 8px 20px rgba(0, 0, 0, 0.15)',
+              gap: '6px',
+              boxShadow: '0 6px 16px rgba(0, 0, 0, 0.15)',
               transition: 'all 0.2s ease',
             }}
           >
-            Apply <ArrowRight size={16} />
+            Apply <ArrowRight size={15} />
           </button>
         )}
       </div>
