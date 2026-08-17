@@ -73,7 +73,8 @@ export default function CreatePropertyPage({ landlord, onBack, onSuccess }) {
       }
 
       await onSuccess({
-        landlord_id: landlord?.id || 2,
+        landlord_id: landlord?.id || 1,
+        landlord_name: landlord?.name || 'Landlord',
         title: title.trim(),
         property_type: propertyType,
         location: location.trim(),

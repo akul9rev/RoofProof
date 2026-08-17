@@ -26,7 +26,13 @@ export default function LandlordDashboard({ properties = [], applications = [], 
   const allActiveListings = uniqueProps.filter(p => !deletedPropertyIds.includes(p.id) && !deletedPropertyIds.includes(Number(p.id)) && !deletedPropertyIds.includes(String(p.id)));
 
   // Filter listings belonging to current landlord
-  const myProperties = allActiveListings.filter(p => Number(p.landlord_id) === Number(currentUser?.id || 1) || (!p.landlord_id && Number(currentUser?.id || 1) === 1));
+  const myProperties = allActiveListings.filter(p => {
+    if (!currentUser) return true;
+    const matchesId = Number(p.landlord_id) === Number(currentUser.id);
+    const matchesName = p.landlord_name && p.landlord_name.toLowerCase() === currentUser.name.toLowerCase();
+    const isRohanDefault = (!p.landlord_id || Number(p.landlord_id) === 1) && Number(currentUser.id) === 1;
+    return matchesId || matchesName || isRohanDefault;
+  });
 
   const totalPages = Math.ceil(myProperties.length / ITEMS_PER_PAGE) || 1;
   const displayListings = myProperties.slice(
