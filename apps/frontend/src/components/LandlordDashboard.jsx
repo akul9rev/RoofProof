@@ -46,7 +46,14 @@ export default function LandlordDashboard({ properties = [], applications = [], 
   };
 
   const handleToggleCreateForm = () => {
-    setShowCreateForm(prev => !prev);
+    const nextState = !showCreateForm;
+    setShowCreateForm(nextState);
+    if (nextState) {
+      setTimeout(() => {
+        const el = document.getElementById('create-property-form-container');
+        if (el) el.scrollIntoView({ behavior: 'smooth' });
+      }, 60);
+    }
   };
 
   return (

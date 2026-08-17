@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Building2, Plus, ArrowLeft, Upload, Check, ShieldCheck, MapPin, Sparkles, AlertCircle } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Building2, Plus, ArrowLeft, Upload, Check, ShieldCheck, MapPin, Sparkles, AlertCircle, Home, FileText } from 'lucide-react';
 
 export default function CreatePropertyPage({ landlord, onBack, onSuccess }) {
   const [title, setTitle] = useState('');
@@ -12,6 +12,10 @@ export default function CreatePropertyPage({ landlord, onBack, onSuccess }) {
   const [imagePreview, setImagePreview] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, []);
 
   const handleImageFileChange = (e) => {
     const file = e.target.files?.[0];
@@ -71,62 +75,71 @@ export default function CreatePropertyPage({ landlord, onBack, onSuccess }) {
   const formattedThreshold = incomeThreshold ? new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(incomeThreshold) : '₹0';
 
   return (
-    <div className="animate-fade-in" style={{ width: '100%', padding: '10px 0 60px' }}>
-      {/* Top Header Navigation */}
+    <div className="animate-fade-in" id="create-property-form-container" style={{ width: '100%', padding: '10px 0 60px' }}>
+      {/* Top Navigation Bar */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '28px', flexWrap: 'wrap', gap: '16px' }}>
         <button
           onClick={onBack}
           className="btn-white-pill"
-          style={{ padding: '8px 18px', fontSize: '0.86rem', display: 'flex', alignItems: 'center', gap: '8px' }}
+          style={{ padding: '9px 20px', fontSize: '0.88rem', display: 'flex', alignItems: 'center', gap: '8px' }}
         >
           <ArrowLeft size={16} /> Back to Landlord Portal
         </button>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#6B9B76', fontSize: '0.82rem', fontWeight: 700 }}>
-          <ShieldCheck size={16} /> MIDNIGHT ZK PROTECTED LISTING CREATION
+        <div style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: '8px',
+          background: 'rgba(107, 155, 118, 0.18)',
+          border: '1px solid rgba(107, 155, 118, 0.35)',
+          padding: '6px 16px',
+          borderRadius: '999px',
+          fontSize: '0.8rem',
+          color: '#6B9B76',
+          fontWeight: 700,
+        }}>
+          <ShieldCheck size={15} /> MIDNIGHT ZK LISTING CREATION
         </div>
       </div>
 
-      {/* Main Professional 2-Column Split Workspace */}
+      {/* Main 2-Column Luxury Split Workspace */}
       <div style={{
         display: 'grid',
-        gridTemplateColumns: 'minmax(320px, 420px) 1fr',
-        gap: '32px',
+        gridTemplateColumns: 'minmax(320px, 400px) 1fr',
+        gap: '28px',
         alignItems: 'start',
       }}>
-        {/* Left Side: Live Card Preview & Publisher Badge */}
+        {/* Left Column: Live Card Preview matching site's white card design */}
         <div style={{ position: 'sticky', top: '20px' }}>
-          <div style={{
-            background: 'rgba(255, 255, 255, 0.05)',
-            border: '1px solid rgba(255, 255, 255, 0.12)',
+          <div className="white-property-card" style={{
+            padding: '22px',
             borderRadius: '24px',
-            padding: '24px',
-            color: '#ffffff',
-            boxShadow: '0 20px 50px rgba(0,0,0,0.4)',
+            boxShadow: '0 20px 50px rgba(0, 0, 0, 0.15)',
           }}>
             <div style={{
               display: 'inline-flex',
               alignItems: 'center',
               gap: '6px',
-              background: 'rgba(107, 155, 118, 0.18)',
-              color: '#6B9B76',
+              background: 'rgba(74, 124, 89, 0.12)',
+              color: '#4A7C59',
               padding: '4px 12px',
               borderRadius: '999px',
-              fontSize: '0.75rem',
+              fontSize: '0.74rem',
               fontWeight: 700,
               marginBottom: '16px',
+              border: '1px solid rgba(74, 124, 89, 0.25)',
             }}>
               <Sparkles size={13} /> LIVE CARD PREVIEW
             </div>
 
             {/* Photo Box */}
             <div style={{
-              height: '240px',
+              height: '230px',
               borderRadius: '18px',
               overflow: 'hidden',
-              background: '#070c13',
+              background: '#FAF9F5',
               marginBottom: '16px',
-              border: '1px solid rgba(255, 255, 255, 0.15)',
+              border: '1px solid rgba(0, 0, 0, 0.08)',
               position: 'relative',
               display: 'flex',
               alignItems: 'center',
@@ -139,28 +152,28 @@ export default function CreatePropertyPage({ landlord, onBack, onSuccess }) {
                   style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                 />
               ) : (
-                <div style={{ textAlign: 'center', color: 'rgba(255,255,255,0.4)', padding: '20px' }}>
-                  <Building2 size={40} style={{ margin: '0 auto 8px', opacity: 0.5 }} />
-                  <div style={{ fontSize: '0.85rem' }}>No Photo Uploaded Yet</div>
-                  <div style={{ fontSize: '0.74rem', opacity: 0.7 }}>Upload a file on the right to preview</div>
+                <div style={{ textAlign: 'center', color: '#666666', padding: '20px' }}>
+                  <Building2 size={42} color="#4A7C59" style={{ margin: '0 auto 8px', opacity: 0.6 }} />
+                  <div style={{ fontSize: '0.88rem', fontWeight: 600, color: '#1a221b' }}>No Photo Uploaded Yet</div>
+                  <div style={{ fontSize: '0.76rem', color: '#777' }}>Upload photo file on right to view</div>
                 </div>
               )}
             </div>
 
-            <h3 style={{ fontSize: '1.35rem', fontWeight: 700, marginBottom: '6px', color: '#ffffff' }}>
-              {title || 'Property Title Here'}
+            <h3 style={{ fontSize: '1.3rem', fontWeight: 700, marginBottom: '6px', color: '#1a221b', lineHeight: 1.25 }}>
+              {title || 'Property Title'}
             </h3>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'rgba(255,255,255,0.7)', fontSize: '0.85rem', marginBottom: '16px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#555e56', fontSize: '0.85rem', marginBottom: '16px' }}>
               <MapPin size={15} color="#4A7C59" />
-              <span>{location || 'City / Location'}</span>
-              <span style={{ margin: '0 4px' }}>•</span>
+              <span>{location || 'City, State'}</span>
+              <span style={{ margin: '0 4px', color: '#ccc' }}>•</span>
               <span style={{ color: '#EBA834', fontWeight: 700 }}>{propertyType}</span>
             </div>
 
             <div style={{
-              background: 'rgba(0, 0, 0, 0.3)',
-              border: '1px solid rgba(255, 255, 255, 0.1)',
+              background: '#FAF9F5',
+              border: '1px solid rgba(0, 0, 0, 0.08)',
               borderRadius: '16px',
               padding: '14px',
               display: 'grid',
@@ -168,36 +181,36 @@ export default function CreatePropertyPage({ landlord, onBack, onSuccess }) {
               gap: '10px',
             }}>
               <div>
-                <div style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', fontWeight: 700 }}>Monthly Rent</div>
-                <div style={{ fontSize: '1.15rem', fontWeight: 800, color: '#ffffff' }}>{formattedRent}</div>
+                <div style={{ fontSize: '0.7rem', color: '#666', textTransform: 'uppercase', fontWeight: 700 }}>Monthly Rent</div>
+                <div style={{ fontSize: '1.15rem', fontWeight: 800, color: '#1a221b' }}>{formattedRent}</div>
               </div>
               <div>
-                <div style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', fontWeight: 700 }}>Min Income</div>
-                <div style={{ fontSize: '1.15rem', fontWeight: 800, color: '#6B9B76' }}>{formattedThreshold}</div>
+                <div style={{ fontSize: '0.7rem', color: '#666', textTransform: 'uppercase', fontWeight: 700 }}>Min Income</div>
+                <div style={{ fontSize: '1.15rem', fontWeight: 800, color: '#4A7C59' }}>{formattedThreshold}</div>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Right Side: Professional Structured Rectangle Form */}
+        {/* Right Column: Luxury White Rectangle Form Container */}
         <div style={{
-          background: 'linear-gradient(165deg, #0e1722 0%, #080e15 100%)',
-          border: '1px solid rgba(255, 255, 255, 0.18)',
-          borderRadius: '24px',
+          background: '#ffffff',
+          borderRadius: '26px',
           padding: '36px',
-          boxShadow: '0 30px 80px rgba(0, 0, 0, 0.6)',
-          color: '#ffffff',
+          boxShadow: '0 25px 70px rgba(0, 0, 0, 0.18)',
+          color: '#1a221b',
+          border: '1px solid rgba(0, 0, 0, 0.08)',
         }}>
-          <div style={{ marginBottom: '24px', borderBottom: '1px solid rgba(255, 255, 255, 0.1)', paddingBottom: '16px' }}>
-            <h2 style={{ fontSize: '1.8rem', fontWeight: 700, margin: 0 }}>List New Rental Property</h2>
-            <p style={{ color: 'rgba(255, 255, 255, 0.65)', fontSize: '0.9rem', marginTop: '4px' }}>
+          <div style={{ marginBottom: '24px', borderBottom: '1px solid rgba(0, 0, 0, 0.08)', paddingBottom: '18px' }}>
+            <h2 style={{ fontSize: '1.8rem', fontWeight: 700, margin: 0, color: '#1a221b' }}>List New Rental Property</h2>
+            <p style={{ color: '#555e56', fontSize: '0.92rem', marginTop: '4px', margin: '4px 0 0' }}>
               Publish listing directly to PostgreSQL database with Midnight Zero-Knowledge income privacy bounds.
             </p>
           </div>
 
           {error && (
             <div style={{
-              background: 'rgba(239, 68, 68, 0.12)',
+              background: 'rgba(239, 68, 68, 0.1)',
               border: '1px solid rgba(239, 68, 68, 0.3)',
               color: '#ef4444',
               padding: '12px 16px',
@@ -216,30 +229,31 @@ export default function CreatePropertyPage({ landlord, onBack, onSuccess }) {
             {/* Title & Type */}
             <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '16px' }}>
               <div>
-                <label style={{ display: 'block', fontSize: '0.88rem', fontWeight: 600, color: 'rgba(255, 255, 255, 0.9)', marginBottom: '6px' }}>
+                <label style={{ display: 'block', fontSize: '0.88rem', fontWeight: 700, color: '#1a221b', marginBottom: '6px' }}>
                   Property Title *
                 </label>
                 <input
                   type="text"
                   value={title}
                   onChange={e => setTitle(e.target.value)}
-                  placeholder="e.g. Palm Court Residency"
+                  placeholder="e.g. Misty Peak Villa"
                   required
                   style={{
                     width: '100%',
                     padding: '12px 16px',
-                    background: 'rgba(255, 255, 255, 0.06)',
-                    border: '1px solid rgba(255, 255, 255, 0.14)',
+                    background: '#FAF9F5',
+                    border: '1px solid rgba(0, 0, 0, 0.12)',
                     borderRadius: '14px',
-                    color: '#ffffff',
+                    color: '#1a221b',
                     fontSize: '0.92rem',
                     outline: 'none',
+                    fontWeight: 500,
                   }}
                 />
               </div>
 
               <div>
-                <label style={{ display: 'block', fontSize: '0.88rem', fontWeight: 600, color: 'rgba(255, 255, 255, 0.9)', marginBottom: '6px' }}>
+                <label style={{ display: 'block', fontSize: '0.88rem', fontWeight: 700, color: '#1a221b', marginBottom: '6px' }}>
                   Housing Type *
                 </label>
                 <select
@@ -248,12 +262,13 @@ export default function CreatePropertyPage({ landlord, onBack, onSuccess }) {
                   style={{
                     width: '100%',
                     padding: '12px 16px',
-                    background: '#0e1722',
-                    border: '1px solid rgba(255, 255, 255, 0.14)',
+                    background: '#FAF9F5',
+                    border: '1px solid rgba(0, 0, 0, 0.12)',
                     borderRadius: '14px',
-                    color: '#ffffff',
+                    color: '#1a221b',
                     fontSize: '0.92rem',
                     outline: 'none',
+                    fontWeight: 600,
                   }}
                 >
                   <option value="Family Apartment">Family Apartment</option>
@@ -267,25 +282,25 @@ export default function CreatePropertyPage({ landlord, onBack, onSuccess }) {
               </div>
             </div>
 
-            {/* Location & Pricing */}
+            {/* Location, Rent, Income */}
             <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr 1fr', gap: '16px' }}>
               <div>
-                <label style={{ display: 'block', fontSize: '0.88rem', fontWeight: 600, color: 'rgba(255, 255, 255, 0.9)', marginBottom: '6px' }}>
+                <label style={{ display: 'block', fontSize: '0.88rem', fontWeight: 700, color: '#1a221b', marginBottom: '6px' }}>
                   Location / City *
                 </label>
                 <input
                   type="text"
                   value={location}
                   onChange={e => setLocation(e.target.value)}
-                  placeholder="e.g. Indiranagar, Bangalore"
+                  placeholder="e.g. Dehradun, Uttarakhand"
                   required
                   style={{
                     width: '100%',
                     padding: '12px 16px',
-                    background: 'rgba(255, 255, 255, 0.06)',
-                    border: '1px solid rgba(255, 255, 255, 0.14)',
+                    background: '#FAF9F5',
+                    border: '1px solid rgba(0, 0, 0, 0.12)',
                     borderRadius: '14px',
-                    color: '#ffffff',
+                    color: '#1a221b',
                     fontSize: '0.92rem',
                     outline: 'none',
                   }}
@@ -293,47 +308,49 @@ export default function CreatePropertyPage({ landlord, onBack, onSuccess }) {
               </div>
 
               <div>
-                <label style={{ display: 'block', fontSize: '0.88rem', fontWeight: 600, color: 'rgba(255, 255, 255, 0.9)', marginBottom: '6px' }}>
+                <label style={{ display: 'block', fontSize: '0.88rem', fontWeight: 700, color: '#1a221b', marginBottom: '6px' }}>
                   Monthly Rent (₹) *
                 </label>
                 <input
                   type="number"
                   value={monthlyRent}
                   onChange={e => setMonthlyRent(e.target.value)}
-                  placeholder="42000"
+                  placeholder="55000"
                   required
                   style={{
                     width: '100%',
                     padding: '12px 16px',
-                    background: 'rgba(255, 255, 255, 0.06)',
-                    border: '1px solid rgba(255, 255, 255, 0.14)',
+                    background: '#FAF9F5',
+                    border: '1px solid rgba(0, 0, 0, 0.12)',
                     borderRadius: '14px',
-                    color: '#ffffff',
+                    color: '#1a221b',
                     fontSize: '0.92rem',
                     outline: 'none',
+                    fontWeight: 600,
                   }}
                 />
               </div>
 
               <div>
-                <label style={{ display: 'block', fontSize: '0.88rem', fontWeight: 600, color: 'rgba(255, 255, 255, 0.9)', marginBottom: '6px' }}>
+                <label style={{ display: 'block', fontSize: '0.88rem', fontWeight: 700, color: '#1a221b', marginBottom: '6px' }}>
                   Min. Income Req. (₹) *
                 </label>
                 <input
                   type="number"
                   value={incomeThreshold}
                   onChange={e => setIncomeThreshold(e.target.value)}
-                  placeholder="120000"
+                  placeholder="165000"
                   required
                   style={{
                     width: '100%',
                     padding: '12px 16px',
-                    background: 'rgba(255, 255, 255, 0.06)',
-                    border: '1px solid rgba(255, 255, 255, 0.14)',
+                    background: '#FAF9F5',
+                    border: '1px solid rgba(0, 0, 0, 0.12)',
                     borderRadius: '14px',
-                    color: '#ffffff',
+                    color: '#1a221b',
                     fontSize: '0.92rem',
                     outline: 'none',
+                    fontWeight: 600,
                   }}
                 />
               </div>
@@ -341,22 +358,22 @@ export default function CreatePropertyPage({ landlord, onBack, onSuccess }) {
 
             {/* Description */}
             <div>
-              <label style={{ display: 'block', fontSize: '0.88rem', fontWeight: 600, color: 'rgba(255, 255, 255, 0.9)', marginBottom: '6px' }}>
+              <label style={{ display: 'block', fontSize: '0.88rem', fontWeight: 700, color: '#1a221b', marginBottom: '6px' }}>
                 Description & Amenities *
               </label>
               <textarea
                 rows="4"
                 value={description}
                 onChange={e => setDescription(e.target.value)}
-                placeholder="e.g. Spacious 2 BHK in a quiet residential lane with modular kitchen and covered parking."
+                placeholder="e.g. 3 BHK hillside villa with a private garden, modular kitchen, and panoramic mountain views."
                 required
                 style={{
                   width: '100%',
                   padding: '12px 16px',
-                  background: 'rgba(255, 255, 255, 0.06)',
-                  border: '1px solid rgba(255, 255, 255, 0.14)',
+                  background: '#FAF9F5',
+                  border: '1px solid rgba(0, 0, 0, 0.12)',
                   borderRadius: '14px',
-                  color: '#ffffff',
+                  color: '#1a221b',
                   fontSize: '0.92rem',
                   outline: 'none',
                   resize: 'none',
@@ -364,61 +381,61 @@ export default function CreatePropertyPage({ landlord, onBack, onSuccess }) {
               />
             </div>
 
-            {/* Image File Upload Dropzone */}
+            {/* Photo Upload Dropzone */}
             <div>
-              <label style={{ display: 'block', fontSize: '0.88rem', fontWeight: 600, color: 'rgba(255, 255, 255, 0.9)', marginBottom: '8px' }}>
-                Upload Property Photo File
+              <label style={{ display: 'block', fontSize: '0.88rem', fontWeight: 700, color: '#1a221b', marginBottom: '8px' }}>
+                Property Photo Upload
               </label>
 
               <div style={{
-                border: '2px dashed rgba(255, 255, 255, 0.2)',
+                border: '2px dashed rgba(74, 124, 89, 0.35)',
                 borderRadius: '18px',
                 padding: '28px',
                 textAlign: 'center',
-                background: 'rgba(0, 0, 0, 0.25)',
+                background: '#FAF9F5',
               }}>
                 <input
                   type="file"
                   accept="image/*"
                   onChange={handleImageFileChange}
                   style={{ display: 'none' }}
-                  id="page-form-image-file"
+                  id="luxury-form-image-file"
                 />
                 <label
-                  htmlFor="page-form-image-file"
+                  htmlFor="luxury-form-image-file"
                   style={{
                     display: 'inline-flex',
                     alignItems: 'center',
                     gap: '8px',
-                    background: '#ffffff',
-                    color: '#0c141d',
+                    background: '#141a15',
+                    color: '#ffffff',
                     padding: '12px 28px',
                     borderRadius: '999px',
                     fontSize: '0.9rem',
                     fontWeight: 700,
                     cursor: 'pointer',
-                    boxShadow: '0 4px 16px rgba(0,0,0,0.2)',
+                    boxShadow: '0 4px 16px rgba(0,0,0,0.15)',
                   }}
                 >
                   <Upload size={18} /> {imageFile ? 'Change Selected Photo' : 'Upload Property Photo'}
                 </label>
-                <div style={{ fontSize: '0.82rem', color: 'rgba(255, 255, 255, 0.5)', marginTop: '10px' }}>
-                  {imageFile ? `${imageFile.name} (${(imageFile.size / 1024).toFixed(1)} KB)` : 'Supported formats: JPG, PNG, WebP (Max 10 MB).'}
+                <div style={{ fontSize: '0.82rem', color: '#666', marginTop: '10px' }}>
+                  {imageFile ? `${imageFile.name} (${(imageFile.size / 1024).toFixed(1)} KB)` : 'Select a JPG, PNG, or WebP photo file.'}
                 </div>
               </div>
             </div>
 
-            {/* Actions */}
-            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '14px', marginTop: '14px', paddingTop: '20px', borderTop: '1px solid rgba(255, 255, 255, 0.1)' }}>
+            {/* Submit Action Bar */}
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '14px', marginTop: '14px', paddingTop: '20px', borderTop: '1px solid rgba(0, 0, 0, 0.08)' }}>
               <button
                 type="button"
                 onClick={onBack}
                 style={{
-                  background: 'rgba(255, 255, 255, 0.08)',
-                  color: '#ffffff',
+                  background: '#FAF9F5',
+                  color: '#1a221b',
                   padding: '12px 28px',
                   borderRadius: '999px',
-                  border: 'none',
+                  border: '1px solid rgba(0, 0, 0, 0.12)',
                   fontWeight: 600,
                   fontSize: '0.92rem',
                   cursor: 'pointer',
@@ -430,8 +447,8 @@ export default function CreatePropertyPage({ landlord, onBack, onSuccess }) {
                 type="submit"
                 disabled={isSubmitting}
                 style={{
-                  background: '#ffffff',
-                  color: '#0c141d',
+                  background: '#141a15',
+                  color: '#ffffff',
                   padding: '12px 32px',
                   borderRadius: '999px',
                   border: 'none',
@@ -441,7 +458,7 @@ export default function CreatePropertyPage({ landlord, onBack, onSuccess }) {
                   display: 'flex',
                   alignItems: 'center',
                   gap: '8px',
-                  boxShadow: '0 8px 28px rgba(0,0,0,0.35)',
+                  boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
                 }}
               >
                 <Plus size={18} /> {isSubmitting ? 'Publishing to Database...' : 'Publish Listing to Database'}
