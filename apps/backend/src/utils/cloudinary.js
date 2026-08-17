@@ -3,11 +3,11 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-// Configure Cloudinary with environment variables or fallback demo credentials
+// Configure Cloudinary with environment variables or user Cloudinary account fallback
 cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME || 'roofproof-cdn',
-  api_key: process.env.CLOUDINARY_API_KEY || '849126482159371',
-  api_secret: process.env.CLOUDINARY_API_SECRET || 'roofproof_secret_key_demo',
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME || 'omfiswpt',
+  api_key: process.env.CLOUDINARY_API_KEY || '488359256626776',
+  api_secret: process.env.CLOUDINARY_API_SECRET || '5R3qy0xb5JjcGot0g3WaSEELrbg',
   secure: true,
 });
 

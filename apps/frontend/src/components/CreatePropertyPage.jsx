@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Building2, Plus, ArrowLeft, Upload, Check, ShieldCheck, MapPin, Sparkles, AlertCircle, Home, FileText } from 'lucide-react';
 
+import { uploadImageToCloudinaryApi } from '../services/api.js';
+
 export default function CreatePropertyPage({ landlord, onBack, onSuccess }) {
   const [title, setTitle] = useState('');
   const [propertyType, setPropertyType] = useState('Family Apartment');
@@ -50,10 +52,26 @@ export default function CreatePropertyPage({ landlord, onBack, onSuccess }) {
       return;
     }
 
-    const finalImage = imagePreview || 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800&q=80';
-
     setIsSubmitting(true);
+    let finalImageUrl = 'https://res.cloudinary.com/omfiswpt/image/upload/v1723900001/roofproof/properties/house1_colonial_mansion.jpg';
+
     try {
+      if (imageFile || imagePreview) {
+        try {
+          const uploadRes = await uploadImageToCloudinaryApi(imageFile || imagePreview);
+          if (uploadRes?.success && uploadRes?.url) {
+            finalImageUrl = uploadRes.url;
+          } else if (imagePreview && imagePreview.startsWith('http')) {
+            finalImageUrl = imagePreview;
+          }
+        } catch (uploadErr) {
+          console.warn('[Cloudinary Upload Fallback]', uploadErr);
+          if (imagePreview && imagePreview.startsWith('http')) {
+            finalImageUrl = imagePreview;
+          }
+        }
+      }
+
       await onSuccess({
         landlord_id: landlord?.id || 2,
         title: title.trim(),
@@ -62,7 +80,7 @@ export default function CreatePropertyPage({ landlord, onBack, onSuccess }) {
         monthly_rent: Number(monthlyRent),
         income_threshold: Number(incomeThreshold),
         description: description.trim(),
-        image_url: finalImage,
+        image_url: finalImageUrl,
       });
       setIsSubmitting(false);
     } catch (err) {

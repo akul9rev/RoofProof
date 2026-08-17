@@ -112,3 +112,22 @@ export async function extractPdfText(file) {
 export async function analyzeForm16Document(file) {
   return extractPdfText(file);
 }
+
+export async function uploadImageToCloudinaryApi(fileOrBase64) {
+  if (typeof fileOrBase64 === 'string') {
+    const res = await fetch(`${API_BASE}/upload/image`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ imageBase64: fileOrBase64 }),
+    });
+    return res.json();
+  }
+
+  const formData = new FormData();
+  formData.append('image', fileOrBase64);
+  const res = await fetch(`${API_BASE}/upload/image`, {
+    method: 'POST',
+    body: formData,
+  });
+  return res.json();
+}
