@@ -266,7 +266,7 @@ export default function TenantDashboard({ properties = [], applications = [], de
             marginBottom: '32px',
           }}>
             {currentListings.map(property => {
-              const app = myApplications.find(a => a.property_id === property.id);
+              const app = myApplications.find(a => Number(a.property_id) === Number(property.id));
               const hasApplied = app && (app.status === 'pending' || app.status === 'approved');
               const isDenied = app && app.status === 'rejected';
 
@@ -336,14 +336,14 @@ export default function TenantDashboard({ properties = [], applications = [], de
               gap: '24px',
             }}>
               {myApplications.map(app => {
-                const targetProp = catalogue.find(p => p.id === app.property_id) || {
+                const targetProp = catalogue.find(p => Number(p.id) === Number(app.property_id)) || {
                   id: app.property_id,
                   title: app.property_title || `Property Listing #${app.property_id}`,
                   location: app.property_location || 'Prime Location',
                   monthly_rent: app.monthly_rent || 42000,
                   income_threshold: app.income_threshold || 120000,
                   description: 'Zero-Knowledge Verified Application active on Midnight Network.',
-                  image_url: app.image_url || 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800&q=80',
+                  image_url: app.image_url || '/houses/house1.jpg',
                 };
 
                 const isDenied = app.status === 'rejected';
