@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Building2, Plus, ShieldCheck, CheckCircle2, Users, Sparkles, ChevronLeft, ChevronRight, X } from 'lucide-react';
+import { Building2, Plus, ShieldCheck, CheckCircle2, Users, Sparkles, ChevronLeft, ChevronRight, X, Clock, User, Home, MapPin } from 'lucide-react';
 import { EXACT_USER_DATASET } from './TenantDashboard';
 import PropertyCard from './PropertyCard';
 import CreatePropertyForm from './CreatePropertyForm';
@@ -305,40 +305,64 @@ export default function LandlordDashboard({ properties = [], applications = [], 
               </p>
             </div>
           ) : (
-            receivedApplications.map(app => (
-              <div key={app.id} className="white-property-card" style={{ padding: '24px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '12px' }}>
-                  <div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-                      <span style={{
-                        background: 'rgba(74, 124, 89, 0.12)',
-                        color: '#4A7C59',
-                        border: '1px solid rgba(74, 124, 89, 0.25)',
-                        padding: '3px 10px',
-                        borderRadius: '999px',
-                        fontSize: '0.75rem',
-                        fontWeight: 700,
-                      }}>
-                        <ShieldCheck size={12} /> ZK Income Verified: PASS
-                      </span>
-                      <span style={{
-                        background: 'rgba(0, 0, 0, 0.05)',
-                        color: '#555',
-                        padding: '3px 10px',
-                        borderRadius: '999px',
-                        fontSize: '0.75rem',
-                      }}>
-                        Tampering Risk: LOW
-                      </span>
-                    </div>
+            receivedApplications.map(app => {
+              const tenantName = app.tenant_name || (Number(app.tenant_id) === 3 ? 'Arjun Sharma' : Number(app.tenant_id) === 4 ? 'Neha Kapoor' : `Applicant #${app.tenant_id}`);
+              const tenantEmail = app.tenant_email || (Number(app.tenant_id) === 3 ? 'arjun.sharma@roofproof.demo' : Number(app.tenant_id) === 4 ? 'neha.kapoor@roofproof.demo' : '');
+              const propTitle = app.property_title || `Property Listing #${app.property_id}`;
+              const propLocation = app.property_location || '';
+              const dateObj = app.created_at ? new Date(app.created_at) : new Date();
+              const formattedDate = dateObj.toLocaleDateString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric',
+              });
+              const formattedTime = dateObj.toLocaleTimeString('en-US', {
+                hour: '2-digit',
+                minute: '2-digit',
+              });
 
-                    <h3 style={{ fontSize: '1.25rem', color: '#1a221b', marginBottom: '4px' }}>
-                      Applicant #{app.tenant_id} &rarr; {app.property_title || `Property #${app.property_id}`}
-                    </h3>
-                    <div style={{ fontSize: '0.82rem', color: '#666' }}>
-                      Submitted on {new Date(app.created_at || Date.now()).toLocaleDateString()}
+              return (
+                <div key={app.id} className="white-property-card" style={{ padding: '24px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '12px' }}>
+                    <div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
+                        <span style={{
+                          background: 'rgba(74, 124, 89, 0.12)',
+                          color: '#4A7C59',
+                          border: '1px solid rgba(74, 124, 89, 0.25)',
+                          padding: '3px 10px',
+                          borderRadius: '999px',
+                          fontSize: '0.75rem',
+                          fontWeight: 700,
+                        }}>
+                          <ShieldCheck size={12} /> ZK Income Verified: PASS
+                        </span>
+                        <span style={{
+                          background: 'rgba(0, 0, 0, 0.05)',
+                          color: '#555',
+                          padding: '3px 10px',
+                          borderRadius: '999px',
+                          fontSize: '0.75rem',
+                        }}>
+                          Tampering Risk: LOW
+                        </span>
+                      </div>
+
+                      {/* Who Requested */}
+                      <h3 style={{ fontSize: '1.2rem', color: '#1a221b', marginBottom: '4px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <User size={18} color="#4A7C59" /> {tenantName} {tenantEmail && <span style={{ fontSize: '0.85rem', color: '#666', fontWeight: 500 }}>({tenantEmail})</span>}
+                      </h3>
+
+                      {/* For What */}
+                      <div style={{ fontSize: '0.92rem', color: '#2d3748', marginBottom: '6px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <Home size={15} color="#3182ce" /> Requested for: <strong style={{ color: '#0c141d' }}>{propTitle}</strong> {propLocation && `(${propLocation})`}
+                      </div>
+
+                      {/* Date & Time */}
+                      <div style={{ fontSize: '0.82rem', color: '#718096', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <Clock size={13} color="#718096" /> Submitted on <strong style={{ color: '#4a5568' }}>{formattedDate}</strong> at <strong style={{ color: '#4a5568' }}>{formattedTime}</strong>
+                      </div>
                     </div>
-                  </div>
 
                   <div style={{ display: 'flex', gap: '10px' }}>
                     {app.status === 'pending' ? (
@@ -371,7 +395,8 @@ export default function LandlordDashboard({ properties = [], applications = [], 
                   </div>
                 </div>
               </div>
-            ))
+            );
+          })
           )}
         </div>
       )}
