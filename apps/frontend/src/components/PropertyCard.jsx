@@ -8,7 +8,6 @@ const HOUSE_IMAGES = [
   '/houses/house4.jpg',
   '/houses/house5.jpg',
   '/houses/house6.jpg',
-  '/houses/house7.jpg',
 ];
 
 export default function PropertyCard({ property, onApply, onDelete, hasApplied, isDenied, onViewDenial, onWithdraw, application, userRole }) {

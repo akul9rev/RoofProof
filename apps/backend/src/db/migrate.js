@@ -1,7 +1,7 @@
 import { pool } from './index.js';
 
 export async function migrate() {
-  console.log('[DB Migrate] Resetting and migrating database with user uploaded house images...');
+  console.log('[DB Migrate] Resetting and migrating database with 6 properties (deleted 7th card)...');
   const client = await pool.connect();
   try {
     await client.query('BEGIN');
@@ -72,23 +72,21 @@ export async function migrate() {
       ALTER SEQUENCE users_id_seq RESTART WITH 5;
     `);
 
-    // 6. Seed 7 Real Properties using exact user uploaded house images
-    // Landlord 1 (Rohan Mehta): 4 Houses | Landlord 2 (Priya Nair): 3 Houses
-    console.log('[DB Migrate] Seeding 7 properties (4 by Rohan Mehta, 3 by Priya Nair) with uploaded images...');
+    // 6. Seed 6 Real Properties (4 by Rohan Mehta, 2 by Priya Nair)
+    console.log('[DB Migrate] Seeding 6 properties (4 by Rohan Mehta, 2 by Priya Nair)...');
     await client.query(`
       INSERT INTO properties (id, landlord_id, title, property_type, location, monthly_rent, income_threshold, description, image_url) VALUES
-      (1, 1, 'Misty Valley Pool Villa', 'Luxury Villa', 'Coorg, Karnataka', 65000, 195000, '3 BHK luxury villa with a private pool, spacious outdoor area, mountain views, furnished living spaces, and a modern kitchen.', '/houses/house1.jpg'),
+      (1, 1, 'Misty Valley Villa', 'Luxury Villa', 'Coorg, Karnataka', 65000, 195000, '3 BHK luxury villa with a private outdoor area, mountain views, furnished living spaces, and a modern kitchen.', '/houses/house1.jpg'),
       (2, 1, 'Royal Courtyard Residence', 'Heritage House', 'Udaipur, Rajasthan', 55000, 165000, 'Spacious heritage-style residence with a private courtyard, traditional interiors, large living areas, and a peaceful setting.', '/houses/house2.jpg'),
       (3, 1, 'Heritage Garden Bungalow', 'Bungalow', 'Ooty, Tamil Nadu', 48000, 144000, 'Charming 3 BHK bungalow with a large garden, traditional architecture, wooden interiors, spacious rooms, and a peaceful hill-station setting.', '/houses/house3.jpg'),
       (4, 1, 'Greenview Family Home', 'Family House', 'Bangalore, Karnataka', 38000, 114000, 'Comfortable 3 BHK family home with generous natural light, multiple balconies, a quiet neighborhood, and nearby residential amenities.', '/houses/house4.jpg'),
       (5, 2, 'Pink Palace Residence', 'Luxury Residence', 'Jaipur, Rajasthan', 72000, 216000, 'Elegant 3 BHK residence inspired by Jaipur architecture, featuring ornate interiors, spacious common areas, and a distinctive heritage character.', '/houses/house5.jpg'),
-      (6, 2, 'Glassfront Modern Estate', 'Modern Villa', 'Kolkata, West Bengal', 52000, 156000, 'Characterful independent modern villa with glass facades, bright interiors, private entry, and a quiet residential setting.', '/houses/house6.jpg'),
-      (7, 2, 'Traditional Courtyard House', 'Family House', 'Madurai, Tamil Nadu', 28000, 84000, 'Traditional 3 BHK family house with a covered front veranda, spacious rooms, tiled flooring, classic woodwork, and a private entrance.', '/houses/house7.jpg');
-      ALTER SEQUENCE properties_id_seq RESTART WITH 8;
+      (6, 2, 'Glassfront Modern Estate', 'Modern Villa', 'Kolkata, West Bengal', 52000, 156000, 'Characterful independent modern villa with glass facades, bright interiors, private entry, and a quiet residential setting.', '/houses/house6.jpg');
+      ALTER SEQUENCE properties_id_seq RESTART WITH 7;
     `);
 
     await client.query('COMMIT');
-    console.log('[DB Migrate] ✓ Clean reset completed: 7 properties created with uploaded house images.');
+    console.log('[DB Migrate] ✓ Clean reset completed: 6 properties created (last card deleted).');
   } catch (err) {
     await client.query('ROLLBACK');
     console.error('[DB Migrate Error]', err.message);
