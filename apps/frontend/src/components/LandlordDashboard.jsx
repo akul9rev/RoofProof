@@ -23,7 +23,7 @@ export default function LandlordDashboard({ properties = [], applications = [], 
   const mergedProps = [...properties, ...customProps, ...EXACT_USER_DATASET];
   const uniqueProps = Array.from(new Map(mergedProps.map(p => [p.id, p])).values());
   // Strictly filter out deleted properties permanently
-  const allActiveListings = uniqueProps.filter(p => !deletedPropertyIds.includes(p.id));
+  const allActiveListings = uniqueProps.filter(p => !deletedPropertyIds.includes(p.id) && !deletedPropertyIds.includes(Number(p.id)) && !deletedPropertyIds.includes(String(p.id)));
 
   // Filter listings belonging to current landlord
   const myProperties = allActiveListings.filter(p => Number(p.landlord_id) === Number(currentUser?.id || 1) || (!p.landlord_id && Number(currentUser?.id || 1) === 1));

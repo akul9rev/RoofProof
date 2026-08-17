@@ -12,7 +12,7 @@ export default function LandingPage({ properties = [], deletedPropertyIds = [], 
 
   const merged = [...properties, ...customProps];
   const uniqueProps = Array.from(new Map(merged.map(p => [Number(p.id), p])).values());
-  const activeProperties = uniqueProps.filter(p => !deletedPropertyIds.includes(p.id) && !deletedPropertyIds.includes(Number(p.id)));
+  const activeProperties = uniqueProps.filter(p => !deletedPropertyIds.includes(p.id) && !deletedPropertyIds.includes(Number(p.id)) && !deletedPropertyIds.includes(String(p.id)));
 
   const featuredProp = activeProperties[0] || {
     id: 1,
