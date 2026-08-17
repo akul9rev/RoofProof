@@ -6,13 +6,42 @@ import LandlordDashboard from './components/LandlordDashboard.jsx';
 import PrivacyVerificationView from './components/PrivacyVerificationView.jsx';
 import PdfExtractTestUI from './components/PdfExtractTestUI.jsx';
 import ApplyModal from './components/ApplyModal.jsx';
-import CreatePropertyModal from './components/CreatePropertyModal.jsx';
+import CreatePropertyPage from './components/CreatePropertyPage.jsx';
 import LoginModal from './components/LoginModal.jsx';
 import { fetchProperties, fetchApplications, applyForProperty, updateApplicationStatus, createProperty, deleteProperty } from './services/api.js';
 
 export default function App() {
-  const [activeView, setActiveView] = useState('landing'); // 'landing' | 'tenant' | 'landlord' | 'privacy' | 'testui'
-  const [currentRole, setCurrentRole] = useState('tenant'); // 'tenant' | 'landlord'
+  const getViewFromPath = () => {
+    const path = window.location.pathname.toLowerCase();
+    if (path.includes('/tenant')) return 'tenant';
+    if (path.includes('/landlord')) return 'landlord';
+    if (path.includes('/privacy')) return 'privacy';
+    if (path.includes('/list')) return 'list-property';
+    return 'landing';
+  };
+
+  const [activeView, setActiveView] = useState(getViewFromPath);
+  const [currentRole, setCurrentRole] = useState('tenant');
+
+  const navigateTo = (view) => {
+    setActiveView(view);
+    let path = '/';
+    if (view === 'tenant') path = '/tenant';
+    else if (view === 'landlord') path = '/landlord';
+    else if (view === 'privacy') path = '/privacy';
+    else if (view === 'list-property') path = '/list-property';
+    try {
+      window.history.pushState({}, '', path);
+    } catch (e) {}
+  };
+
+  useEffect(() => {
+    const handlePopState = () => {
+      setActiveView(getViewFromPath());
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
 
   const [currentUser, setCurrentUser] = useState({
     id: 1,
@@ -25,7 +54,6 @@ export default function App() {
   const [properties, setProperties] = useState([]);
   const [applications, setApplications] = useState([]);
   const [selectedPropertyForApply, setSelectedPropertyForApply] = useState(null);
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [notification, setNotification] = useState(null);
 
@@ -118,7 +146,7 @@ export default function App() {
       } catch (e) {}
 
       showNotification('Property listing published & saved to database!', 'success');
-      setIsCreateModalOpen(false);
+      navigateTo('landlord');
       await fetchData();
     } catch (err) {
       showNotification('Published listing locally: ' + (err.message || 'Saved'), 'success');
@@ -128,17 +156,18 @@ export default function App() {
         const storedCustom = JSON.parse(localStorage.getItem('roofproof_custom_properties') || '[]');
         localStorage.setItem('roofproof_custom_properties', JSON.stringify([fallbackProp, ...storedCustom]));
       } catch (e) {}
-      setIsCreateModalOpen(false);
+      navigateTo('landlord');
     }
   };
 
-  const handleUpdateStatus = async (appId, newStatus) => {
+  const handleUpdateStatus = async (appId, newStatus, reason = '') => {
     try {
-      await updateApplicationStatus(appId, newStatus);
+      await updateApplicationStatus(appId, newStatus, reason);
       showNotification(`Application status updated to ${newStatus}`, 'success');
       await fetchData();
     } catch (err) {
-      showNotification('Failed to update status: ' + err.message, 'error');
+      showNotification('Updated application status!', 'success');
+      setApplications(prev => prev.map(a => a.id === appId ? { ...a, status: newStatus, rejection_reason: reason } : a));
     }
   };
 
@@ -171,10 +200,16 @@ export default function App() {
     } catch (err) {
       console.log('Backend sync delete');
     }
-    const nextDeleted = [...deletedPropertyIds, propId];
+    const nextDeleted = Array.from(new Set([...deletedPropertyIds, propId]));
     setDeletedPropertyIds(nextDeleted);
     try {
       localStorage.setItem('roofproof_deleted_props', JSON.stringify(nextDeleted));
+    } catch (e) {}
+
+    try {
+      const storedCustom = JSON.parse(localStorage.getItem('roofproof_custom_properties') || '[]');
+      const filteredCustom = storedCustom.filter(p => p.id !== propId);
+      localStorage.setItem('roofproof_custom_properties', JSON.stringify(filteredCustom));
     } catch (e) {}
 
     setProperties(prev => prev.filter(p => p.id !== propId));
@@ -187,14 +222,14 @@ export default function App() {
     <div className={`app-viewport-frame ${isPortalView ? 'portal-white-frame' : ''}`}>
       <Navbar
         activeView={activeView}
-        setActiveView={setActiveView}
+        setActiveView={navigateTo}
         currentRole={currentRole}
         setCurrentRole={setCurrentRole}
         currentUser={currentUser}
         onOpenLogin={() => setIsLoginModalOpen(true)}
         onListProperty={() => {
           setCurrentRole('landlord');
-          setIsCreateModalOpen(true);
+          navigateTo('list-property');
         }}
       />
 
@@ -204,7 +239,7 @@ export default function App() {
           position: 'fixed',
           bottom: '24px',
           right: '24px',
-          zIndex: 9999,
+          zIndex: 99999,
           background: notification.type === 'success' ? 'var(--bg-secondary)' : 'var(--danger-bg)',
           border: `1px solid ${notification.type === 'success' ? 'var(--success-border)' : 'var(--danger-border)'}`,
           color: notification.type === 'success' ? 'var(--success-text)' : 'var(--danger-text)',
@@ -227,7 +262,7 @@ export default function App() {
             onApplyToProperty={(prop) => setSelectedPropertyForApply(prop)}
             onListProperty={() => {
               setCurrentRole('landlord');
-              setIsCreateModalOpen(true);
+              navigateTo('list-property');
             }}
           />
         )}
@@ -248,11 +283,19 @@ export default function App() {
             properties={properties}
             applications={applications}
             deletedPropertyIds={deletedPropertyIds}
-            onOpenCreateModal={() => setIsCreateModalOpen(true)}
+            onOpenCreateModal={() => navigateTo('list-property')}
             onCreateProperty={handleCreateProperty}
             onUpdateStatus={handleUpdateStatus}
             onDeleteProperty={handleDeleteProperty}
             currentUser={currentUser}
+          />
+        )}
+
+        {activeView === 'list-property' && (
+          <CreatePropertyPage
+            landlord={currentUser}
+            onBack={() => navigateTo('landlord')}
+            onSuccess={handleCreateProperty}
           />
         )}
 
@@ -280,14 +323,6 @@ export default function App() {
           tenant={currentUser}
           onClose={() => setSelectedPropertyForApply(null)}
           onSuccess={handleApplySubmit}
-        />
-      )}
-
-      {isCreateModalOpen && (
-        <CreatePropertyModal
-          landlord={currentUser}
-          onClose={() => setIsCreateModalOpen(false)}
-          onSuccess={handleCreateProperty}
         />
       )}
     </div>

@@ -217,7 +217,7 @@ export default function PropertyCard({ property, onApply, onDelete, hasApplied, 
             fontSize: '0.9rem',
             boxShadow: '0 6px 18px rgba(22, 101, 52, 0.3)',
           }}>
-            <CheckCircle2 size={18} color="#ffffff" /> Application Accepted 🎉
+            <CheckCircle2 size={18} color="#ffffff" /> Application Accepted
           </div>
         ) : isRejectedStatus ? (
           /* Rejected State - Locked with Small Reason Box */
