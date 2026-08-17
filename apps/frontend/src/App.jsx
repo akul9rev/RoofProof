@@ -9,7 +9,7 @@ import ApplyModal from './components/ApplyModal.jsx';
 import CreatePropertyPage from './components/CreatePropertyPage.jsx';
 import LoginModal from './components/LoginModal.jsx';
 import ErrorPage from './components/ErrorPage.jsx';
-import { fetchProperties, fetchApplications, applyForProperty, updateApplicationStatus, createProperty, deleteProperty } from './services/api.js';
+import { fetchProperties, fetchApplications, applyForProperty, updateApplicationStatus, createProperty, deleteProperty, withdrawApplication } from './services/api.js';
 
 export default function App() {
   const getViewFromPath = () => {
@@ -26,10 +26,27 @@ export default function App() {
   };
 
   const [activeView, setActiveView] = useState(getViewFromPath);
-  const [currentRole, setCurrentRole] = useState('tenant');
 
-  // Unauthenticated by default when app loads
-  const [currentUser, setCurrentUser] = useState(null);
+  // Read logged-in user from localStorage so authentication survives browser refresh
+  const [currentUser, setCurrentUser] = useState(() => {
+    try {
+      const saved = localStorage.getItem('roofproof_logged_user');
+      return saved ? JSON.parse(saved) : null;
+    } catch (e) {
+      return null;
+    }
+  });
+
+  const [currentRole, setCurrentRole] = useState(() => {
+    try {
+      const saved = localStorage.getItem('roofproof_logged_user');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        return parsed?.role || 'tenant';
+      }
+    } catch (e) {}
+    return 'tenant';
+  });
 
   const navigateTo = (view) => {
     setActiveView(view);
@@ -102,7 +119,20 @@ export default function App() {
   const handleLoginSuccess = (userObj) => {
     setCurrentUser(userObj);
     setCurrentRole(userObj.role);
+    try {
+      localStorage.setItem('roofproof_logged_user', JSON.stringify(userObj));
+    } catch (e) {}
     showNotification(`Signed in successfully as ${userObj.name} (${userObj.role})`, 'success');
+  };
+
+  const handleLogout = () => {
+    setCurrentUser(null);
+    setCurrentRole('tenant');
+    try {
+      localStorage.removeItem('roofproof_logged_user');
+    } catch (e) {}
+    showNotification('Signed out of RoofProof', 'success');
+    navigateTo('landing');
   };
 
   const handleApplySubmit = async (payload) => {
@@ -111,19 +141,36 @@ export default function App() {
       showNotification('Please sign in to submit your ZK rental application', 'error');
       return;
     }
+
+    const applicationPayload = {
+      ...payload,
+      tenant_id: currentUser.id,
+      tenant_name: currentUser.name,
+      tenant_email: currentUser.email,
+    };
+
     try {
-      const res = await applyForProperty(payload.property_id, payload);
+      const res = await applyForProperty(payload.property_id, applicationPayload);
       const newApp = res?.application || {
         id: Date.now(),
         property_id: payload.property_id,
-        tenant_id: payload.tenant_id || currentUser.id,
+        tenant_id: currentUser.id,
+        tenant_name: currentUser.name,
+        tenant_email: currentUser.email,
         status: 'pending',
-        verification_status: payload.verification_status,
+        verification_status: payload.verification_status || 'verified_pass',
         zk_tx_hash: payload.zk_tx_hash,
         created_at: new Date().toISOString(),
       };
 
-      setApplications(prev => [newApp, ...prev]);
+      setApplications(prev => [newApp, ...prev.filter(a => !(Number(a.property_id) === Number(payload.property_id) && Number(a.tenant_id) === Number(currentUser.id)))]);
+
+      try {
+        const stored = JSON.parse(localStorage.getItem('roofproof_my_apps') || '[]');
+        const filteredStored = stored.filter(a => !(Number(a.property_id) === Number(payload.property_id) && Number(a.tenant_id) === Number(currentUser.id)));
+        localStorage.setItem('roofproof_my_apps', JSON.stringify([newApp, ...filteredStored]));
+      } catch (e) {}
+
       showNotification('Privacy proof generated and application submitted!', 'success');
       setSelectedPropertyForApply(null);
       await fetchData();
@@ -131,13 +178,20 @@ export default function App() {
       const fallbackApp = {
         id: Date.now(),
         property_id: payload.property_id,
-        tenant_id: payload.tenant_id || currentUser.id,
+        tenant_id: currentUser.id,
+        tenant_name: currentUser.name,
+        tenant_email: currentUser.email,
         status: 'pending',
-        verification_status: payload.verification_status,
+        verification_status: payload.verification_status || 'verified_pass',
         zk_tx_hash: payload.zk_tx_hash,
         created_at: new Date().toISOString(),
       };
-      setApplications(prev => [fallbackApp, ...prev]);
+      setApplications(prev => [fallbackApp, ...prev.filter(a => !(Number(a.property_id) === Number(payload.property_id) && Number(a.tenant_id) === Number(currentUser.id)))]);
+      try {
+        const stored = JSON.parse(localStorage.getItem('roofproof_my_apps') || '[]');
+        const filteredStored = stored.filter(a => !(Number(a.property_id) === Number(payload.property_id) && Number(a.tenant_id) === Number(currentUser.id)));
+        localStorage.setItem('roofproof_my_apps', JSON.stringify([fallbackApp, ...filteredStored]));
+      } catch (e) {}
       showNotification('Application submitted with ZK proof!', 'success');
       setSelectedPropertyForApply(null);
     }
@@ -172,7 +226,7 @@ export default function App() {
       await fetchData();
     } catch (err) {
       showNotification('Updated application status!', 'success');
-      setApplications(prev => prev.map(a => a.id === appId ? { ...a, status: newStatus, rejection_reason: reason } : a));
+      setApplications(prev => prev.map(a => Number(a.id) === Number(appId) ? { ...a, status: newStatus, rejection_reason: reason } : a));
     }
   };
 
@@ -182,7 +236,15 @@ export default function App() {
     } catch (err) {
       console.log('Backend sync withdraw');
     }
-    setApplications(prev => prev.filter(a => a.id !== appId && a.property_id !== appId));
+
+    setApplications(prev => prev.filter(a => Number(a.id) !== Number(appId) && Number(a.property_id) !== Number(appId)));
+
+    try {
+      const stored = JSON.parse(localStorage.getItem('roofproof_my_apps') || '[]');
+      const filtered = stored.filter(a => Number(a.id) !== Number(appId) && Number(a.property_id) !== Number(appId));
+      localStorage.setItem('roofproof_my_apps', JSON.stringify(filtered));
+    } catch (e) {}
+
     showNotification('Application withdrawn successfully', 'success');
   };
 
@@ -217,6 +279,7 @@ export default function App() {
         setCurrentRole={setCurrentRole}
         currentUser={currentUser}
         onOpenLogin={() => setIsLoginModalOpen(true)}
+        onLogout={handleLogout}
         onListProperty={() => {
           if (!currentUser) {
             setIsLoginModalOpen(true);
