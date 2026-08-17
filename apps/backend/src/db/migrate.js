@@ -13,8 +13,16 @@ export async function migrate() {
         name VARCHAR(255) NOT NULL,
         email VARCHAR(255) UNIQUE NOT NULL,
         role VARCHAR(50) NOT NULL CHECK (role IN ('tenant', 'landlord')),
+        phone VARCHAR(50),
+        city VARCHAR(100),
+        occupation VARCHAR(100),
+        organization VARCHAR(100),
         created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
       );
+      ALTER TABLE users ADD COLUMN IF NOT EXISTS phone VARCHAR(50);
+      ALTER TABLE users ADD COLUMN IF NOT EXISTS city VARCHAR(100);
+      ALTER TABLE users ADD COLUMN IF NOT EXISTS occupation VARCHAR(100);
+      ALTER TABLE users ADD COLUMN IF NOT EXISTS organization VARCHAR(100);
     `);
 
     // 2. Properties Table
