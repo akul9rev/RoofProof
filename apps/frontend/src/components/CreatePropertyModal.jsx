@@ -2,6 +2,33 @@ import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { X, Building2, Plus, AlertCircle, Upload, Image as ImageIcon, Check } from 'lucide-react';
 
+function sanitizeImageUrl(rawUrl) {
+  if (!rawUrl || !rawUrl.trim()) return 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800&q=80';
+  let url = rawUrl.trim();
+
+  // If user pasted data URL (uploaded file), return as is
+  if (url.startsWith('data:image/')) {
+    return url;
+  }
+
+  // If user pasted an Unsplash photo page URL e.g. https://unsplash.com/photos/abc-XZ4V9g6o24M
+  if (url.includes('unsplash.com/photos/')) {
+    const photoSlug = url.split('unsplash.com/photos/')[1]?.split('?')[0]?.split('#')[0];
+    if (photoSlug) {
+      const parts = photoSlug.split('-');
+      const photoId = parts[parts.length - 1] || photoSlug;
+      return `https://images.unsplash.com/photo-${photoId}?auto=format&fit=crop&w=800&q=80`;
+    }
+  }
+
+  // If images.unsplash.com URL without params
+  if (url.includes('images.unsplash.com') && !url.includes('auto=format')) {
+    url += (url.includes('?') ? '&' : '?') + 'auto=format&fit=crop&w=800&q=80';
+  }
+
+  return url;
+}
+
 export default function CreatePropertyModal({ landlord, onClose, onSuccess }) {
   const [title, setTitle] = useState('');
   const [propertyType, setPropertyType] = useState('Family Apartment');
@@ -47,6 +74,12 @@ export default function CreatePropertyModal({ landlord, onClose, onSuccess }) {
     reader.readAsDataURL(file);
   };
 
+  const handleUrlInputChange = (e) => {
+    const rawVal = e.target.value;
+    setImageUrl(rawVal);
+    setImagePreview(sanitizeImageUrl(rawVal));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
@@ -56,7 +89,7 @@ export default function CreatePropertyModal({ landlord, onClose, onSuccess }) {
       return;
     }
 
-    const finalImage = imageUrl.trim() || 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800&q=80';
+    const finalImage = sanitizeImageUrl(imageUrl);
 
     setIsSubmitting(true);
     try {
@@ -76,6 +109,8 @@ export default function CreatePropertyModal({ landlord, onClose, onSuccess }) {
       setError(err.message || 'Failed to publish property listing to database.');
     }
   };
+
+  const displayPreviewUrl = imagePreview || sanitizeImageUrl(imageUrl);
 
   return createPortal(
     <div style={{
@@ -285,10 +320,10 @@ export default function CreatePropertyModal({ landlord, onClose, onSuccess }) {
             </div>
           </div>
 
-          {/* Property Image Upload / Image URL */}
+          {/* Property Image Upload / Unsplash URL */}
           <div>
             <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, color: 'rgba(255, 255, 255, 0.8)', marginBottom: '4px' }}>
-              Property Photo Upload / Unsplash URL
+              Property Photo Upload / Unsplash Image URL
             </label>
 
             <div style={{ display: 'flex', gap: '10px', alignItems: 'center', marginBottom: '8px' }}>
@@ -323,10 +358,7 @@ export default function CreatePropertyModal({ landlord, onClose, onSuccess }) {
             <input
               type="text"
               value={imageUrl}
-              onChange={e => {
-                setImageUrl(e.target.value);
-                setImagePreview(e.target.value);
-              }}
+              onChange={handleUrlInputChange}
               placeholder="https://images.unsplash.com/photo-1545324418-cc1a3fa10c00..."
               style={{
                 width: '100%',
@@ -340,15 +372,40 @@ export default function CreatePropertyModal({ landlord, onClose, onSuccess }) {
               }}
             />
 
-            {imagePreview && (
+            {displayPreviewUrl && (
               <div style={{
                 marginTop: '10px',
-                height: '110px',
-                borderRadius: '12px',
+                height: '130px',
+                borderRadius: '14px',
                 overflow: 'hidden',
-                border: '1px solid rgba(255, 255, 255, 0.2)',
+                border: '1px solid rgba(255, 255, 255, 0.25)',
+                position: 'relative',
+                background: '#0a1017',
               }}>
-                <img src={imagePreview} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                <img
+                  src={displayPreviewUrl}
+                  alt="Property Live Preview"
+                  onError={(e) => {
+                    e.target.src = 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800&q=80';
+                  }}
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                />
+                <div style={{
+                  position: 'absolute',
+                  bottom: '6px',
+                  left: '8px',
+                  background: 'rgba(0, 0, 0, 0.75)',
+                  color: '#ffffff',
+                  fontSize: '0.7rem',
+                  padding: '2px 8px',
+                  borderRadius: '999px',
+                  fontWeight: 700,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                }}>
+                  <Check size={11} color="#22c55e" /> Live Photo Preview
+                </div>
               </div>
             )}
           </div>
