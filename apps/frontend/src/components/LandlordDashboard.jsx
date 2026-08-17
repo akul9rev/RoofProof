@@ -34,8 +34,22 @@ export default function LandlordDashboard({ properties = [], applications = [], 
     currentPage * ITEMS_PER_PAGE
   );
 
+  const storedApps = (() => {
+    try {
+      return JSON.parse(localStorage.getItem('roofproof_my_apps') || '[]');
+    } catch {
+      return [];
+    }
+  })();
+
+  const allApps = [...applications, ...storedApps];
+  const uniqueApps = Array.from(new Map(allApps.map(a => [`${a.tenant_id}_${a.property_id}`, a])).values());
+
   const myPropertyIds = myProperties.map(p => Number(p.id));
-  const receivedApplications = applications.filter(a => myPropertyIds.includes(Number(a.property_id)) || Number(a.landlord_id) === Number(currentUser?.id || 1));
+  const receivedApplications = uniqueApps.filter(a =>
+    myPropertyIds.includes(Number(a.property_id)) ||
+    Number(a.landlord_id) === Number(currentUser?.id || 1)
+  );
 
   const handleDenySubmit = (e) => {
     e.preventDefault();
