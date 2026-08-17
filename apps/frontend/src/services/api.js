@@ -90,7 +90,11 @@ export async function loginOrRegister(data) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data),
   });
-  return res.json();
+  const json = await res.json();
+  if (!res.ok || json.success === false) {
+    throw new Error(json.error || 'Authentication failed');
+  }
+  return json;
 }
 
 export async function extractPdfText(file) {

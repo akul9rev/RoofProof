@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Shield, Building, User } from 'lucide-react';
+import { X, Shield, Building, User, Info, ArrowRight, AlertTriangle } from 'lucide-react';
 import { loginOrRegister } from '../services/api';
 
 export default function LoginModal({ isOpen, onClose, currentRole, onLoginSuccess, currentUser }) {
@@ -14,6 +14,7 @@ export default function LoginModal({ isOpen, onClose, currentRole, onLoginSucces
   const [organization, setOrganization] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
+  const [showCredentialsGuide, setShowCredentialsGuide] = useState(true);
 
   useEffect(() => {
     if (isOpen) {
@@ -28,6 +29,19 @@ export default function LoginModal({ isOpen, onClose, currentRole, onLoginSucces
 
   if (!isOpen) return null;
 
+  const registeredCredentials = [
+    { name: 'Rohan Mehta', email: 'rohan.mehta@roofproof.demo', role: 'landlord', info: 'Landlord (4 Properties)' },
+    { name: 'Priya Nair', email: 'priya.nair@roofproof.demo', role: 'landlord', info: 'Landlord (2 Properties)' },
+    { name: 'Arjun Sharma', email: 'arjun.sharma@roofproof.demo', role: 'tenant', info: 'Tenant (Software Eng)' },
+    { name: 'Neha Kapoor', email: 'neha.kapoor@roofproof.demo', role: 'tenant', info: 'Tenant (Product Lead)' },
+  ];
+
+  const handleFillEmail = (userEmail, userRole) => {
+    setEmail(userEmail);
+    setSelectedRole(userRole);
+    setError(null);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
@@ -37,18 +51,19 @@ export default function LoginModal({ isOpen, onClose, currentRole, onLoginSucces
       return;
     }
     if (authMode === 'signup' && !name) {
-      setError('Please enter your full name');
+      setError('Please enter your full name to register');
       return;
     }
 
     setIsSubmitting(true);
     try {
       const payload = {
-        name: name || (selectedRole === 'tenant' ? 'Arjun Sharma' : 'Rohan Mehta'),
+        mode: authMode,
+        name: name || undefined,
         email: email.trim(),
         role: selectedRole,
-        phone,
-        city,
+        phone: phone || undefined,
+        city: city || undefined,
         occupation: selectedRole === 'tenant' ? occupation : undefined,
         organization: selectedRole === 'landlord' ? organization : undefined,
       };
@@ -56,7 +71,9 @@ export default function LoginModal({ isOpen, onClose, currentRole, onLoginSucces
       const res = await loginOrRegister(payload);
       const userObj = res?.user || {
         id: selectedRole === 'tenant' ? 3 : 1,
-        ...payload,
+        name: name || (selectedRole === 'tenant' ? 'Arjun Sharma' : 'Rohan Mehta'),
+        email: email.trim(),
+        role: selectedRole,
       };
 
       onLoginSuccess(userObj);
@@ -64,7 +81,7 @@ export default function LoginModal({ isOpen, onClose, currentRole, onLoginSucces
       onClose();
     } catch (err) {
       setIsSubmitting(false);
-      setError(err.message || 'Failed to authenticate user account.');
+      setError(err.message || 'Authentication failed. Please verify your email.');
     }
   };
 
@@ -93,7 +110,7 @@ export default function LoginModal({ isOpen, onClose, currentRole, onLoginSucces
         className="luxury-modal-container animate-modal-scale"
         onClick={(e) => e.stopPropagation()}
         style={{
-          maxWidth: '480px',
+          maxWidth: '500px',
           width: '100%',
           padding: '28px 30px',
           borderRadius: '26px',
@@ -146,7 +163,7 @@ export default function LoginModal({ isOpen, onClose, currentRole, onLoginSucces
               {authMode === 'signin' ? 'Sign In to Account' : 'Create RoofProof Account'}
             </h3>
             <p style={{ fontSize: '0.78rem', color: 'rgba(255, 255, 255, 0.6)', margin: 0 }}>
-              Midnight Zero-Knowledge Identity Protection
+              Midnight Zero-Knowledge Database Verification
             </p>
           </div>
         </div>
@@ -162,7 +179,7 @@ export default function LoginModal({ isOpen, onClose, currentRole, onLoginSucces
         }}>
           <button
             type="button"
-            onClick={() => setAuthMode('signin')}
+            onClick={() => { setAuthMode('signin'); setError(null); }}
             style={{
               flex: 1,
               padding: '8px',
@@ -179,7 +196,7 @@ export default function LoginModal({ isOpen, onClose, currentRole, onLoginSucces
           </button>
           <button
             type="button"
-            onClick={() => setAuthMode('signup')}
+            onClick={() => { setAuthMode('signup'); setError(null); }}
             style={{
               flex: 1,
               padding: '8px',
@@ -194,6 +211,68 @@ export default function LoginModal({ isOpen, onClose, currentRole, onLoginSucces
           >
             Create Account
           </button>
+        </div>
+
+        {/* Registered DB Credentials Reference Guide */}
+        <div style={{
+          background: 'rgba(255, 255, 255, 0.04)',
+          border: '1px solid rgba(255, 255, 255, 0.1)',
+          borderRadius: '16px',
+          padding: '12px 14px',
+          marginBottom: '20px',
+        }}>
+          <div 
+            onClick={() => setShowCredentialsGuide(!showCredentialsGuide)}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              cursor: 'pointer',
+              userSelect: 'none',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <Info size={15} color="#EBA834" />
+              <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#ffffff' }}>
+                Registered DB Accounts (Click to Fill)
+              </span>
+            </div>
+            <span style={{ fontSize: '0.72rem', color: '#EBA834', fontWeight: 600 }}>
+              {showCredentialsGuide ? 'Hide ▲' : 'Show ▼'}
+            </span>
+          </div>
+
+          {showCredentialsGuide && (
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 1fr',
+              gap: '8px',
+              marginTop: '10px',
+            }}>
+              {registeredCredentials.map((cred) => (
+                <div
+                  key={cred.email}
+                  onClick={() => handleFillEmail(cred.email, cred.role)}
+                  style={{
+                    background: email === cred.email ? 'rgba(235, 168, 52, 0.15)' : 'rgba(255, 255, 255, 0.05)',
+                    border: `1px solid ${email === cred.email ? 'rgba(235, 168, 52, 0.4)' : 'rgba(255, 255, 255, 0.08)'}`,
+                    borderRadius: '10px',
+                    padding: '8px 10px',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                  }}
+                >
+                  <div style={{ fontSize: '0.78rem', fontWeight: 700, color: '#ffffff' }}>{cred.name}</div>
+                  <div style={{ fontSize: '0.68rem', color: cred.role === 'landlord' ? '#6B9B76' : '#EBA834' }}>
+                    {cred.info}
+                  </div>
+                  <div style={{ fontSize: '0.66rem', color: 'rgba(255,255,255,0.45)', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    {cred.email}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Role Selector Tabs */}
@@ -243,14 +322,44 @@ export default function LoginModal({ isOpen, onClose, currentRole, onLoginSucces
           {error && (
             <div style={{
               background: 'rgba(239, 68, 68, 0.15)',
-              border: '1px solid rgba(239, 68, 68, 0.3)',
-              borderRadius: '12px',
-              padding: '10px 14px',
-              color: '#f87171',
-              fontSize: '0.82rem',
-              marginBottom: '14px',
+              border: '1px solid rgba(239, 68, 68, 0.35)',
+              borderRadius: '14px',
+              padding: '14px 16px',
+              marginBottom: '16px',
             }}>
-              {error}
+              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
+                <AlertTriangle size={18} color="#ef4444" style={{ marginTop: '2px', flexShrink: 0 }} />
+                <div>
+                  <div style={{ fontSize: '0.86rem', fontWeight: 700, color: '#f87171', marginBottom: '4px' }}>
+                    Authentication Failed
+                  </div>
+                  <div style={{ fontSize: '0.8rem', color: 'rgba(255, 255, 255, 0.85)', lineHeight: 1.45 }}>
+                    {error}
+                  </div>
+                  {authMode === 'signin' && (
+                    <button
+                      type="button"
+                      onClick={() => { setAuthMode('signup'); setError(null); }}
+                      style={{
+                        marginTop: '10px',
+                        background: '#ffffff',
+                        color: '#0c141d',
+                        border: 'none',
+                        borderRadius: '999px',
+                        padding: '6px 14px',
+                        fontSize: '0.76rem',
+                        fontWeight: 700,
+                        cursor: 'pointer',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '4px',
+                      }}
+                    >
+                      Switch to Create Account <ArrowRight size={12} />
+                    </button>
+                  )}
+                </div>
+              </div>
             </div>
           )}
 
@@ -360,7 +469,7 @@ export default function LoginModal({ isOpen, onClose, currentRole, onLoginSucces
                 : '0 6px 20px rgba(235, 168, 52, 0.4)',
             }}
           >
-            {isSubmitting ? 'Authenticating...' : (authMode === 'signin' ? 'Sign In Now' : 'Create & Sign In')}
+            {isSubmitting ? 'Authenticating with DB...' : (authMode === 'signin' ? 'Sign In Now' : 'Create & Sign In')}
           </button>
         </form>
       </div>
