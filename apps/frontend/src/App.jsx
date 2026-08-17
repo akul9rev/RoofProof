@@ -270,6 +270,9 @@ export default function App() {
   // 2. Tenant Role Security Guard: Tenant attempting to access Landlord Portal or Create Property
   const isTenantRestricted = currentUser && currentRole === 'tenant' && (activeView === 'landlord' || activeView === 'list-property');
 
+  // 3. Landlord Role Security Guard: Landlord attempting to access Tenant Portal
+  const isLandlordRestricted = currentUser && currentRole === 'landlord' && activeView === 'tenant';
+
   return (
     <div className="app-viewport-frame">
       <Navbar
@@ -322,7 +325,7 @@ export default function App() {
             onOpenLogin={() => setIsLoginModalOpen(true)}
             currentRole={currentRole}
           />
-        ) : isTenantRestricted ? (
+        ) : (isTenantRestricted || isLandlordRestricted) ? (
           <ErrorPage
             type="403"
             onNavigate={navigateTo}

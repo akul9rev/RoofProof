@@ -25,8 +25,8 @@ export default function LandlordDashboard({ properties = [], applications = [], 
   // Strictly filter out deleted properties permanently
   const allActiveListings = uniqueProps.filter(p => !deletedPropertyIds.includes(p.id));
 
-  // Filter listings belonging to current landlord or demo catalogue
-  const myProperties = allActiveListings.filter(p => p.landlord_id === currentUser?.id || !p.landlord_id);
+  // Filter listings belonging to current landlord
+  const myProperties = allActiveListings.filter(p => Number(p.landlord_id) === Number(currentUser?.id || 1) || (!p.landlord_id && Number(currentUser?.id || 1) === 1));
 
   const totalPages = Math.ceil(myProperties.length / ITEMS_PER_PAGE) || 1;
   const displayListings = myProperties.slice(
@@ -34,8 +34,8 @@ export default function LandlordDashboard({ properties = [], applications = [], 
     currentPage * ITEMS_PER_PAGE
   );
 
-  const myPropertyIds = myProperties.map(p => p.id);
-  const receivedApplications = applications.filter(a => myPropertyIds.includes(a.property_id));
+  const myPropertyIds = myProperties.map(p => Number(p.id));
+  const receivedApplications = applications.filter(a => myPropertyIds.includes(Number(a.property_id)) || Number(a.landlord_id) === Number(currentUser?.id || 1));
 
   const handleDenySubmit = (e) => {
     e.preventDefault();

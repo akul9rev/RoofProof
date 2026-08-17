@@ -1,21 +1,25 @@
 import React from 'react';
-import { ShieldAlert, AlertTriangle, Lock, ArrowLeft, RefreshCw, Home, UserCheck } from 'lucide-react';
+import { ShieldAlert, AlertTriangle, Lock, ArrowLeft, RefreshCw, UserCheck } from 'lucide-react';
 
 export default function ErrorPage({ type = '403', onNavigate, onOpenLogin, currentRole }) {
+  const isLandlordRole = currentRole === 'landlord';
+
   const errorConfigs = {
     403: {
       code: '403',
       title: 'Access Restricted',
-      subtitle: 'Tenant Account Restricted Area',
-      description: 'You are currently signed in as a Tenant. Tenants do not have permission to view the Landlord Management Portal or publish new listings. Please switch or sign in as a Landlord to access property management tools.',
+      subtitle: isLandlordRole ? 'Tenant Portal Restricted for Landlords' : 'Landlord Portal Restricted for Tenants',
+      description: isLandlordRole 
+        ? 'You are signed in as a Landlord. Landlord accounts are restricted from viewing the Tenant Portal. Please access the Landlord Portal to manage your properties and review tenant applications.'
+        : 'You are signed in as a Tenant. Tenant accounts do not have permission to view the Landlord Management Portal or publish new property listings. Please switch or sign in as a Landlord.',
       icon: Lock,
       color: '#ef4444',
       bgGlow: 'rgba(239, 68, 68, 0.15)',
       borderColor: 'rgba(239, 68, 68, 0.3)',
-      primaryActionText: 'Go to Tenant Portal',
-      primaryActionView: 'tenant',
+      primaryActionText: isLandlordRole ? 'Go to Landlord Portal' : 'Go to Tenant Portal',
+      primaryActionView: isLandlordRole ? 'landlord' : 'tenant',
       showLoginButton: true,
-      loginButtonText: 'Sign In as Landlord',
+      loginButtonText: 'Switch Account',
     },
     404: {
       code: '404',
@@ -34,7 +38,7 @@ export default function ErrorPage({ type = '403', onNavigate, onOpenLogin, curre
       code: '401',
       title: 'Authentication Required',
       subtitle: 'Session Expired or Login Required',
-      description: 'Your session requires authentication. Please sign in to your RoofProof account using your registered email address to access private portal features.',
+      description: 'Your session requires authentication. Please sign in to your RoofProof account using your registered email and password to access private portal features.',
       icon: ShieldAlert,
       color: '#3b82f6',
       bgGlow: 'rgba(59, 130, 246, 0.15)',
