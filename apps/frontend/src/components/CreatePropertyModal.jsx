@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { X, Building2, Plus, AlertCircle, Upload, Image as ImageIcon, Check } from 'lucide-react';
 
 export default function CreatePropertyModal({ landlord, onClose, onSuccess }) {
@@ -76,7 +77,7 @@ export default function CreatePropertyModal({ landlord, onClose, onSuccess }) {
     }
   };
 
-  return (
+  return createPortal(
     <div style={{
       position: 'fixed',
       top: 0,
@@ -91,7 +92,7 @@ export default function CreatePropertyModal({ landlord, onClose, onSuccess }) {
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      zIndex: 99999,
+      zIndex: 999999,
       padding: '16px',
     }} onClick={onClose}>
       <div 
@@ -417,6 +418,7 @@ export default function CreatePropertyModal({ landlord, onClose, onSuccess }) {
           </div>
         </form>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

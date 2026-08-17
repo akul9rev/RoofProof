@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { ShieldCheck, Lock, CheckCircle2, AlertCircle, X, ArrowRight, Loader2, FileText, Upload } from 'lucide-react';
+import { createPortal } from 'react-dom';
+import { ShieldCheck, Lock, CheckCircle2, AlertCircle, X, Loader2, FileText, Upload } from 'lucide-react';
 import { extractPdfText } from '../services/api';
 
 export default function ApplyModal({ property, tenant, onClose, onSuccess }) {
@@ -138,10 +139,13 @@ export default function ApplyModal({ property, tenant, onClose, onSuccess }) {
     }
   };
 
-  return (
+  return createPortal(
     <div style={{
       position: 'fixed',
-      inset: 0,
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
       width: '100vw',
       height: '100vh',
       background: 'rgba(3, 7, 12, 0.88)',
@@ -150,8 +154,8 @@ export default function ApplyModal({ property, tenant, onClose, onSuccess }) {
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      zIndex: 99999,
-      padding: '12px',
+      zIndex: 999999,
+      padding: '16px',
     }} onClick={onClose}>
       <div
         className="glass-card animate-fade-in"
@@ -159,284 +163,281 @@ export default function ApplyModal({ property, tenant, onClose, onSuccess }) {
         style={{
           maxWidth: '460px',
           width: '100%',
-          padding: '20px 22px',
+          padding: '22px 24px',
           background: 'linear-gradient(165deg, #0d1620 0%, #070c13 100%)',
-          border: '1px solid rgba(255, 255, 255, 0.16)',
-          borderRadius: '22px',
-          boxShadow: '0 25px 70px rgba(0, 0, 0, 0.9)',
+          border: '1px solid rgba(255, 255, 255, 0.18)',
+          borderRadius: '24px',
+          boxShadow: '0 30px 90px rgba(0, 0, 0, 0.95)',
           position: 'relative',
           color: '#ffffff',
-          maxHeight: '94vh',
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'space-between',
+          maxHeight: '90vh',
+          overflowY: 'auto',
         }}
       >
-        <div>
-          {/* Modal Header */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <div style={{
-                width: '32px', height: '32px', borderRadius: '8px',
-                background: '#4A7C59', display: 'flex', alignItems: 'center', justifyContent: 'center',
-              }}>
-                <Lock size={16} color="#ffffff" />
-              </div>
-              <div>
-                <h3 style={{ fontSize: '1.05rem', fontWeight: 700, color: '#ffffff', margin: 0, lineHeight: 1.2 }}>
-                  Form 16 ZK Verification
-                </h3>
-                <p style={{ fontSize: '0.74rem', color: 'rgba(255, 255, 255, 0.55)', margin: 0 }}>
-                  Property #{property.id} • Private Witness
-                </p>
-              </div>
+        {/* Modal Header */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <div style={{
+              width: '32px', height: '32px', borderRadius: '8px',
+              background: '#4A7C59', display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>
+              <Lock size={16} color="#ffffff" />
             </div>
-            <button
-              onClick={onClose}
-              style={{
-                background: 'rgba(255, 255, 255, 0.08)',
-                color: 'rgba(255, 255, 255, 0.7)',
-                border: 'none',
-                borderRadius: '999px',
-                cursor: 'pointer',
-                padding: '5px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              <X size={16} />
-            </button>
-          </div>
-
-          {/* Compact Property & Income Bar */}
-          <div style={{
-            background: 'rgba(255, 255, 255, 0.04)',
-            border: '1px solid rgba(255, 255, 255, 0.08)',
-            borderRadius: '12px',
-            padding: '10px 12px',
-            marginBottom: '12px',
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-          }}>
             <div>
-              <div style={{ fontSize: '0.88rem', fontWeight: 700, color: '#ffffff' }}>{property.title}</div>
-              <div style={{ fontSize: '0.74rem', color: 'rgba(255, 255, 255, 0.5)' }}>{property.location}</div>
-            </div>
-            <div style={{ textAlign: 'right' }}>
-              <div style={{ fontSize: '0.68rem', color: 'rgba(255, 255, 255, 0.5)', textTransform: 'uppercase', fontWeight: 700 }}>Min Income</div>
-              <div style={{ fontSize: '0.95rem', fontWeight: 800, color: '#EBA834' }}>{formattedThreshold}/mo</div>
-            </div>
-          </div>
-
-          {/* Compact Privacy Note */}
-          <div style={{
-            background: 'rgba(74, 124, 89, 0.12)',
-            border: '1px solid rgba(74, 124, 89, 0.3)',
-            borderRadius: '12px',
-            padding: '8px 12px',
-            marginBottom: '14px',
-            display: 'flex',
-            gap: '8px',
-            alignItems: 'center',
-          }}>
-            <ShieldCheck size={16} color="#6B9B76" style={{ flexShrink: 0 }} />
-            <div style={{ fontSize: '0.75rem', color: 'rgba(255, 255, 255, 0.8)', lineHeight: 1.35 }}>
-              Form 16 runs in browser memory. Salary is ZK protected & <strong>never sent to landlord</strong>.
+              <h3 style={{ fontSize: '1.05rem', fontWeight: 700, color: '#ffffff', margin: 0, lineHeight: 1.2 }}>
+                Form 16 ZK Verification
+              </h3>
+              <p style={{ fontSize: '0.74rem', color: 'rgba(255, 255, 255, 0.55)', margin: 0 }}>
+                Property #{property.id} • Private Witness
+              </p>
             </div>
           </div>
+          <button
+            onClick={onClose}
+            style={{
+              background: 'rgba(255, 255, 255, 0.08)',
+              color: 'rgba(255, 255, 255, 0.7)',
+              border: 'none',
+              borderRadius: '999px',
+              cursor: 'pointer',
+              padding: '5px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <X size={16} />
+          </button>
+        </div>
 
-          {/* Upload & Form 16 Analysis Form */}
-          {!analysisResult ? (
-            <form onSubmit={handleAnalyze}>
-              <div style={{ marginBottom: '12px' }}>
-                <div style={{
-                  border: '2px dashed rgba(255, 255, 255, 0.18)',
-                  borderRadius: '14px',
-                  padding: '14px 12px',
-                  textAlign: 'center',
-                  background: 'rgba(0, 0, 0, 0.25)',
-                }}>
-                  <FileText size={26} color="#6B9B76" style={{ margin: '0 auto 6px' }} />
-                  <div style={{ fontSize: '0.85rem', fontWeight: 600, color: '#ffffff', marginBottom: '2px' }}>
-                    {selectedFile ? selectedFile.name : 'Choose Form 16 PDF'}
-                  </div>
-                  <div style={{ fontSize: '0.74rem', color: 'rgba(255, 255, 255, 0.5)', marginBottom: '8px' }}>
-                    {selectedFile ? `${(selectedFile.size / 1024).toFixed(1)} KB` : 'Indian Form 16 PDF files (.pdf) only.'}
-                  </div>
-                  <input
-                    type="file"
-                    accept=".pdf,application/pdf"
-                    onChange={handleFileChange}
-                    style={{ display: 'none' }}
-                    id="modal-form16-compact-input"
-                  />
-                  <label
-                    htmlFor="modal-form16-compact-input"
-                    style={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '5px',
-                      background: '#ffffff',
-                      color: '#0c141d',
-                      padding: '6px 14px',
-                      borderRadius: '999px',
-                      fontSize: '0.78rem',
-                      fontWeight: 700,
-                      cursor: 'pointer',
-                    }}
-                  >
-                    <Upload size={13} />
-                    {selectedFile ? 'Change File' : 'Browse PDF File'}
-                  </label>
-                </div>
-              </div>
+        {/* Compact Property & Income Bar */}
+        <div style={{
+          background: 'rgba(255, 255, 255, 0.04)',
+          border: '1px solid rgba(255, 255, 255, 0.08)',
+          borderRadius: '12px',
+          padding: '10px 12px',
+          marginBottom: '12px',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+        }}>
+          <div>
+            <div style={{ fontSize: '0.88rem', fontWeight: 700, color: '#ffffff' }}>{property.title}</div>
+            <div style={{ fontSize: '0.74rem', color: 'rgba(255, 255, 255, 0.5)' }}>{property.location}</div>
+          </div>
+          <div style={{ textAlign: 'right' }}>
+            <div style={{ fontSize: '0.68rem', color: 'rgba(255, 255, 255, 0.5)', textTransform: 'uppercase', fontWeight: 700 }}>Min Income</div>
+            <div style={{ fontSize: '0.95rem', fontWeight: 800, color: '#EBA834' }}>{formattedThreshold}/mo</div>
+          </div>
+        </div>
 
-              {analysisError && (
-                <div style={{
-                  background: 'rgba(239, 68, 68, 0.12)',
-                  border: '1px solid rgba(239, 68, 68, 0.3)',
-                  color: '#ef4444',
-                  borderRadius: '10px',
-                  padding: '8px 10px',
-                  fontSize: '0.78rem',
-                  marginBottom: '12px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                }}>
-                  <AlertCircle size={14} style={{ flexShrink: 0 }} />
-                  <span>{analysisError}</span>
-                </div>
-              )}
+        {/* Compact Privacy Note */}
+        <div style={{
+          background: 'rgba(74, 124, 89, 0.12)',
+          border: '1px solid rgba(74, 124, 89, 0.3)',
+          borderRadius: '12px',
+          padding: '8px 12px',
+          marginBottom: '14px',
+          display: 'flex',
+          gap: '8px',
+          alignItems: 'center',
+        }}>
+          <ShieldCheck size={16} color="#6B9B76" style={{ flexShrink: 0 }} />
+          <div style={{ fontSize: '0.75rem', color: 'rgba(255, 255, 255, 0.8)', lineHeight: 1.35 }}>
+            Form 16 runs in browser memory. Salary is ZK protected & <strong>never sent to landlord</strong>.
+          </div>
+        </div>
 
-              {isAnalyzing ? (
-                <div style={{ textAlign: 'center', padding: '10px 0' }}>
-                  <Loader2 className="animate-spin" size={24} color="#6B9B76" style={{ margin: '0 auto 6px' }} />
-                  <div style={{ fontWeight: 600, fontSize: '0.82rem', color: '#ffffff' }}>
-                    Analyzing Form 16 & Generating ZK Proof...
-                  </div>
-                </div>
-              ) : (
-                <button
-                  type="submit"
-                  disabled={!selectedFile}
-                  style={{
-                    width: '100%',
-                    background: selectedFile ? '#ffffff' : 'rgba(255, 255, 255, 0.2)',
-                    color: selectedFile ? '#0c141d' : 'rgba(255, 255, 255, 0.5)',
-                    padding: '10px',
-                    borderRadius: '999px',
-                    border: 'none',
-                    fontWeight: 700,
-                    fontSize: '0.85rem',
-                    cursor: selectedFile ? 'pointer' : 'not-allowed',
-                  }}
-                >
-                  Analyze Form 16 PDF
-                </button>
-              )}
-            </form>
-          ) : (
-            /* ZK Verification Result View */
-            <div>
+        {/* Upload & Form 16 Analysis Form */}
+        {!analysisResult ? (
+          <form onSubmit={handleAnalyze}>
+            <div style={{ marginBottom: '12px' }}>
               <div style={{
-                background: isEligible ? 'rgba(74, 124, 89, 0.15)' : 'rgba(239, 68, 68, 0.12)',
-                border: `1px solid ${isEligible ? 'rgba(74, 124, 89, 0.4)' : 'rgba(239, 68, 68, 0.4)'}`,
+                border: '2px dashed rgba(255, 255, 255, 0.18)',
                 borderRadius: '14px',
-                padding: '12px',
+                padding: '14px 12px',
                 textAlign: 'center',
-                marginBottom: '12px',
+                background: 'rgba(0, 0, 0, 0.25)',
               }}>
-                <CheckCircle2 size={30} color={isEligible ? '#6B9B76' : '#ef4444'} style={{ margin: '0 auto 6px' }} />
-                <h4 style={{ color: isEligible ? '#6B9B76' : '#ef4444', fontSize: '1.05rem', marginBottom: '2px', fontWeight: 700 }}>
-                  {isEligible ? 'Form 16 Passed ✓' : 'Income Below Requirement'}
-                </h4>
-                <p style={{ color: 'rgba(255, 255, 255, 0.75)', fontSize: '0.78rem', margin: 0 }}>
-                  {isEligible
-                    ? 'Verified income satisfies landlord requirement.'
-                    : 'Income does not satisfy minimum requirement.'}
-                </p>
-              </div>
-
-              {/* ZK Proof Hash Preview */}
-              <div style={{
-                background: 'rgba(0, 0, 0, 0.3)',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
-                borderRadius: '10px',
-                padding: '8px 10px',
-                marginBottom: '12px',
-                fontSize: '0.74rem',
-              }}>
-                <div style={{ color: '#EBA834', fontWeight: 700, marginBottom: '2px' }}>
-                  Midnight ZK Proof Hash:
+                <FileText size={26} color="#6B9B76" style={{ margin: '0 auto 6px' }} />
+                <div style={{ fontSize: '0.85rem', fontWeight: 600, color: '#ffffff', marginBottom: '2px' }}>
+                  {selectedFile ? selectedFile.name : 'Choose Form 16 PDF'}
                 </div>
-                <div style={{ fontFamily: 'monospace', color: 'rgba(255, 255, 255, 0.8)', wordBreak: 'break-all' }}>
-                  {analysisResult.proofHash}
+                <div style={{ fontSize: '0.74rem', color: 'rgba(255, 255, 255, 0.5)', marginBottom: '8px' }}>
+                  {selectedFile ? `${(selectedFile.size / 1024).toFixed(1)} KB` : 'Indian Form 16 PDF files (.pdf) only.'}
                 </div>
-              </div>
-
-              {submitError && (
-                <div style={{
-                  background: 'rgba(239, 68, 68, 0.12)',
-                  border: '1px solid rgba(239, 68, 68, 0.3)',
-                  color: '#ef4444',
-                  borderRadius: '10px',
-                  padding: '8px 10px',
-                  fontSize: '0.78rem',
-                  marginBottom: '12px',
-                }}>
-                  {submitError}
-                </div>
-              )}
-
-              <div style={{ display: 'flex', gap: '8px' }}>
-                <button
-                  type="button"
-                  onClick={() => setAnalysisResult(null)}
+                <input
+                  type="file"
+                  accept=".pdf,application/pdf"
+                  onChange={handleFileChange}
+                  style={{ display: 'none' }}
+                  id="modal-form16-portal-input"
+                />
+                <label
+                  htmlFor="modal-form16-portal-input"
                   style={{
-                    flex: 1,
-                    background: 'rgba(255, 255, 255, 0.08)',
-                    color: '#ffffff',
-                    padding: '10px',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '5px',
+                    background: '#ffffff',
+                    color: '#0c141d',
+                    padding: '6px 14px',
                     borderRadius: '999px',
-                    border: 'none',
-                    fontWeight: 600,
-                    fontSize: '0.82rem',
+                    fontSize: '0.78rem',
+                    fontWeight: 700,
                     cursor: 'pointer',
                   }}
                 >
-                  Re-upload
-                </button>
-                <button
-                  type="button"
-                  onClick={handleFinalSubmit}
-                  disabled={isSubmitting || !isEligible}
-                  style={{
-                    flex: 2,
-                    background: isEligible ? '#ffffff' : 'rgba(255, 255, 255, 0.2)',
-                    color: isEligible ? '#0c141d' : 'rgba(255, 255, 255, 0.5)',
-                    padding: '10px',
-                    borderRadius: '999px',
-                    border: 'none',
-                    fontWeight: 700,
-                    fontSize: '0.85rem',
-                    cursor: isEligible && !isSubmitting ? 'pointer' : 'not-allowed',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '5px',
-                  }}
-                >
-                  {isSubmitting ? <Loader2 className="animate-spin" size={14} /> : null}
-                  {isSubmitting ? 'Submitting ZK Application...' : 'Submit Application'}
-                </button>
+                  <Upload size={13} />
+                  {selectedFile ? 'Change File' : 'Browse PDF File'}
+                </label>
               </div>
             </div>
-          )}
-        </div>
+
+            {analysisError && (
+              <div style={{
+                background: 'rgba(239, 68, 68, 0.12)',
+                border: '1px solid rgba(239, 68, 68, 0.3)',
+                color: '#ef4444',
+                borderRadius: '10px',
+                padding: '8px 10px',
+                fontSize: '0.78rem',
+                marginBottom: '12px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+              }}>
+                <AlertCircle size={14} style={{ flexShrink: 0 }} />
+                <span>{analysisError}</span>
+              </div>
+            )}
+
+            {isAnalyzing ? (
+              <div style={{ textAlign: 'center', padding: '10px 0' }}>
+                <Loader2 className="animate-spin" size={24} color="#6B9B76" style={{ margin: '0 auto 6px' }} />
+                <div style={{ fontWeight: 600, fontSize: '0.82rem', color: '#ffffff' }}>
+                  Analyzing Form 16 & Generating ZK Proof...
+                </div>
+              </div>
+            ) : (
+              <button
+                type="submit"
+                disabled={!selectedFile}
+                style={{
+                  width: '100%',
+                  background: selectedFile ? '#ffffff' : 'rgba(255, 255, 255, 0.2)',
+                  color: selectedFile ? '#0c141d' : 'rgba(255, 255, 255, 0.5)',
+                  padding: '10px',
+                  borderRadius: '999px',
+                  border: 'none',
+                  fontWeight: 700,
+                  fontSize: '0.85rem',
+                  cursor: selectedFile ? 'pointer' : 'not-allowed',
+                }}
+              >
+                Analyze Form 16 PDF
+              </button>
+            )}
+          </form>
+        ) : (
+          /* ZK Verification Result View */
+          <div>
+            <div style={{
+              background: isEligible ? 'rgba(74, 124, 89, 0.15)' : 'rgba(239, 68, 68, 0.12)',
+              border: `1px solid ${isEligible ? 'rgba(74, 124, 89, 0.4)' : 'rgba(239, 68, 68, 0.4)'}`,
+              borderRadius: '14px',
+              padding: '12px',
+              textAlign: 'center',
+              marginBottom: '12px',
+            }}>
+              <CheckCircle2 size={30} color={isEligible ? '#6B9B76' : '#ef4444'} style={{ margin: '0 auto 6px' }} />
+              <h4 style={{ color: isEligible ? '#6B9B76' : '#ef4444', fontSize: '1.05rem', marginBottom: '2px', fontWeight: 700 }}>
+                {isEligible ? 'Form 16 Passed ✓' : 'Income Below Requirement'}
+              </h4>
+              <p style={{ color: 'rgba(255, 255, 255, 0.75)', fontSize: '0.78rem', margin: 0 }}>
+                {isEligible
+                  ? 'Verified income satisfies landlord requirement.'
+                  : 'Income does not satisfy minimum requirement.'}
+              </p>
+            </div>
+
+            {/* ZK Proof Hash Preview */}
+            <div style={{
+              background: 'rgba(0, 0, 0, 0.3)',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+              borderRadius: '10px',
+              padding: '8px 10px',
+              marginBottom: '12px',
+              fontSize: '0.74rem',
+            }}>
+              <div style={{ color: '#EBA834', fontWeight: 700, marginBottom: '2px' }}>
+                Midnight ZK Proof Hash:
+              </div>
+              <div style={{ fontFamily: 'monospace', color: 'rgba(255, 255, 255, 0.8)', wordBreak: 'break-all' }}>
+                {analysisResult.proofHash}
+              </div>
+            </div>
+
+            {submitError && (
+              <div style={{
+                background: 'rgba(239, 68, 68, 0.12)',
+                border: '1px solid rgba(239, 68, 68, 0.3)',
+                color: '#ef4444',
+                borderRadius: '10px',
+                padding: '8px 10px',
+                fontSize: '0.78rem',
+                marginBottom: '12px',
+              }}>
+                {submitError}
+              </div>
+            )}
+
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <button
+                type="button"
+                onClick={() => setAnalysisResult(null)}
+                style={{
+                  flex: 1,
+                  background: 'rgba(255, 255, 255, 0.08)',
+                  color: '#ffffff',
+                  padding: '10px',
+                  borderRadius: '999px',
+                  border: 'none',
+                  fontWeight: 600,
+                  fontSize: '0.82rem',
+                  cursor: 'pointer',
+                }}
+              >
+                Re-upload
+              </button>
+              <button
+                type="button"
+                onClick={handleFinalSubmit}
+                disabled={isSubmitting || !isEligible}
+                style={{
+                  flex: 2,
+                  background: isEligible ? '#ffffff' : 'rgba(255, 255, 255, 0.2)',
+                  color: isEligible ? '#0c141d' : 'rgba(255, 255, 255, 0.5)',
+                  padding: '10px',
+                  borderRadius: '999px',
+                  border: 'none',
+                  fontWeight: 700,
+                  fontSize: '0.85rem',
+                  cursor: isEligible && !isSubmitting ? 'pointer' : 'not-allowed',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '5px',
+                }}
+              >
+                {isSubmitting ? <Loader2 className="animate-spin" size={14} /> : null}
+                {isSubmitting ? 'Submitting ZK Application...' : 'Submit Application'}
+              </button>
+            </div>
+          </div>
+        )}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
