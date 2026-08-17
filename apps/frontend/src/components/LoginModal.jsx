@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { X, Shield, ArrowRight, CheckCircle2, Building, User } from 'lucide-react';
 
 export default function LoginModal({ isOpen, onClose, currentRole, onLoginSuccess, currentUser }) {
@@ -53,18 +54,20 @@ export default function LoginModal({ isOpen, onClose, currentRole, onLoginSucces
     onClose();
   };
 
-  return (
+  return createPortal(
     <div 
       style={{
         position: 'fixed',
         inset: 0,
+        width: '100vw',
+        height: '100vh',
         background: 'rgba(5, 10, 16, 0.88)',
         backdropFilter: 'blur(16px)',
         WebkitBackdropFilter: 'blur(16px)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        zIndex: 9999,
+        zIndex: 999999,
         padding: '16px',
       }}
       onClick={onClose}
@@ -370,6 +373,7 @@ export default function LoginModal({ isOpen, onClose, currentRole, onLoginSucces
           </button>
         </form>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

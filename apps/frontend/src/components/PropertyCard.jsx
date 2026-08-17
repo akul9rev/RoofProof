@@ -1,5 +1,5 @@
 import React from 'react';
-import { MapPin, ShieldCheck, ArrowRight, AlertCircle, Info, XCircle, Trash2, User } from 'lucide-react';
+import { MapPin, ShieldCheck, ArrowRight, AlertCircle, Info, XCircle, Trash2, User, CheckCircle2 } from 'lucide-react';
 
 const UNSPLASH_IMAGES = [
   'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800&q=80',
@@ -18,6 +18,10 @@ export default function PropertyCard({ property, onApply, onDelete, hasApplied, 
 
   const imageUrl = property.image_url || UNSPLASH_IMAGES[(property.id || 0) % UNSPLASH_IMAGES.length];
   const landlordName = property.landlord_name || 'Ananya Verma';
+
+  const isApprovedStatus = application?.status === 'approved';
+  const isRejectedStatus = application?.status === 'rejected' || isDenied;
+  const isPendingStatus = application?.status === 'pending' || (hasApplied && !isApprovedStatus && !isRejectedStatus);
 
   const handleApplyClick = (e) => {
     e.preventDefault();
@@ -197,7 +201,57 @@ export default function PropertyCard({ property, onApply, onDelete, hasApplied, 
               </button>
             )}
           </div>
-        ) : hasApplied ? (
+        ) : isApprovedStatus ? (
+          /* Approved State - Locked, No Actions Allowed */
+          <div style={{
+            width: '100%',
+            padding: '12px',
+            borderRadius: '999px',
+            background: 'linear-gradient(135deg, #15803d 0%, #166534 100%)',
+            color: '#ffffff',
+            fontWeight: 800,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '8px',
+            fontSize: '0.9rem',
+            boxShadow: '0 6px 18px rgba(22, 101, 52, 0.3)',
+          }}>
+            <CheckCircle2 size={18} color="#ffffff" /> Application Approved 🎉
+          </div>
+        ) : isRejectedStatus ? (
+          /* Rejected State - Locked with Small Reason Box */
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <div style={{
+              width: '100%',
+              padding: '10px 14px',
+              borderRadius: '999px',
+              background: 'rgba(239, 68, 68, 0.12)',
+              color: '#ef4444',
+              fontWeight: 700,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '6px',
+              border: '1px solid rgba(239, 68, 68, 0.3)',
+              fontSize: '0.86rem',
+            }}>
+              <AlertCircle size={16} /> Application Declined
+            </div>
+            <div style={{
+              fontSize: '0.78rem',
+              color: '#dc2626',
+              background: 'rgba(239, 68, 68, 0.06)',
+              border: '1px solid rgba(239, 68, 68, 0.2)',
+              borderRadius: '12px',
+              padding: '8px 12px',
+              lineHeight: 1.4,
+            }}>
+              <strong>Landlord Note:</strong> {application?.rejection_reason || 'Owner Denied: Property requirements or move-in timeline criteria not met.'}
+            </div>
+          </div>
+        ) : isPendingStatus ? (
+          /* Pending State - Show Applied Pill + Withdraw Button */
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
             <div style={{
               width: '100%',
@@ -238,49 +292,8 @@ export default function PropertyCard({ property, onApply, onDelete, hasApplied, 
               <XCircle size={14} /> Withdraw Application
             </button>
           </div>
-        ) : isDenied ? (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-            <button
-              disabled
-              style={{
-                width: '100%',
-                padding: '12px',
-                borderRadius: '999px',
-                background: 'rgba(239, 68, 68, 0.12)',
-                color: '#ef4444',
-                fontWeight: 700,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '8px',
-                cursor: 'not-allowed',
-                border: '1px solid rgba(239, 68, 68, 0.3)',
-              }}
-            >
-              <AlertCircle size={18} /> Owner Denied Application
-            </button>
-            {onViewDenial && (
-              <button
-                type="button"
-                onClick={onViewDenial}
-                style={{
-                  background: 'transparent',
-                  border: 'none',
-                  color: '#555',
-                  fontSize: '0.8rem',
-                  cursor: 'pointer',
-                  textAlign: 'center',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '4px',
-                }}
-              >
-                <Info size={12} /> View Why Owner Denied
-              </button>
-            )}
-          </div>
         ) : (
+          /* Initial Apply Button */
           <button
             type="button"
             onClick={handleApplyClick}

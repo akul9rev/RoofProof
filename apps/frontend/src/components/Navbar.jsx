@@ -147,49 +147,67 @@ export default function Navbar({ activeView, setActiveView, currentRole, setCurr
           </button>
         </nav>
 
-        {/* Minimalist Profile Circle Avatar */}
-        <div
-          onClick={onOpenLogin}
-          title={`Signed in as ${currentUser?.name || 'User'} (${currentRole}) - Click to switch profile`}
-          style={{
-            position: 'relative',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          <div style={{
-            width: '40px',
-            height: '40px',
-            borderRadius: '50%',
-            background: isTenant 
-              ? 'linear-gradient(135deg, #EBA834 0%, #F59E0B 100%)' 
-              : 'linear-gradient(135deg, #6B9B76 0%, #4A7C59 100%)',
-            color: isTenant ? '#0c141d' : '#ffffff',
-            fontWeight: 700,
-            fontSize: '0.92rem',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            boxShadow: isTenant ? '0 0 16px rgba(235, 168, 52, 0.35)' : '0 0 16px rgba(107, 155, 118, 0.35)',
-            border: '2px solid rgba(255, 255, 255, 0.2)',
-            transition: 'all 0.2s ease',
-          }}>
-            {initials}
-          </div>
+        {/* Minimalist Profile Avatar & Sign In Button */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <button
+            type="button"
+            onClick={onOpenLogin}
+            className="btn-white-pill"
+            style={{
+              padding: '7px 16px',
+              fontSize: '0.82rem',
+              background: 'rgba(255, 255, 255, 0.12)',
+              color: '#ffffff',
+              border: '1px solid rgba(255, 255, 255, 0.25)',
+              cursor: 'pointer',
+            }}
+          >
+            Sign In / Switch Role
+          </button>
 
-          {/* Active status indicator dot */}
-          <span style={{
-            position: 'absolute',
-            bottom: '0',
-            right: '0',
-            width: '11px',
-            height: '11px',
-            borderRadius: '50%',
-            background: '#22c55e',
-            border: '2px solid #09121a',
-          }}></span>
+          <div
+            onClick={onOpenLogin}
+            title={`Signed in as ${currentUser?.name || 'User'} (${currentRole}) - Click to switch profile`}
+            style={{
+              position: 'relative',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <div style={{
+              width: '40px',
+              height: '40px',
+              borderRadius: '50%',
+              background: isTenant 
+                ? 'linear-gradient(135deg, #EBA834 0%, #F59E0B 100%)' 
+                : 'linear-gradient(135deg, #6B9B76 0%, #4A7C59 100%)',
+              color: isTenant ? '#0c141d' : '#ffffff',
+              fontWeight: 700,
+              fontSize: '0.92rem',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              boxShadow: isTenant ? '0 0 16px rgba(235, 168, 52, 0.35)' : '0 0 16px rgba(107, 155, 118, 0.35)',
+              border: '2px solid rgba(255, 255, 255, 0.2)',
+              transition: 'all 0.2s ease',
+            }}>
+              {initials}
+            </div>
+
+            {/* Active status indicator dot */}
+            <span style={{
+              position: 'absolute',
+              bottom: '0',
+              right: '0',
+              width: '11px',
+              height: '11px',
+              borderRadius: '50%',
+              background: '#22c55e',
+              border: '2px solid #09121a',
+            }}></span>
+          </div>
         </div>
 
         {/* Action Buttons: List Now and Find a Home */}
