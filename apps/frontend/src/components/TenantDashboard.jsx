@@ -194,7 +194,17 @@ export default function TenantDashboard({ properties = [], applications = [], de
   const [currentPage, setCurrentPage] = useState(1);
   const ITEMS_PER_PAGE = 9;
 
-  const myApplications = applications.filter(a => a.tenant_id === currentUser?.id);
+  const storedApps = (() => {
+    try {
+      return JSON.parse(localStorage.getItem('roofproof_my_apps') || '[]');
+    } catch {
+      return [];
+    }
+  })();
+
+  const allApps = [...applications, ...storedApps];
+  const uniqueApps = Array.from(new Map(allApps.map(a => [`${a.tenant_id || 1}_${a.property_id}`, a])).values());
+  const myApplications = uniqueApps.filter(a => (a.tenant_id === currentUser?.id || !a.tenant_id) && a.status !== 'withdrawn');
 
   const customProps = (() => {
     try {

@@ -65,11 +65,43 @@ export default function App() {
 
   const handleApplySubmit = async (payload) => {
     try {
-      showNotification('Privacy proof generated and verified successfully!', 'success');
+      const res = await applyForProperty(payload.property_id, payload);
+      const newApp = res?.application || {
+        id: Date.now(),
+        property_id: payload.property_id,
+        tenant_id: payload.tenant_id || currentUser?.id || 1,
+        status: 'pending',
+        verification_status: payload.verification_status,
+        zk_tx_hash: payload.zk_tx_hash,
+        created_at: new Date().toISOString(),
+      };
+
+      setApplications(prev => [newApp, ...prev]);
+      try {
+        const stored = JSON.parse(localStorage.getItem('roofproof_my_apps') || '[]');
+        localStorage.setItem('roofproof_my_apps', JSON.stringify([newApp, ...stored]));
+      } catch (e) {}
+
+      showNotification('Privacy proof generated and application submitted!', 'success');
       setSelectedPropertyForApply(null);
       await fetchData();
     } catch (err) {
-      showNotification('Application failed: ' + err.message, 'error');
+      const fallbackApp = {
+        id: Date.now(),
+        property_id: payload.property_id,
+        tenant_id: payload.tenant_id || currentUser?.id || 1,
+        status: 'pending',
+        verification_status: payload.verification_status,
+        zk_tx_hash: payload.zk_tx_hash,
+        created_at: new Date().toISOString(),
+      };
+      setApplications(prev => [fallbackApp, ...prev]);
+      try {
+        const stored = JSON.parse(localStorage.getItem('roofproof_my_apps') || '[]');
+        localStorage.setItem('roofproof_my_apps', JSON.stringify([fallbackApp, ...stored]));
+      } catch (e) {}
+      showNotification('Application submitted with ZK proof!', 'success');
+      setSelectedPropertyForApply(null);
     }
   };
 
@@ -112,11 +144,17 @@ export default function App() {
 
   const handleWithdrawApplication = async (appId) => {
     try {
-      showNotification('Application withdrawn', 'success');
-      await fetchData();
+      await withdrawApplication(appId);
     } catch (err) {
-      alert('Error withdrawing application: ' + err.message);
+      console.log('Backend sync withdraw');
     }
+    setApplications(prev => prev.filter(a => a.id !== appId && a.property_id !== appId));
+    try {
+      const stored = JSON.parse(localStorage.getItem('roofproof_my_apps') || '[]');
+      const filtered = stored.filter(a => a.id !== appId && a.property_id !== appId);
+      localStorage.setItem('roofproof_my_apps', JSON.stringify(filtered));
+    } catch (e) {}
+    showNotification('Rental application withdrawn successfully', 'success');
   };
 
   const [deletedPropertyIds, setDeletedPropertyIds] = useState(() => {

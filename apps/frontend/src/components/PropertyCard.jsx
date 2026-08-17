@@ -1,5 +1,5 @@
 import React from 'react';
-import { MapPin, ShieldCheck, ArrowRight, AlertCircle, Info, XCircle, Trash2 } from 'lucide-react';
+import { MapPin, ShieldCheck, ArrowRight, AlertCircle, Info, XCircle, Trash2, User } from 'lucide-react';
 
 const UNSPLASH_IMAGES = [
   'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800&q=80',
@@ -17,12 +17,24 @@ export default function PropertyCard({ property, onApply, onDelete, hasApplied, 
   const formattedThreshold = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(property.income_threshold);
 
   const imageUrl = property.image_url || UNSPLASH_IMAGES[(property.id || 0) % UNSPLASH_IMAGES.length];
+  const landlordName = property.landlord_name || 'Ananya Verma';
 
   const handleApplyClick = (e) => {
     e.preventDefault();
     e.stopPropagation();
     if (typeof onApply === 'function') {
       onApply(property);
+    }
+  };
+
+  const handleWithdrawClick = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const appId = application?.id || property.id;
+    if (window.confirm(`Withdraw your rental application for "${property.title}"?`)) {
+      if (typeof onWithdraw === 'function') {
+        onWithdraw(appId);
+      }
     }
   };
 
@@ -41,7 +53,7 @@ export default function PropertyCard({ property, onApply, onDelete, hasApplied, 
           height: '210px',
           borderRadius: '20px',
           overflow: 'hidden',
-          marginBottom: '18px',
+          marginBottom: '16px',
           position: 'relative',
         }}>
           <img
@@ -103,16 +115,22 @@ export default function PropertyCard({ property, onApply, onDelete, hasApplied, 
           )}
         </div>
 
-        <h3 style={{ fontSize: '1.35rem', marginBottom: '6px', lineHeight: 1.25, color: '#1a221b', fontWeight: 700 }}>
+        <h3 style={{ fontSize: '1.3rem', marginBottom: '4px', lineHeight: 1.25, color: '#1a221b', fontWeight: 700 }}>
           {property.title}
         </h3>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#555e56', fontSize: '0.88rem', marginBottom: '12px' }}>
+        {/* Listed By Landlord Badge */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '5px', color: '#555e56', fontSize: '0.8rem', marginBottom: '8px' }}>
+          <User size={13} color="#4A7C59" />
+          <span>Listed by: <strong style={{ color: '#1a221b', fontWeight: 700 }}>{landlordName}</strong></span>
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#555e56', fontSize: '0.85rem', marginBottom: '14px' }}>
           <MapPin size={15} color="#4A7C59" />
           <span>{property.location}</span>
         </div>
 
-        <p style={{ color: '#4a524b', fontSize: '0.88rem', marginBottom: '18px', lineHeight: 1.5 }}>
+        <p style={{ color: '#4a524b', fontSize: '0.88rem', marginBottom: '16px', lineHeight: 1.45 }}>
           {property.description}
         </p>
       </div>
@@ -124,7 +142,7 @@ export default function PropertyCard({ property, onApply, onDelete, hasApplied, 
           border: '1px solid rgba(0, 0, 0, 0.08)',
           borderRadius: '16px',
           padding: '14px 16px',
-          marginBottom: '18px',
+          marginBottom: '16px',
           display: 'grid',
           gridTemplateColumns: '1fr 1fr',
           gap: '12px',
@@ -148,7 +166,7 @@ export default function PropertyCard({ property, onApply, onDelete, hasApplied, 
           </div>
         </div>
 
-        {/* Action button */}
+        {/* Action Button States */}
         {userRole === 'landlord' ? (
           <div style={{ display: 'flex', gap: '8px' }}>
             {onDelete && (
@@ -181,49 +199,44 @@ export default function PropertyCard({ property, onApply, onDelete, hasApplied, 
           </div>
         ) : hasApplied ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-            <button 
-              disabled 
+            <div style={{
+              width: '100%',
+              padding: '10px 14px',
+              borderRadius: '999px',
+              background: 'rgba(74, 124, 89, 0.12)',
+              color: '#4A7C59',
+              fontWeight: 700,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '6px',
+              border: '1px solid rgba(74, 124, 89, 0.3)',
+              fontSize: '0.85rem',
+            }}>
+              <ShieldCheck size={16} /> Applied with ZK Proof
+            </div>
+            <button
+              type="button"
+              onClick={handleWithdrawClick}
               style={{
                 width: '100%',
-                padding: '12px',
+                padding: '9px',
                 borderRadius: '999px',
-                background: 'rgba(74, 124, 89, 0.12)',
-                color: '#4A7C59',
+                background: 'rgba(239, 68, 68, 0.08)',
+                color: '#ef4444',
+                border: '1px solid rgba(239, 68, 68, 0.25)',
                 fontWeight: 700,
+                fontSize: '0.82rem',
+                cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                gap: '8px',
-                cursor: 'default',
-                border: '1px solid rgba(74, 124, 89, 0.3)',
-                fontSize: '0.88rem',
+                gap: '5px',
+                transition: 'all 0.2s ease',
               }}
             >
-              <ShieldCheck size={16} /> Applied with ZK Proof
+              <XCircle size={14} /> Withdraw Application
             </button>
-            {onWithdraw && application && application.status === 'pending' && (
-              <button
-                type="button"
-                onClick={() => onWithdraw(application.id)}
-                style={{
-                  width: '100%',
-                  padding: '8px',
-                  borderRadius: '999px',
-                  background: 'rgba(239, 68, 68, 0.1)',
-                  color: '#ef4444',
-                  border: '1px solid rgba(239, 68, 68, 0.3)',
-                  fontWeight: 600,
-                  fontSize: '0.8rem',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '6px',
-                }}
-              >
-                <XCircle size={14} /> Withdraw Application
-              </button>
-            )}
           </div>
         ) : isDenied ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
@@ -268,7 +281,6 @@ export default function PropertyCard({ property, onApply, onDelete, hasApplied, 
             )}
           </div>
         ) : (
-          /* Working Apply Button renamed cleanly to "Apply" */
           <button
             type="button"
             onClick={handleApplyClick}
