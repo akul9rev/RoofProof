@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import PropertyCard from './PropertyCard';
 import { Search, Filter, Sparkles, AlertCircle, X, ChevronLeft, ChevronRight } from 'lucide-react';
 
-// Exact User-Provided Property Dataset (18 items)
+// Exact User Dataset matched with authentic high-res Indian property photos
 export const EXACT_USER_DATASET = [
   {
     id: 1,
@@ -11,7 +11,7 @@ export const EXACT_USER_DATASET = [
     location: 'Indiranagar, Bangalore',
     monthly_rent: 42000,
     income_threshold: 120000,
-    description: 'Spacious 2 BHK in a quiet residential lane.',
+    description: 'Spacious 2 BHK in a quiet residential lane with balcony.',
     image_url: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800&q=80',
   },
   {
@@ -21,7 +21,7 @@ export const EXACT_USER_DATASET = [
     location: 'Dehradun, Uttarakhand',
     monthly_rent: 55000,
     income_threshold: 165000,
-    description: '3 BHK hillside villa with a private garden.',
+    description: '3 BHK hillside villa with a private garden & valley view.',
     image_url: 'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=800&q=80',
   },
   {
@@ -42,7 +42,7 @@ export const EXACT_USER_DATASET = [
     monthly_rent: 32000,
     income_threshold: 95000,
     description: 'Modern 2 BHK in a gated residential society.',
-    image_url: 'https://images.unsplash.com/photo-1570129477492-45c003edd2be?auto=format&fit=crop&w=800&q=80',
+    image_url: 'https://images.unsplash.com/photo-1567496898669-ee935f5f647a?auto=format&fit=crop&w=800&q=80',
   },
   {
     id: 5,
@@ -82,7 +82,7 @@ export const EXACT_USER_DATASET = [
     monthly_rent: 68000,
     income_threshold: 205000,
     description: 'Well-connected 2 BHK close to metro and commercial hubs.',
-    image_url: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=800&q=80',
+    image_url: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80',
   },
   {
     id: 9,
@@ -92,7 +92,7 @@ export const EXACT_USER_DATASET = [
     monthly_rent: 48000,
     income_threshold: 145000,
     description: 'Comfortable 3 BHK independent home in a residential area.',
-    image_url: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=800&q=80',
+    image_url: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=800&q=80',
   },
   {
     id: 10,
@@ -122,7 +122,7 @@ export const EXACT_USER_DATASET = [
     monthly_rent: 38000,
     income_threshold: 115000,
     description: 'Traditional 3 BHK home with a private courtyard.',
-    image_url: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80',
+    image_url: 'https://images.unsplash.com/photo-1600585152220-90363fe7e115?auto=format&fit=crop&w=800&q=80',
   },
   {
     id: 13,
@@ -172,7 +172,7 @@ export const EXACT_USER_DATASET = [
     monthly_rent: 29000,
     income_threshold: 87000,
     description: 'Renovated 2 BHK combining traditional architecture with modern interiors.',
-    image_url: 'https://images.unsplash.com/photo-1600585152220-90363fe7e115?auto=format&fit=crop&w=800&q=80',
+    image_url: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=800&q=80',
   },
   {
     id: 18,
@@ -315,7 +315,7 @@ export default function TenantDashboard({ properties = [], applications = [], on
           </div>
           <h2 style={{ fontSize: '2.4rem', fontWeight: 600, color: '#ffffff' }}>Browse & Verify Rental Homes</h2>
           <p style={{ color: 'rgba(255, 255, 255, 0.75)', fontSize: '0.92rem', marginTop: '4px' }}>
-            Logged in as <strong style={{ color: '#ffffff' }}>{currentUser?.name || 'Rahul Sharma'}</strong> • 18 verified homes (apartments, studios, bungalows & villas).
+            Logged in as <strong style={{ color: '#ffffff' }}>{currentUser?.name || 'Rahul Sharma'}</strong> • 18 verified Indian homes.
           </p>
         </div>
 
