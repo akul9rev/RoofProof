@@ -23,12 +23,16 @@ export async function migrate() {
         id SERIAL PRIMARY KEY,
         landlord_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
         title VARCHAR(255) NOT NULL,
+        property_type VARCHAR(100) DEFAULT 'Family Apartment',
         location VARCHAR(255) NOT NULL,
         monthly_rent NUMERIC(12, 2) NOT NULL,
         income_threshold NUMERIC(12, 2) NOT NULL,
         description TEXT NOT NULL,
+        image_url TEXT,
         created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
       );
+      ALTER TABLE properties ADD COLUMN IF NOT EXISTS image_url TEXT;
+      ALTER TABLE properties ADD COLUMN IF NOT EXISTS property_type TEXT;
     `);
 
     // 3. Applications Table (STRICT: NO income, NO financial docs, NO private ZK witness)

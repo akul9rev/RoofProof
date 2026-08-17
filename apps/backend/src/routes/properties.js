@@ -12,10 +12,12 @@ router.get('/', async (req, res) => {
         p.landlord_id, 
         u.name AS landlord_name, 
         p.title, 
+        p.property_type,
         p.location, 
         p.monthly_rent, 
         p.income_threshold, 
         p.description, 
+        p.image_url,
         p.created_at,
         COUNT(a.id)::int AS total_applications
       FROM properties p
@@ -41,10 +43,12 @@ router.get('/:id', async (req, res) => {
         u.name AS landlord_name, 
         u.email AS landlord_email,
         p.title, 
+        p.property_type,
         p.location, 
         p.monthly_rent, 
         p.income_threshold, 
         p.description, 
+        p.image_url,
         p.created_at
       FROM properties p
       LEFT JOIN users u ON p.landlord_id = u.id
@@ -62,7 +66,7 @@ router.get('/:id', async (req, res) => {
 
 // POST /api/properties - Create property listing
 router.post('/', async (req, res) => {
-  const { landlord_id, title, location, monthly_rent, income_threshold, description } = req.body;
+  const { landlord_id, title, location, monthly_rent, income_threshold, description, image_url, property_type } = req.body;
 
   if (!landlord_id || !title || !location || !monthly_rent || !income_threshold || !description) {
     return res.status(400).json({
@@ -73,12 +77,21 @@ router.post('/', async (req, res) => {
 
   try {
     const result = await query(`
-      INSERT INTO properties (landlord_id, title, location, monthly_rent, income_threshold, description)
-      VALUES ($1, $2, $3, $4, $5, $6)
-      RETURNING id, landlord_id, title, location, monthly_rent, income_threshold, description, created_at;
-    `, [landlord_id, title.trim(), location.trim(), Number(monthly_rent), Number(income_threshold), description.trim()]);
+      INSERT INTO properties (landlord_id, title, location, monthly_rent, income_threshold, description, image_url, property_type)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+      RETURNING id, landlord_id, title, location, monthly_rent, income_threshold, description, image_url, property_type, created_at;
+    `, [
+      landlord_id,
+      title.trim(),
+      location.trim(),
+      Number(monthly_rent),
+      Number(income_threshold),
+      description.trim(),
+      image_url || 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800&q=80',
+      property_type || 'Family Apartment',
+    ]);
 
-    res.status(201).json({ success: true, property: result.rows[0], message: 'Property listing published successfully.' });
+    res.status(201).json({ success: true, property: result.rows[0], message: 'Property listing published successfully to database.' });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }

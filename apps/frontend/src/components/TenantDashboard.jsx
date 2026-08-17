@@ -196,8 +196,17 @@ export default function TenantDashboard({ properties = [], applications = [], de
 
   const myApplications = applications.filter(a => a.tenant_id === currentUser?.id);
 
-  // Filter out any deleted properties
-  const catalogue = EXACT_USER_DATASET.filter(p => !deletedPropertyIds.includes(p.id));
+  const customProps = (() => {
+    try {
+      return JSON.parse(localStorage.getItem('roofproof_custom_properties') || '[]');
+    } catch {
+      return [];
+    }
+  })();
+
+  const mergedProperties = [...properties.filter(p => !EXACT_USER_DATASET.some(e => e.id === p.id)), ...customProps, ...EXACT_USER_DATASET];
+  const uniqueProperties = Array.from(new Map(mergedProperties.map(p => [p.id, p])).values());
+  const catalogue = uniqueProperties.filter(p => !deletedPropertyIds.includes(p.id));
 
   const filteredProperties = catalogue.filter(p => {
     const matchesSearch = p.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
