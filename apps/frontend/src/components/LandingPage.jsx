@@ -1,5 +1,5 @@
 import React from 'react';
-import { Edit3, MapPin, Home, ShieldCheck, Cpu, Lock, Star, Sparkles, ArrowRight } from 'lucide-react';
+import { Edit3, MapPin, Home, ShieldCheck, Cpu, Lock } from 'lucide-react';
 
 export default function LandingPage({ properties = [], onApplyToProperty }) {
   const featuredProp = properties[0] || {
@@ -15,10 +15,10 @@ export default function LandingPage({ properties = [], onApplyToProperty }) {
       {/* 1. Hero Landing Page Section */}
       <div style={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))',
         gap: '40px',
         alignItems: 'center',
-        padding: '10px 0 40px',
+        padding: '10px 0 20px',
       }}>
         {/* Left Column: Hero Title & AI/ZK Subtext */}
         <div>
@@ -30,8 +30,8 @@ export default function LandingPage({ properties = [], onApplyToProperty }) {
 
           <div style={{ marginTop: '2rem' }}>
             <p style={{
-              maxWidth: '460px',
-              fontSize: '1rem',
+              maxWidth: '420px',
+              fontSize: '0.96rem',
               color: 'rgba(255, 255, 255, 0.85)',
               lineHeight: 1.6,
               textShadow: '0 2px 10px rgba(0, 0, 0, 0.85)',
@@ -43,29 +43,26 @@ export default function LandingPage({ properties = [], onApplyToProperty }) {
 
         {/* Right Column: House Booking & Verification Card */}
         <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-          <div style={{
+          <div className="glass-card" style={{
             maxWidth: '420px',
             width: '100%',
             padding: '26px',
             borderRadius: '26px',
-            background: 'rgba(14, 23, 34, 0.55)',
-            backdropFilter: 'blur(20px)',
-            WebkitBackdropFilter: 'blur(20px)',
-            border: '1px solid rgba(255, 255, 255, 0.15)',
-            boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.15)',
+            background: 'rgba(12, 18, 25, 0.88)',
+            border: '1px solid rgba(255, 255, 255, 0.14)',
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '18px' }}>
               <div>
                 <h3 style={{
                   fontSize: '1.45rem',
-                  fontWeight: 600,
+                  fontWeight: 500,
                   color: '#ffffff',
                   lineHeight: 1.25,
                   marginBottom: '4px',
                 }}>
                   {featuredProp.title}
                 </h3>
-                <span style={{ fontSize: '0.82rem', color: 'rgba(255, 255, 255, 0.65)' }}>
+                <span style={{ fontSize: '0.82rem', color: 'rgba(255, 255, 255, 0.55)' }}>
                   {featuredProp.location} • 3 BHK Luxury Villa
                 </span>
               </div>
@@ -83,37 +80,42 @@ export default function LandingPage({ properties = [], onApplyToProperty }) {
               </div>
             </div>
 
-            {/* Quick Badges */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '16px' }}>
+            {/* Location & BHK Input Pills */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 1fr',
+              gap: '10px',
+              marginBottom: '14px',
+            }}>
               <div style={{
                 background: 'rgba(255, 255, 255, 0.05)',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
+                border: '1px solid rgba(255, 255, 255, 0.08)',
                 borderRadius: '14px',
                 padding: '10px 12px',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '8px',
               }}>
-                <MapPin size={15} color="#EBA834" />
+                <MapPin size={15} color="rgba(255,255,255,0.5)" />
                 <div>
-                  <div style={{ fontSize: '0.68rem', color: 'rgba(255,255,255,0.5)' }}>Location</div>
-                  <div style={{ fontSize: '0.82rem', color: '#ffffff', fontWeight: 600 }}>Manali, HP</div>
+                  <div style={{ fontSize: '0.68rem', color: 'rgba(255,255,255,0.45)' }}>Location</div>
+                  <div style={{ fontSize: '0.82rem', color: '#ffffff', fontWeight: 500 }}>Manali, HP</div>
                 </div>
               </div>
 
               <div style={{
                 background: 'rgba(255, 255, 255, 0.05)',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
+                border: '1px solid rgba(255, 255, 255, 0.08)',
                 borderRadius: '14px',
                 padding: '10px 12px',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '8px',
               }}>
-                <Home size={15} color="#6B9B76" />
+                <Home size={15} color="rgba(255,255,255,0.5)" />
                 <div>
-                  <div style={{ fontSize: '0.68rem', color: 'rgba(255,255,255,0.5)' }}>Config</div>
-                  <div style={{ fontSize: '0.82rem', color: '#ffffff', fontWeight: 600 }}>3 BHK Villa</div>
+                  <div style={{ fontSize: '0.68rem', color: 'rgba(255,255,255,0.45)' }}>Config</div>
+                  <div style={{ fontSize: '0.82rem', color: '#ffffff', fontWeight: 500 }}>3 BHK Villa</div>
                 </div>
               </div>
             </div>
@@ -150,8 +152,8 @@ export default function LandingPage({ properties = [], onApplyToProperty }) {
 
               <div style={{
                 fontSize: '0.75rem',
-                color: '#6B9B76',
-                fontWeight: 600,
+                color: 'rgba(255, 255, 255, 0.85)',
+                fontWeight: 500,
               }}>
                 10% annual payment discount
               </div>
@@ -160,242 +162,253 @@ export default function LandingPage({ properties = [], onApplyToProperty }) {
             {/* Rent & Action */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '20px' }}>
               <div>
-                <span style={{ fontSize: '1.75rem', fontWeight: 700, color: '#ffffff' }}>
+                <span style={{ fontSize: '1.75rem', fontWeight: 600, color: '#ffffff' }}>
                   ₹{(featuredProp.monthly_rent || 75000).toLocaleString('en-IN')}
                 </span>
-                <span style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.6)' }}> / month</span>
+                <span style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.5)' }}> / month</span>
               </div>
-              <span style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.6)' }}>3 BHK • 6 guests</span>
+              <span style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.5)' }}>3 BHK • 6 guests</span>
             </div>
 
             <button
               onClick={() => onApplyToProperty(featuredProp)}
               className="btn-white-pill"
-              style={{ width: '100%', padding: '12px', fontSize: '0.92rem' }}
+              style={{ width: '100%' }}
             >
-              Apply with ZK Proof
+              Book Now
             </button>
           </div>
         </div>
       </div>
 
-      {/* 2. About Section - Transparent Glass Container */}
-      <section id="about-section" style={{
-        background: 'rgba(14, 23, 34, 0.45)',
-        backdropFilter: 'blur(20px)',
-        WebkitBackdropFilter: 'blur(20px)',
-        border: '1px solid rgba(255, 255, 255, 0.12)',
-        borderRadius: '32px',
-        padding: '50px 36px',
-        margin: '40px 0',
-        boxShadow: '0 25px 70px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.15)',
-        color: '#ffffff',
-      }}>
+      {/* 2. About Section - Light Cream Box matching Image 2 */}
+      <section id="about-section" className="about-box-light">
         <div style={{ textAlign: 'center', maxWidth: '760px', margin: '0 auto' }}>
+          {/* Badge with horizontal lines */}
           <div style={{
             display: 'inline-flex',
             alignItems: 'center',
             gap: '16px',
-            fontSize: '0.75rem',
+            fontSize: '0.72rem',
             letterSpacing: '0.22em',
             textTransform: 'uppercase',
-            color: '#6B9B76',
+            color: '#4A7C59',
             fontWeight: 700,
             marginBottom: '20px',
           }}>
-            <span style={{ width: '40px', height: '1px', background: '#6B9B76', opacity: 0.6 }}></span>
-            PRIVACY FIRST VERIFICATION
-            <span style={{ width: '40px', height: '1px', background: '#6B9B76', opacity: 0.6 }}></span>
+            <span style={{ width: '40px', height: '1px', background: '#4A7C59', opacity: 0.6 }}></span>
+            PRIVACY FIRST
+            <span style={{ width: '40px', height: '1px', background: '#4A7C59', opacity: 0.6 }}></span>
           </div>
 
-          <h2 style={{
-            fontSize: '2.5rem',
-            fontFamily: 'var(--font-heading)',
-            fontWeight: 600,
-            lineHeight: 1.25,
-            color: '#ffffff',
-            margin: '0 0 16px',
-          }}>
+          <h2 className="serif-heading-light">
             Know what's real. <br />
-            <em style={{ color: '#EBA834', fontStyle: 'normal' }}>Before</em> you sign.
+            <em>Before</em> you sign.
           </h2>
 
           <p style={{
-            fontSize: '1.05rem',
-            color: 'rgba(255, 255, 255, 0.8)',
+            fontSize: '1.02rem',
+            color: '#4a524b',
             lineHeight: 1.65,
             margin: '20px auto 32px',
-            maxWidth: '640px',
+            maxWidth: '620px',
+            fontWeight: 400,
           }}>
             RoofProof gives your tenancy applications the visibility and zero-knowledge privacy it needs to prevent expired disclosures, avoid fraud, and run with confidence — every single day.
           </p>
+
+          <button 
+            onClick={() => onApplyToProperty(featuredProp)}
+            style={{
+              background: '#141a15',
+              color: '#ffffff',
+              fontFamily: 'var(--font-body)',
+              fontSize: '0.78rem',
+              letterSpacing: '0.18em',
+              fontWeight: 700,
+              padding: '14px 36px',
+              border: 'none',
+              borderRadius: '2px',
+              cursor: 'pointer',
+              textTransform: 'uppercase',
+              boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
+              transition: 'all 0.2s ease',
+            }}
+          >
+            FIND A HOME
+          </button>
         </div>
 
-        {/* 3 Clean Transparent Glass Feature Cards */}
+        {/* 3 Clean Feature Cards inside About Box */}
         <div style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
-          gap: '24px',
-          marginTop: '40px',
+          gap: '20px',
+          marginTop: '48px',
         }}>
           <div style={{
-            background: 'rgba(255, 255, 255, 0.04)',
-            border: '1px solid rgba(255, 255, 255, 0.1)',
-            borderRadius: '20px',
+            background: '#ffffff',
             padding: '24px',
-            color: '#ffffff',
-            transition: 'all 0.3s ease',
+            borderRadius: '16px',
+            border: '1px solid rgba(0, 0, 0, 0.06)',
+            boxShadow: '0 8px 24px rgba(0, 0, 0, 0.03)',
           }}>
             <div style={{
-              width: '42px', height: '42px', borderRadius: '12px',
-              background: 'rgba(235, 168, 52, 0.18)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              marginBottom: '16px', border: '1px solid rgba(235, 168, 52, 0.3)',
+              width: '40px',
+              height: '40px',
+              borderRadius: '10px',
+              background: 'rgba(74, 124, 89, 0.12)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginBottom: '14px',
             }}>
-              <Lock size={20} color="#EBA834" />
+              <ShieldCheck size={20} color="#4A7C59" />
             </div>
-            <h4 style={{ fontSize: '1.1rem', fontWeight: 700, marginBottom: '8px', color: '#ffffff' }}>
-              Zero-Knowledge Privacy
-            </h4>
-            <p style={{ fontSize: '0.88rem', color: 'rgba(255, 255, 255, 0.7)', lineHeight: 1.5, margin: 0 }}>
-              Form 16 PDFs and salary statements are processed in local memory. Only cryptographic mathematical proofs reach the landlord.
+            <h3 style={{ fontSize: '1.1rem', fontWeight: 600, color: '#1a221b', marginBottom: '6px' }}>
+              Private Income Witnesses
+            </h3>
+            <p style={{ fontSize: '0.86rem', color: '#555e56', lineHeight: 1.5 }}>
+              Form 16 income data stays strictly in browser RAM. Zero raw salary digits are transmitted over the network or stored in databases.
             </p>
           </div>
 
           <div style={{
-            background: 'rgba(255, 255, 255, 0.04)',
-            border: '1px solid rgba(255, 255, 255, 0.1)',
-            borderRadius: '20px',
+            background: '#ffffff',
             padding: '24px',
-            color: '#ffffff',
-            transition: 'all 0.3s ease',
+            borderRadius: '16px',
+            border: '1px solid rgba(0, 0, 0, 0.06)',
+            boxShadow: '0 8px 24px rgba(0, 0, 0, 0.03)',
           }}>
             <div style={{
-              width: '42px', height: '42px', borderRadius: '12px',
-              background: 'rgba(107, 155, 118, 0.18)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              marginBottom: '16px', border: '1px solid rgba(107, 155, 118, 0.3)',
+              width: '40px',
+              height: '40px',
+              borderRadius: '10px',
+              background: 'rgba(74, 124, 89, 0.12)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginBottom: '14px',
             }}>
-              <ShieldCheck size={20} color="#6B9B76" />
+              <Cpu size={20} color="#4A7C59" />
             </div>
-            <h4 style={{ fontSize: '1.1rem', fontWeight: 700, marginBottom: '8px', color: '#ffffff' }}>
-              Midnight Compact ZK Engine
-            </h4>
-            <p style={{ fontSize: '0.88rem', color: 'rgba(255, 255, 255, 0.7)', lineHeight: 1.5, margin: 0 }}>
-              Powered by Midnight Network ZK-SNARK witness execution proving salary exceeds minimum rent threshold without revealing total net worth.
+            <h3 style={{ fontSize: '1.1rem', fontWeight: 600, color: '#1a221b', marginBottom: '6px' }}>
+              AI Anomaly Detector
+            </h3>
+            <p style={{ fontSize: '0.86rem', color: '#555e56', lineHeight: 1.5 }}>
+              8-feature OCR stream scanner checks layout, arithmetic, and font stream consistency before generating cryptographic proofs.
             </p>
           </div>
 
           <div style={{
-            background: 'rgba(255, 255, 255, 0.04)',
-            border: '1px solid rgba(255, 255, 255, 0.1)',
-            borderRadius: '20px',
+            background: '#ffffff',
             padding: '24px',
-            color: '#ffffff',
-            transition: 'all 0.3s ease',
+            borderRadius: '16px',
+            border: '1px solid rgba(0, 0, 0, 0.06)',
+            boxShadow: '0 8px 24px rgba(0, 0, 0, 0.03)',
           }}>
             <div style={{
-              width: '42px', height: '42px', borderRadius: '12px',
-              background: 'rgba(255, 255, 255, 0.1)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              marginBottom: '16px', border: '1px solid rgba(255, 255, 255, 0.2)',
+              width: '40px',
+              height: '40px',
+              borderRadius: '10px',
+              background: 'rgba(74, 124, 89, 0.12)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginBottom: '14px',
             }}>
-              <Cpu size={20} color="#ffffff" />
+              <Lock size={20} color="#4A7C59" />
             </div>
-            <h4 style={{ fontSize: '1.1rem', fontWeight: 700, marginBottom: '8px', color: '#ffffff' }}>
-              Instant Verification
-            </h4>
-            <p style={{ fontSize: '0.88rem', color: 'rgba(255, 255, 255, 0.7)', lineHeight: 1.5, margin: 0 }}>
-              Instant PASS/FAIL verification badges allow landlords to approve verified tenants in seconds with zero paperwork overhead.
+            <h3 style={{ fontSize: '1.1rem', fontWeight: 600, color: '#1a221b', marginBottom: '6px' }}>
+              Midnight On-Chain Proofs
+            </h3>
+            <p style={{ fontSize: '0.86rem', color: '#555e56', lineHeight: 1.5 }}>
+              Midnight Compact smart contracts record binary true/false verification state on-chain, linked to your property application hash.
             </p>
           </div>
         </div>
       </section>
 
-      {/* 3. Reviews Section - Transparent Glass Layout */}
-      <section id="reviews-section" style={{
-        padding: '40px 0',
-      }}>
-        <div style={{ textAlign: 'center', marginBottom: '36px' }}>
-          <div style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '8px',
-            background: 'rgba(235, 168, 52, 0.15)',
-            border: '1px solid rgba(235, 168, 52, 0.35)',
-            padding: '5px 14px',
-            borderRadius: '999px',
-            fontSize: '0.78rem',
-            color: '#EBA834',
-            fontWeight: 700,
-            marginBottom: '12px',
-          }}>
-            <Star size={13} fill="#EBA834" /> TENANT & LANDLORD REVIEWS
-          </div>
-          <h2 style={{ fontSize: '2.2rem', fontWeight: 700, color: '#ffffff', margin: 0 }}>
-            Trusted by Privacy-Conscious Renters
+      {/* 3. Reviews Section - Dark Black Box matching Image 1 */}
+      <section id="reviews-section" className="reviews-box-dark">
+        <div style={{ marginBottom: '32px' }}>
+          <h2 className="serif-heading-dark">
+            Built for the people <br />
+            who value <em>privacy.</em>
           </h2>
         </div>
 
+        {/* 3 Column Grid Cards matching Image 1 */}
         <div style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-          gap: '24px',
+          gap: '0',
+          borderTop: '1px solid rgba(255, 255, 255, 0.1)',
         }}>
-          <div style={{
-            background: 'rgba(14, 23, 34, 0.45)',
-            backdropFilter: 'blur(16px)',
-            border: '1px solid rgba(255, 255, 255, 0.12)',
-            borderRadius: '24px',
-            padding: '24px',
-            color: '#ffffff',
-          }}>
-            <div style={{ display: 'flex', gap: '4px', marginBottom: '12px' }}>
-              {[...Array(5)].map((_, i) => <Star key={i} size={15} fill="#EBA834" color="#EBA834" />)}
+          {/* Card 1 */}
+          <div className="editorial-review-card">
+            <div style={{ color: '#6B9B76', fontSize: '1.05rem', letterSpacing: '4px' }}>
+              ★★★★★
             </div>
-            <p style={{ fontSize: '0.9rem', color: 'rgba(255, 255, 255, 0.8)', lineHeight: 1.55, marginBottom: '16px' }}>
-              "I never felt comfortable sharing my full Form 16 PDF with random brokers. RoofProof let me prove my income threshold instantly with 100% privacy."
+
+            <p className="editorial-quote">
+              "Before RoofProof, we discovered expired disclosures only when a tenant complained. Now we get verified proofs in seconds. That alone changed everything."
             </p>
-            <div style={{ fontSize: '0.84rem', fontWeight: 700, color: '#ffffff' }}>Rahul Sharma</div>
-            <div style={{ fontSize: '0.75rem', color: '#EBA834' }}>Verified Tenant • Bangalore</div>
+
+            <div className="editorial-author">
+              RAVI M. · TENANT APPLICANT
+            </div>
           </div>
 
-          <div style={{
-            background: 'rgba(14, 23, 34, 0.45)',
-            backdropFilter: 'blur(16px)',
-            border: '1px solid rgba(255, 255, 255, 0.12)',
-            borderRadius: '24px',
-            padding: '24px',
-            color: '#ffffff',
-          }}>
-            <div style={{ display: 'flex', gap: '4px', marginBottom: '12px' }}>
-              {[...Array(5)].map((_, i) => <Star key={i} size={15} fill="#EBA834" color="#EBA834" />)}
+          {/* Card 2 */}
+          <div className="editorial-review-card">
+            <div style={{ color: '#6B9B76', fontSize: '1.05rem', letterSpacing: '4px' }}>
+              ★★★★★
             </div>
-            <p style={{ fontSize: '0.9rem', color: 'rgba(255, 255, 255, 0.8)', lineHeight: 1.55, marginBottom: '16px' }}>
-              "As a landlord, receiving cryptographically verified tenant applications makes background checks seamless. No more manual income math!"
+
+            <p className="editorial-quote">
+              "The AI anomaly tracking is the feature I didn't know I needed. Knowing exactly which document stream passes — without storing 300 tenants' salary slips — is a completely different level of control."
             </p>
-            <div style={{ fontSize: '0.84rem', fontWeight: 700, color: '#ffffff' }}>Ananya Verma</div>
-            <div style={{ fontSize: '0.75rem', color: '#6B9B76' }}>Verified Landlord • Mumbai</div>
+
+            <div className="editorial-author">
+              PRIYA L. · HEAD PROPERTY MANAGER
+            </div>
           </div>
 
-          <div style={{
-            background: 'rgba(14, 23, 34, 0.45)',
-            backdropFilter: 'blur(16px)',
-            border: '1px solid rgba(255, 255, 255, 0.12)',
-            borderRadius: '24px',
-            padding: '24px',
-            color: '#ffffff',
-          }}>
-            <div style={{ display: 'flex', gap: '4px', marginBottom: '12px' }}>
-              {[...Array(5)].map((_, i) => <Star key={i} size={15} fill="#EBA834" color="#EBA834" />)}
+          {/* Card 3 */}
+          <div className="editorial-review-card">
+            <div style={{ color: '#6B9B76', fontSize: '1.05rem', letterSpacing: '4px' }}>
+              ★★★★★
             </div>
-            <p style={{ fontSize: '0.9rem', color: 'rgba(255, 255, 255, 0.8)', lineHeight: 1.55, marginBottom: '16px' }}>
-              "The Midnight ZK integration is brilliant. It feels like the future of web3 real estate verification in India."
+
+            <p className="editorial-quote">
+              "We stopped running out of verified applicants completely. Midnight zero-knowledge proofs give us enough confidence to approve instantly — it genuinely runs smoother than any system we've had."
             </p>
-            <div style={{ fontSize: '0.84rem', fontWeight: 700, color: '#ffffff' }}>Vikramaditya K.</div>
-            <div style={{ fontSize: '0.75rem', color: '#EBA834' }}>Web3 Enthusiast • Pune</div>
+
+            <div className="editorial-author">
+              JAMES K. · LANDLORD
+            </div>
           </div>
         </div>
+
+        {/* Minimalist Footer */}
+        <footer style={{
+          marginTop: '40px',
+          paddingTop: '24px',
+          borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          gap: '16px',
+          fontSize: '0.78rem',
+          color: 'rgba(255, 255, 255, 0.4)',
+          fontFamily: 'var(--font-body)',
+        }}>
+          <div>RoofProof © 2026</div>
+          <div>Privacy-Preserving Rental Verification on Midnight Network</div>
+          <div>Zero Data Stored • ZK Verified</div>
+        </footer>
       </section>
     </div>
   );
