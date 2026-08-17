@@ -1,8 +1,9 @@
 import React from 'react';
-import { Shield } from 'lucide-react';
+import { Shield, User, LogIn } from 'lucide-react';
 
-export default function Navbar({ activeView, setActiveView, currentRole, setCurrentRole, onListProperty, currentUser, onOpenLogin }) {
-  // Get initials from current user name
+export default function Navbar({ activeView, setActiveView, currentRole, onListProperty, currentUser, onOpenLogin }) {
+  const isLandlord = currentRole === 'landlord';
+
   const getUserInitials = (name) => {
     if (!name) return 'RP';
     const parts = name.trim().split(' ');
@@ -13,7 +14,6 @@ export default function Navbar({ activeView, setActiveView, currentRole, setCurr
   };
 
   const initials = getUserInitials(currentUser?.name);
-  const isTenant = currentRole === 'tenant';
 
   return (
     <header style={{
@@ -34,8 +34,8 @@ export default function Navbar({ activeView, setActiveView, currentRole, setCurr
         }}
       >
         <div style={{
-          width: '36px',
-          height: '36px',
+          width: '38px',
+          height: '38px',
           borderRadius: '10px',
           background: 'linear-gradient(135deg, #EBA834 0%, #F59E0B 100%)',
           display: 'flex',
@@ -56,53 +56,68 @@ export default function Navbar({ activeView, setActiveView, currentRole, setCurr
         </span>
       </div>
 
-      {/* Right-aligned Nav Links & Action Buttons */}
+      {/* Navigation Links - Role Dependent */}
       <div style={{
         display: 'flex',
         alignItems: 'center',
-        gap: '24px',
+        gap: '20px',
         marginLeft: 'auto',
       }}>
         <nav style={{
           display: 'flex',
           alignItems: 'center',
-          gap: '24px',
+          gap: '20px',
         }}>
           <button
-            onClick={() => {
-              setCurrentRole('tenant');
-              setActiveView('tenant');
-            }}
+            onClick={() => setActiveView('landing')}
             style={{
               background: 'transparent',
-              color: activeView === 'tenant' ? '#ffffff' : 'rgba(255, 255, 255, 0.75)',
-              fontWeight: activeView === 'tenant' ? 600 : 400,
+              color: activeView === 'landing' ? '#ffffff' : 'rgba(255, 255, 255, 0.75)',
+              fontWeight: activeView === 'landing' ? 600 : 400,
               fontSize: '0.9rem',
               border: 'none',
               cursor: 'pointer',
               transition: 'all 0.2s ease',
             }}
           >
-            Tenant Portal
+            Home
           </button>
 
-          <button
-            onClick={() => {
-              setCurrentRole('landlord');
-              setActiveView('landlord');
-            }}
-            style={{
-              background: 'transparent',
-              color: activeView === 'landlord' ? '#ffffff' : 'rgba(255, 255, 255, 0.75)',
-              fontWeight: activeView === 'landlord' ? 600 : 400,
-              fontSize: '0.9rem',
-              border: 'none',
-              cursor: 'pointer',
-              transition: 'all 0.2s ease',
-            }}
-          >
-            Landlord Portal
-          </button>
+          {/* If Landlord logged in -> Show ONLY Landlord Portal */}
+          {isLandlord && (
+            <button
+              onClick={() => setActiveView('landlord')}
+              style={{
+                background: 'transparent',
+                color: activeView === 'landlord' ? '#ffffff' : 'rgba(255, 255, 255, 0.75)',
+                fontWeight: activeView === 'landlord' ? 600 : 400,
+                fontSize: '0.9rem',
+                border: 'none',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+              }}
+            >
+              Landlord Portal
+            </button>
+          )}
+
+          {/* If Tenant logged in -> Show ONLY Tenant Portal */}
+          {!isLandlord && (
+            <button
+              onClick={() => setActiveView('tenant')}
+              style={{
+                background: 'transparent',
+                color: activeView === 'tenant' ? '#ffffff' : 'rgba(255, 255, 255, 0.75)',
+                fontWeight: activeView === 'tenant' ? 600 : 400,
+                fontSize: '0.9rem',
+                border: 'none',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+              }}
+            >
+              Tenant Portal
+            </button>
+          )}
 
           <button
             onClick={() => {
@@ -124,50 +139,35 @@ export default function Navbar({ activeView, setActiveView, currentRole, setCurr
           >
             About
           </button>
-
-          <button
-            onClick={() => {
-              setActiveView('landing');
-              setTimeout(() => {
-                const el = document.getElementById('reviews-section');
-                if (el) el.scrollIntoView({ behavior: 'smooth' });
-              }, 50);
-            }}
-            style={{
-              background: 'transparent',
-              color: 'rgba(255, 255, 255, 0.75)',
-              fontWeight: 400,
-              fontSize: '0.9rem',
-              border: 'none',
-              cursor: 'pointer',
-              transition: 'all 0.2s ease',
-            }}
-          >
-            Reviews
-          </button>
         </nav>
 
-        {/* Minimalist Profile Avatar & Sign In Button */}
+        {/* Profile / Sign In Button - No Switch Button */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <button
             type="button"
             onClick={onOpenLogin}
             className="btn-white-pill"
             style={{
-              padding: '7px 16px',
-              fontSize: '0.82rem',
-              background: 'rgba(255, 255, 255, 0.12)',
-              color: '#ffffff',
-              border: '1px solid rgba(255, 255, 255, 0.25)',
+              padding: '8px 18px',
+              fontSize: '0.84rem',
+              background: isLandlord
+                ? 'linear-gradient(135deg, #4A7C59 0%, #3B6647 100%)'
+                : 'linear-gradient(135deg, #EBA834 0%, #F59E0B 100%)',
+              color: isLandlord ? '#ffffff' : '#0c141d',
+              border: 'none',
               cursor: 'pointer',
+              fontWeight: 700,
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
             }}
           >
-            Sign In / Switch Role
+            <User size={15} /> Sign In
           </button>
 
           <div
             onClick={onOpenLogin}
-            title={`Signed in as ${currentUser?.name || 'User'} (${currentRole}) - Click to switch profile`}
+            title={`Logged in as ${currentUser?.name || 'User'} (${currentRole})`}
             style={{
               position: 'relative',
               cursor: 'pointer',
@@ -177,32 +177,29 @@ export default function Navbar({ activeView, setActiveView, currentRole, setCurr
             }}
           >
             <div style={{
-              width: '40px',
-              height: '40px',
+              width: '38px',
+              height: '38px',
               borderRadius: '50%',
-              background: isTenant 
-                ? 'linear-gradient(135deg, #EBA834 0%, #F59E0B 100%)' 
-                : 'linear-gradient(135deg, #6B9B76 0%, #4A7C59 100%)',
-              color: isTenant ? '#0c141d' : '#ffffff',
+              background: isLandlord
+                ? 'linear-gradient(135deg, #6B9B76 0%, #4A7C59 100%)'
+                : 'linear-gradient(135deg, #EBA834 0%, #F59E0B 100%)',
+              color: isLandlord ? '#ffffff' : '#0c141d',
               fontWeight: 700,
-              fontSize: '0.92rem',
+              fontSize: '0.88rem',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              boxShadow: isTenant ? '0 0 16px rgba(235, 168, 52, 0.35)' : '0 0 16px rgba(107, 155, 118, 0.35)',
+              boxShadow: isLandlord ? '0 0 14px rgba(107, 155, 118, 0.35)' : '0 0 14px rgba(235, 168, 52, 0.35)',
               border: '2px solid rgba(255, 255, 255, 0.2)',
-              transition: 'all 0.2s ease',
             }}>
               {initials}
             </div>
-
-            {/* Active status indicator dot */}
             <span style={{
               position: 'absolute',
               bottom: '0',
               right: '0',
-              width: '11px',
-              height: '11px',
+              width: '10px',
+              height: '10px',
               borderRadius: '50%',
               background: '#22c55e',
               border: '2px solid #09121a',
@@ -210,26 +207,25 @@ export default function Navbar({ activeView, setActiveView, currentRole, setCurr
           </div>
         </div>
 
-        {/* Action Buttons: List Now and Find a Home */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <button 
-            onClick={onListProperty}
-            className="btn-white-pill"
-            style={{ padding: '10px 22px', fontSize: '0.88rem' }}
-          >
-            List Now
-          </button>
-
-          <button 
-            onClick={() => {
-              setCurrentRole('tenant');
-              setActiveView('tenant');
-            }}
-            className="btn-white-pill"
-            style={{ padding: '10px 22px', fontSize: '0.88rem' }}
-          >
-            Find a Home
-          </button>
+        {/* Action Button: Landlord sees 'List Now', Tenant sees 'Book / Apply' */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          {isLandlord ? (
+            <button 
+              onClick={onListProperty}
+              className="btn-white-pill"
+              style={{ padding: '9px 20px', fontSize: '0.86rem' }}
+            >
+              List Now
+            </button>
+          ) : (
+            <button 
+              onClick={() => setActiveView('tenant')}
+              className="btn-white-pill"
+              style={{ padding: '9px 20px', fontSize: '0.86rem' }}
+            >
+              Book / Apply
+            </button>
+          )}
         </div>
       </div>
     </header>
