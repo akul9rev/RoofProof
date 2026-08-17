@@ -62,6 +62,12 @@ body {
   flex-direction: column;
 }
 
+/* Solid non-transparent container for Tenant & Landlord Dashboards */
+.app-viewport-frame.portal-solid-frame {
+  background: #09121a !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.15) !important;
+}
+
 @media (max-width: 768px) {
   .app-viewport-frame {
     padding: 1.5rem;

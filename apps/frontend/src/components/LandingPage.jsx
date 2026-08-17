@@ -1,14 +1,21 @@
 import React from 'react';
-import { Edit3, MapPin, Home, ShieldCheck, Cpu, Lock } from 'lucide-react';
+import { Edit3, MapPin, Home, ShieldCheck, Cpu, Lock, Plus, ArrowRight } from 'lucide-react';
 
-export default function LandingPage({ properties = [], onApplyToProperty }) {
-  const featuredProp = properties[0] || {
-    id: 1,
-    title: 'Evergreen Pine Luxury Villa',
-    location: 'Manali, Himachal Pradesh',
-    monthly_rent: 75000,
-    income_threshold: 225000,
-  };
+export default function LandingPage({ properties = [], onApplyToProperty, onListProperty }) {
+  const hasProperties = properties && properties.length > 0;
+  const featuredProp = hasProperties ? properties[0] : null;
+
+  const formattedRent = featuredProp
+    ? new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(featuredProp.monthly_rent)
+    : '₹0';
+
+  const annualRent = featuredProp
+    ? new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(featuredProp.monthly_rent * 12)
+    : '₹0';
+
+  const discountAnnualRent = featuredProp
+    ? new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(Math.round(featuredProp.monthly_rent * 12 * 0.9))
+    : '₹0';
 
   return (
     <div className="animate-fade-in" style={{ width: '100%', position: 'relative' }}>
@@ -41,7 +48,7 @@ export default function LandingPage({ properties = [], onApplyToProperty }) {
           </div>
         </div>
 
-        {/* Right Column: House Booking & Verification Card */}
+        {/* Right Column: Dynamic House Booking Card from Live Properties */}
         <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
           <div className="glass-card" style={{
             maxWidth: '420px',
@@ -51,365 +58,233 @@ export default function LandingPage({ properties = [], onApplyToProperty }) {
             background: 'rgba(12, 18, 25, 0.88)',
             border: '1px solid rgba(255, 255, 255, 0.14)',
           }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '18px' }}>
-              <div>
-                <h3 style={{
-                  fontSize: '1.45rem',
-                  fontWeight: 500,
-                  color: '#ffffff',
-                  lineHeight: 1.25,
-                  marginBottom: '4px',
+            {featuredProp ? (
+              <>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '18px' }}>
+                  <div>
+                    <h3 style={{
+                      fontSize: '1.45rem',
+                      fontWeight: 700,
+                      color: '#ffffff',
+                      lineHeight: 1.25,
+                      marginBottom: '4px',
+                    }}>
+                      {featuredProp.title}
+                    </h3>
+                    <span style={{ fontSize: '0.82rem', color: 'rgba(255, 255, 255, 0.55)' }}>
+                      {featuredProp.location} • {featuredProp.property_type || featuredProp.type || 'Verified Property'}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Location & Config Input Pills */}
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: '1fr 1fr',
+                  gap: '10px',
+                  marginBottom: '14px',
                 }}>
-                  {featuredProp.title}
+                  <div style={{
+                    background: 'rgba(255, 255, 255, 0.05)',
+                    border: '1px solid rgba(255, 255, 255, 0.08)',
+                    borderRadius: '14px',
+                    padding: '10px 12px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                  }}>
+                    <MapPin size={15} color="rgba(255,255,255,0.5)" />
+                    <div>
+                      <div style={{ fontSize: '0.68rem', color: 'rgba(255,255,255,0.45)' }}>Location</div>
+                      <div style={{ fontSize: '0.82rem', color: '#ffffff', fontWeight: 600 }}>{featuredProp.location.split(',')[0]}</div>
+                    </div>
+                  </div>
+
+                  <div style={{
+                    background: 'rgba(255, 255, 255, 0.05)',
+                    border: '1px solid rgba(255, 255, 255, 0.08)',
+                    borderRadius: '14px',
+                    padding: '10px 12px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                  }}>
+                    <Home size={15} color="rgba(255,255,255,0.5)" />
+                    <div>
+                      <div style={{ fontSize: '0.68rem', color: 'rgba(255,255,255,0.45)' }}>Config</div>
+                      <div style={{ fontSize: '0.82rem', color: '#ffffff', fontWeight: 600 }}>{featuredProp.property_type || featuredProp.type || 'Rental Home'}</div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Annual Rent Discount Card */}
+                <div style={{
+                  background: 'rgba(255, 255, 255, 0.04)',
+                  border: '1px solid rgba(255, 255, 255, 0.08)',
+                  borderRadius: '16px',
+                  padding: '12px 14px',
+                  marginBottom: '18px',
+                }}>
+                  <div style={{ fontSize: '0.7rem', color: 'rgba(255, 255, 255, 0.5)', textTransform: 'uppercase', fontWeight: 700 }}>
+                    Annual Rent Option
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginTop: '4px' }}>
+                    <span style={{ textDecoration: 'line-through', color: 'rgba(255, 255, 255, 0.4)', fontSize: '0.9rem' }}>
+                      {annualRent}
+                    </span>
+                    <span style={{ fontSize: '1.18rem', fontWeight: 700, color: '#ffffff' }}>
+                      {discountAnnualRent} <span style={{ fontSize: '0.85rem', fontWeight: 400, color: 'rgba(255,255,255,0.7)' }}>/ yr</span>
+                    </span>
+                  </div>
+                  <div style={{ fontSize: '0.74rem', color: '#6B9B76', marginTop: '4px', fontWeight: 600 }}>
+                    10% annual payment discount available
+                  </div>
+                </div>
+
+                {/* Pricing & Apply Button */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
+                  <div>
+                    <span style={{ fontSize: '1.75rem', fontWeight: 800, color: '#ffffff' }}>
+                      {formattedRent}
+                    </span>
+                    <span style={{ fontSize: '0.82rem', color: 'rgba(255, 255, 255, 0.6)' }}> / month</span>
+                  </div>
+                  <span style={{ fontSize: '0.78rem', color: 'rgba(255, 255, 255, 0.5)' }}>
+                    ZK Eligible
+                  </span>
+                </div>
+
+                <button
+                  onClick={() => onApplyToProperty(featuredProp)}
+                  className="btn-white-pill"
+                  style={{
+                    width: '100%',
+                    padding: '14px',
+                    fontSize: '0.95rem',
+                    fontWeight: 700,
+                  }}
+                >
+                  Book / Apply Now <ArrowRight size={16} />
+                </button>
+              </>
+            ) : (
+              <div style={{ textAlign: 'center', padding: '20px 10px' }}>
+                <div style={{
+                  width: '48px', height: '48px', borderRadius: '14px',
+                  background: 'rgba(235, 168, 52, 0.15)', border: '1px solid rgba(235, 168, 52, 0.3)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 14px',
+                }}>
+                  <Plus size={24} color="#EBA834" />
+                </div>
+                <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: '#ffffff', marginBottom: '8px' }}>
+                  No Active Listings Yet
                 </h3>
-                <span style={{ fontSize: '0.82rem', color: 'rgba(255, 255, 255, 0.55)' }}>
-                  {featuredProp.location} • 3 BHK Luxury Villa
-                </span>
+                <p style={{ fontSize: '0.86rem', color: 'rgba(255, 255, 255, 0.65)', lineHeight: 1.45, marginBottom: '20px' }}>
+                  Be the first landlord to publish a property listing! Your new listing will immediately display on this live hero card.
+                </p>
+                <button
+                  onClick={onListProperty}
+                  className="btn-white-pill"
+                  style={{ width: '100%', padding: '12px', fontSize: '0.9rem', fontWeight: 700 }}
+                >
+                  <Plus size={16} /> List New Property Now
+                </button>
               </div>
-              <div style={{
-                width: '32px',
-                height: '32px',
-                borderRadius: '50%',
-                background: 'rgba(255, 255, 255, 0.08)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                cursor: 'pointer',
-              }}>
-                <Edit3 size={15} color="rgba(255,255,255,0.7)" />
-              </div>
-            </div>
-
-            {/* Location & BHK Input Pills */}
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: '1fr 1fr',
-              gap: '10px',
-              marginBottom: '14px',
-            }}>
-              <div style={{
-                background: 'rgba(255, 255, 255, 0.05)',
-                border: '1px solid rgba(255, 255, 255, 0.08)',
-                borderRadius: '14px',
-                padding: '10px 12px',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-              }}>
-                <MapPin size={15} color="rgba(255,255,255,0.5)" />
-                <div>
-                  <div style={{ fontSize: '0.68rem', color: 'rgba(255,255,255,0.45)' }}>Location</div>
-                  <div style={{ fontSize: '0.82rem', color: '#ffffff', fontWeight: 500 }}>Manali, HP</div>
-                </div>
-              </div>
-
-              <div style={{
-                background: 'rgba(255, 255, 255, 0.05)',
-                border: '1px solid rgba(255, 255, 255, 0.08)',
-                borderRadius: '14px',
-                padding: '10px 12px',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-              }}>
-                <Home size={15} color="rgba(255,255,255,0.5)" />
-                <div>
-                  <div style={{ fontSize: '0.68rem', color: 'rgba(255,255,255,0.45)' }}>Config</div>
-                  <div style={{ fontSize: '0.82rem', color: '#ffffff', fontWeight: 500 }}>3 BHK Villa</div>
-                </div>
-              </div>
-            </div>
-
-            {/* Annual Rent Box with 10% Discount */}
-            <div style={{
-              background: 'rgba(255, 255, 255, 0.05)',
-              border: '1px solid rgba(255, 255, 255, 0.12)',
-              borderRadius: '16px',
-              padding: '12px 14px',
-              marginBottom: '20px',
-              color: '#ffffff',
-            }}>
-              <div style={{ fontSize: '0.72rem', color: 'rgba(255, 255, 255, 0.6)', marginBottom: '4px' }}>
-                Annual Rent
-              </div>
-
-              <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginBottom: '4px' }}>
-                <span style={{
-                  fontSize: '0.88rem',
-                  color: 'rgba(255, 255, 255, 0.45)',
-                  textDecoration: 'line-through',
-                }}>
-                  ₹9,00,000
-                </span>
-                <span style={{
-                  fontSize: '1.1rem',
-                  fontWeight: 700,
-                  color: '#ffffff',
-                }}>
-                  ₹8,10,000 / yr
-                </span>
-              </div>
-
-              <div style={{
-                fontSize: '0.75rem',
-                color: 'rgba(255, 255, 255, 0.85)',
-                fontWeight: 500,
-              }}>
-                10% annual payment discount
-              </div>
-            </div>
-
-            {/* Rent & Action */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '20px' }}>
-              <div>
-                <span style={{ fontSize: '1.75rem', fontWeight: 600, color: '#ffffff' }}>
-                  ₹{(featuredProp.monthly_rent || 75000).toLocaleString('en-IN')}
-                </span>
-                <span style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.5)' }}> / month</span>
-              </div>
-              <span style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.5)' }}>3 BHK • 6 guests</span>
-            </div>
-
-            <button
-              onClick={() => onApplyToProperty(featuredProp)}
-              className="btn-white-pill"
-              style={{ width: '100%' }}
-            >
-              Book Now
-            </button>
+            )}
           </div>
         </div>
       </div>
 
-      {/* 2. About Section - Light Cream Box matching Image 2 */}
-      <section id="about-section" className="about-box-light">
-        <div style={{ textAlign: 'center', maxWidth: '760px', margin: '0 auto' }}>
-          {/* Badge with horizontal lines */}
-          <div style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '16px',
-            fontSize: '0.72rem',
-            letterSpacing: '0.22em',
-            textTransform: 'uppercase',
-            color: '#4A7C59',
-            fontWeight: 700,
-            marginBottom: '20px',
-          }}>
-            <span style={{ width: '40px', height: '1px', background: '#4A7C59', opacity: 0.6 }}></span>
-            PRIVACY FIRST
-            <span style={{ width: '40px', height: '1px', background: '#4A7C59', opacity: 0.6 }}></span>
-          </div>
-
-          <h2 className="serif-heading-light">
-            Know what's real. <br />
-            <em>Before</em> you sign.
-          </h2>
-
-          <p style={{
-            fontSize: '1.02rem',
-            color: '#4a524b',
-            lineHeight: 1.65,
-            margin: '20px auto 32px',
-            maxWidth: '620px',
-            fontWeight: 400,
-          }}>
-            RoofProof gives your tenancy applications the visibility and zero-knowledge privacy it needs to prevent expired disclosures, avoid fraud, and run with confidence — every single day.
-          </p>
-
-          <button 
-            onClick={() => onApplyToProperty(featuredProp)}
-            style={{
-              background: '#141a15',
-              color: '#ffffff',
-              fontFamily: 'var(--font-body)',
+      {/* 2. About Section - Light Cream Card Container */}
+      <div id="about-section" className="about-box-light animate-fade-in" style={{ scrollMarginTop: '80px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '32px', alignItems: 'center' }}>
+          <div>
+            <div style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              background: 'rgba(74, 124, 89, 0.12)',
+              color: '#4A7C59',
+              padding: '4px 12px',
+              borderRadius: '999px',
               fontSize: '0.78rem',
-              letterSpacing: '0.18em',
               fontWeight: 700,
-              padding: '14px 36px',
-              border: 'none',
-              borderRadius: '2px',
-              cursor: 'pointer',
-              textTransform: 'uppercase',
-              boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
-              transition: 'all 0.2s ease',
-            }}
-          >
-            FIND A HOME
-          </button>
-        </div>
-
-        {/* 3 Clean Feature Cards inside About Box */}
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
-          gap: '20px',
-          marginTop: '48px',
-        }}>
-          <div style={{
-            background: '#ffffff',
-            padding: '24px',
-            borderRadius: '16px',
-            border: '1px solid rgba(0, 0, 0, 0.06)',
-            boxShadow: '0 8px 24px rgba(0, 0, 0, 0.03)',
-          }}>
-            <div style={{
-              width: '40px',
-              height: '40px',
-              borderRadius: '10px',
-              background: 'rgba(74, 124, 89, 0.12)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              marginBottom: '14px',
+              marginBottom: '16px',
             }}>
-              <ShieldCheck size={20} color="#4A7C59" />
+              <ShieldCheck size={14} /> ABOUT ROOFPROOF
             </div>
-            <h3 style={{ fontSize: '1.1rem', fontWeight: 600, color: '#1a221b', marginBottom: '6px' }}>
-              Private Income Witnesses
-            </h3>
-            <p style={{ fontSize: '0.86rem', color: '#555e56', lineHeight: 1.5 }}>
-              Form 16 income data stays strictly in browser RAM. Zero raw salary digits are transmitted over the network or stored in databases.
+            <h2 className="serif-heading-light" style={{ marginBottom: '16px' }}>
+              Solving the rental <em>privacy dilemma</em>.
+            </h2>
+            <p style={{ color: '#4a524b', fontSize: '0.98rem', lineHeight: 1.6, marginBottom: '20px' }}>
+              Traditional landlords demand raw bank statements, Form 16 PDFs, and salary slips — exposing full financial histories, employer details, and personal transactions.
+            </p>
+            <p style={{ color: '#4a524b', fontSize: '0.98rem', lineHeight: 1.6 }}>
+              RoofProof combines local AI document extraction with Midnight Compact Zero-Knowledge circuits to prove <code>income &ge; threshold</code> with 100% cryptographic certainty without exposing exact numbers.
             </p>
           </div>
 
           <div style={{
-            background: '#ffffff',
-            padding: '24px',
-            borderRadius: '16px',
-            border: '1px solid rgba(0, 0, 0, 0.06)',
-            boxShadow: '0 8px 24px rgba(0, 0, 0, 0.03)',
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr',
+            gap: '16px',
           }}>
-            <div style={{
-              width: '40px',
-              height: '40px',
-              borderRadius: '10px',
-              background: 'rgba(74, 124, 89, 0.12)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              marginBottom: '14px',
-            }}>
-              <Cpu size={20} color="#4A7C59" />
+            <div style={{ background: '#ffffff', padding: '20px', borderRadius: '18px', border: '1px solid rgba(0,0,0,0.06)' }}>
+              <Cpu size={24} color="#4A7C59" style={{ marginBottom: '10px' }} />
+              <h4 style={{ fontSize: '1.05rem', color: '#1a221b', marginBottom: '4px' }}>Local Witness Extraction</h4>
+              <p style={{ fontSize: '0.82rem', color: '#666', lineHeight: 1.4 }}>Form 16 PDFs are parsed inside browser RAM only.</p>
             </div>
-            <h3 style={{ fontSize: '1.1rem', fontWeight: 600, color: '#1a221b', marginBottom: '6px' }}>
-              AI Anomaly Detector
-            </h3>
-            <p style={{ fontSize: '0.86rem', color: '#555e56', lineHeight: 1.5 }}>
-              8-feature OCR stream scanner checks layout, arithmetic, and font stream consistency before generating cryptographic proofs.
-            </p>
-          </div>
 
-          <div style={{
-            background: '#ffffff',
-            padding: '24px',
-            borderRadius: '16px',
-            border: '1px solid rgba(0, 0, 0, 0.06)',
-            boxShadow: '0 8px 24px rgba(0, 0, 0, 0.03)',
-          }}>
-            <div style={{
-              width: '40px',
-              height: '40px',
-              borderRadius: '10px',
-              background: 'rgba(74, 124, 89, 0.12)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              marginBottom: '14px',
-            }}>
-              <Lock size={20} color="#4A7C59" />
+            <div style={{ background: '#ffffff', padding: '20px', borderRadius: '18px', border: '1px solid rgba(0,0,0,0.06)' }}>
+              <Lock size={24} color="#EBA834" style={{ marginBottom: '10px' }} />
+              <h4 style={{ fontSize: '1.05rem', color: '#1a221b', marginBottom: '4px' }}>Zero-Knowledge Proof</h4>
+              <p style={{ fontSize: '0.82rem', color: '#666', lineHeight: 1.4 }}>Generates Midnight ZK proof (PASS / FAIL only).</p>
             </div>
-            <h3 style={{ fontSize: '1.1rem', fontWeight: 600, color: '#1a221b', marginBottom: '6px' }}>
-              Midnight On-Chain Proofs
-            </h3>
-            <p style={{ fontSize: '0.86rem', color: '#555e56', lineHeight: 1.5 }}>
-              Midnight Compact smart contracts record binary true/false verification state on-chain, linked to your property application hash.
-            </p>
           </div>
         </div>
-      </section>
+      </div>
 
-      {/* 3. Reviews Section - Dark Black Box matching Image 1 */}
-      <section id="reviews-section" className="reviews-box-dark">
-        <div style={{ marginBottom: '32px' }}>
-          <h2 className="serif-heading-dark">
-            Built for the people <br />
-            who value <em>privacy.</em>
+      {/* 3. Reviews & Testimonials Section - Dark Box Container */}
+      <div id="reviews-section" className="reviews-box-dark animate-fade-in" style={{ scrollMarginTop: '80px' }}>
+        <div style={{ textAlign: 'center', marginBottom: '32px' }}>
+          <span style={{ fontSize: '0.78rem', color: '#EBA834', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.05em' }}>
+            USER TESTIMONIALS
+          </span>
+          <h2 style={{ fontSize: '2.2rem', color: '#ffffff', fontWeight: 600, marginTop: '4px' }}>
+            Trusted by Landlords & Tenants
           </h2>
         </div>
 
-        {/* 3 Column Grid Cards matching Image 1 */}
         <div style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-          gap: '0',
-          borderTop: '1px solid rgba(255, 255, 255, 0.1)',
+          gap: '20px',
         }}>
-          {/* Card 1 */}
-          <div className="editorial-review-card">
-            <div style={{ color: '#6B9B76', fontSize: '1.05rem', letterSpacing: '4px' }}>
-              ★★★★★
-            </div>
-
-            <p className="editorial-quote">
-              "Before RoofProof, we discovered expired disclosures only when a tenant complained. Now we get verified proofs in seconds. That alone changed everything."
+          <div style={{ background: 'rgba(255, 255, 255, 0.04)', padding: '24px', borderRadius: '20px', border: '1px solid rgba(255,255,255,0.08)' }}>
+            <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: '0.9rem', lineHeight: 1.5, marginBottom: '16px', fontStyle: 'italic' }}>
+              "As a tenant, I hated sending PDF bank statements to strangers. RoofProof let me verify my income in 10 seconds without revealing my savings."
             </p>
-
-            <div className="editorial-author">
-              RAVI M. · TENANT APPLICANT
-            </div>
+            <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#ffffff' }}>Rahul Sharma</div>
+            <div style={{ fontSize: '0.75rem', color: '#EBA834' }}>Software Engineer, Tenant</div>
           </div>
 
-          {/* Card 2 */}
-          <div className="editorial-review-card">
-            <div style={{ color: '#6B9B76', fontSize: '1.05rem', letterSpacing: '4px' }}>
-              ★★★★★
-            </div>
-
-            <p className="editorial-quote">
-              "The AI anomaly tracking is the feature I didn't know I needed. Knowing exactly which document stream passes — without storing 300 tenants' salary slips — is a completely different level of control."
+          <div style={{ background: 'rgba(255, 255, 255, 0.04)', padding: '24px', borderRadius: '20px', border: '1px solid rgba(255,255,255,0.08)' }}>
+            <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: '0.9rem', lineHeight: 1.5, marginBottom: '16px', fontStyle: 'italic' }}>
+              "I get instant ZK verified proof that applicants earn above requirement. Eliminates fake salary slips completely."
             </p>
-
-            <div className="editorial-author">
-              PRIYA L. · HEAD PROPERTY MANAGER
-            </div>
+            <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#ffffff' }}>Ananya Verma</div>
+            <div style={{ fontSize: '0.75rem', color: '#6B9B76' }}>Property Owner, Landlord</div>
           </div>
 
-          {/* Card 3 */}
-          <div className="editorial-review-card">
-            <div style={{ color: '#6B9B76', fontSize: '1.05rem', letterSpacing: '4px' }}>
-              ★★★★★
-            </div>
-
-            <p className="editorial-quote">
-              "We stopped running out of verified applicants completely. Midnight zero-knowledge proofs give us enough confidence to approve instantly — it genuinely runs smoother than any system we've had."
+          <div style={{ background: 'rgba(255, 255, 255, 0.04)', padding: '24px', borderRadius: '20px', border: '1px solid rgba(255,255,255,0.08)' }}>
+            <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: '0.9rem', lineHeight: 1.5, marginBottom: '16px', fontStyle: 'italic' }}>
+              "Midnight zero-knowledge integration makes this the safest property rental platform in India."
             </p>
-
-            <div className="editorial-author">
-              JAMES K. · LANDLORD
-            </div>
+            <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#ffffff' }}>Vikram Patel</div>
+            <div style={{ fontSize: '0.75rem', color: '#EBA834' }}>Web3 Enthusiast</div>
           </div>
         </div>
-
-        {/* Minimalist Footer */}
-        <footer style={{
-          marginTop: '40px',
-          paddingTop: '24px',
-          borderTop: '1px solid rgba(255, 255, 255, 0.08)',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          flexWrap: 'wrap',
-          gap: '16px',
-          fontSize: '0.78rem',
-          color: 'rgba(255, 255, 255, 0.4)',
-          fontFamily: 'var(--font-body)',
-        }}>
-          <div>RoofProof © 2026</div>
-          <div>Privacy-Preserving Rental Verification on Midnight Network</div>
-          <div>Zero Data Stored • ZK Verified</div>
-        </footer>
-      </section>
+      </div>
     </div>
   );
 }

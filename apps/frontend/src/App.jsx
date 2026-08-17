@@ -216,10 +216,10 @@ export default function App() {
     showNotification('Property listing deleted successfully', 'success');
   };
 
-  const isPortalView = activeView === 'tenant' || activeView === 'landlord';
+  const isPortalView = activeView === 'tenant' || activeView === 'landlord' || activeView === 'list-property';
 
   return (
-    <div className={`app-viewport-frame ${isPortalView ? 'portal-white-frame' : ''}`}>
+    <div className={`app-viewport-frame ${isPortalView ? 'portal-solid-frame' : ''}`}>
       <Navbar
         activeView={activeView}
         setActiveView={navigateTo}
