@@ -42,8 +42,16 @@ export default function LandlordDashboard({ properties = [], applications = [], 
     }
   })();
 
-  const allApps = [...applications, ...storedApps];
-  const uniqueApps = Array.from(new Map(allApps.map(a => [`${a.tenant_id}_${a.property_id}`, a])).values());
+  const allApps = [...storedApps, ...applications];
+  const appMap = new Map();
+  allApps.forEach(a => {
+    const key = `${a.tenant_id}_${a.property_id}`;
+    const existing = appMap.get(key);
+    if (!existing || a.status === 'approved' || a.status === 'rejected' || (existing.status === 'pending' && a.status !== 'pending')) {
+      appMap.set(key, { ...(existing || {}), ...a });
+    }
+  });
+  const uniqueApps = Array.from(appMap.values());
 
   const myPropertyIds = myProperties.map(p => Number(p.id));
   const receivedApplications = uniqueApps.filter(a =>

@@ -222,12 +222,28 @@ export default function App() {
   const handleUpdateStatus = async (appId, newStatus, reason = '') => {
     try {
       await updateApplicationStatus(appId, newStatus, reason);
-      showNotification(`Application status updated to ${newStatus}`, 'success');
-      await fetchData();
     } catch (err) {
-      showNotification('Updated application status!', 'success');
-      setApplications(prev => prev.map(a => Number(a.id) === Number(appId) ? { ...a, status: newStatus, rejection_reason: reason } : a));
+      console.log('Backend sync updateStatus fallback');
     }
+
+    setApplications(prev => prev.map(a => 
+      (Number(a.id) === Number(appId) || Number(a.property_id) === Number(appId))
+        ? { ...a, status: newStatus, rejection_reason: reason }
+        : a
+    ));
+
+    try {
+      const stored = JSON.parse(localStorage.getItem('roofproof_my_apps') || '[]');
+      const updatedStored = stored.map(a => 
+        (Number(a.id) === Number(appId) || Number(a.property_id) === Number(appId))
+          ? { ...a, status: newStatus, rejection_reason: reason }
+          : a
+      );
+      localStorage.setItem('roofproof_my_apps', JSON.stringify(updatedStored));
+    } catch (e) {}
+
+    showNotification(`Application status updated to ${newStatus}!`, 'success');
+    await fetchData();
   };
 
   const handleWithdrawApplication = async (appId) => {

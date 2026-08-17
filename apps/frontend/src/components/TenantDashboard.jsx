@@ -21,8 +21,16 @@ export default function TenantDashboard({ properties = [], applications = [], de
     }
   })();
 
-  const allApps = [...applications, ...storedApps];
-  const uniqueApps = Array.from(new Map(allApps.map(a => [`${a.tenant_id}_${a.property_id}`, a])).values());
+  const allApps = [...storedApps, ...applications];
+  const appMap = new Map();
+  allApps.forEach(a => {
+    const key = `${a.tenant_id}_${a.property_id}`;
+    const existing = appMap.get(key);
+    if (!existing || a.status === 'approved' || a.status === 'rejected' || (existing.status === 'pending' && a.status !== 'pending')) {
+      appMap.set(key, { ...(existing || {}), ...a });
+    }
+  });
+  const uniqueApps = Array.from(appMap.values());
   const myApplications = uniqueApps.filter(a => (Number(a.tenant_id) === Number(currentUser?.id || 3) || !a.tenant_id) && a.status !== 'withdrawn');
 
   const customProps = (() => {
