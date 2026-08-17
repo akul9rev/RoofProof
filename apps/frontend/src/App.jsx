@@ -349,7 +349,9 @@ export default function App() {
           property={selectedPropertyForApply}
           onClose={() => setSelectedPropertyForApply(null)}
           onSubmit={handleApplySubmit}
+          onSuccess={handleApplySubmit}
           currentUser={currentUser}
+          tenant={currentUser}
         />
       )}
 
