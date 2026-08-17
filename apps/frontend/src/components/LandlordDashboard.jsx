@@ -3,13 +3,14 @@ import { Building2, Plus, ShieldCheck, CheckCircle2, Users, Sparkles } from 'luc
 import { EXACT_USER_DATASET } from './TenantDashboard';
 import PropertyCard from './PropertyCard';
 
-export default function LandlordDashboard({ properties = [], applications = [], onOpenCreateModal, onUpdateStatus, onDeleteProperty, currentUser }) {
+export default function LandlordDashboard({ properties = [], applications = [], deletedPropertyIds = [], onOpenCreateModal, onUpdateStatus, onDeleteProperty, currentUser }) {
   const [activeTab, setActiveTab] = useState('listings'); // 'listings' | 'applicants'
   const [selectedAppForDenial, setSelectedAppForDenial] = useState(null);
   const [denialReason, setDenialReason] = useState('');
 
-  const myProperties = properties.filter(p => p.landlord_id === currentUser?.id);
-  const displayListings = myProperties.length > 0 ? myProperties.slice(0, 9) : EXACT_USER_DATASET.slice(0, 9);
+  const activeDataset = EXACT_USER_DATASET.filter(p => !deletedPropertyIds.includes(p.id));
+  const myProperties = properties.filter(p => p.landlord_id === currentUser?.id && !deletedPropertyIds.includes(p.id));
+  const displayListings = myProperties.length > 0 ? myProperties.slice(0, 9) : activeDataset.slice(0, 9);
 
   const myPropertyIds = displayListings.map(p => p.id);
   const receivedApplications = applications.filter(a => myPropertyIds.includes(a.property_id));

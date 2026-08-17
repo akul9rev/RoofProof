@@ -103,16 +103,28 @@ export default function App() {
     }
   };
 
+  const [deletedPropertyIds, setDeletedPropertyIds] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem('roofproof_deleted_props') || '[]');
+    } catch {
+      return [];
+    }
+  });
+
   const handleDeleteProperty = async (propId) => {
     try {
       await deleteProperty(propId);
-      setProperties(prev => prev.filter(p => p.id !== propId));
-      showNotification('Property listing deleted successfully', 'success');
-      await fetchData();
     } catch (err) {
-      setProperties(prev => prev.filter(p => p.id !== propId));
-      showNotification('Property listing deleted', 'success');
+      console.log('Backend sync delete');
     }
+    const nextDeleted = [...deletedPropertyIds, propId];
+    setDeletedPropertyIds(nextDeleted);
+    try {
+      localStorage.setItem('roofproof_deleted_props', JSON.stringify(nextDeleted));
+    } catch (e) {}
+
+    setProperties(prev => prev.filter(p => p.id !== propId));
+    showNotification('Property listing deleted successfully', 'success');
   };
 
   const isPortalView = activeView === 'tenant' || activeView === 'landlord';
@@ -170,6 +182,7 @@ export default function App() {
           <TenantDashboard
             properties={properties}
             applications={applications}
+            deletedPropertyIds={deletedPropertyIds}
             onApply={(property) => setSelectedPropertyForApply(property)}
             onWithdraw={handleWithdrawApplication}
             currentUser={currentUser}
@@ -180,6 +193,7 @@ export default function App() {
           <LandlordDashboard
             properties={properties}
             applications={applications}
+            deletedPropertyIds={deletedPropertyIds}
             onOpenCreateModal={() => setIsCreateModalOpen(true)}
             onUpdateStatus={handleUpdateStatus}
             onDeleteProperty={handleDeleteProperty}

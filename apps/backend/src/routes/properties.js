@@ -202,4 +202,16 @@ router.post('/:id/apply', async (req, res) => {
   }
 });
 
+// DELETE /api/properties/:id - Delete property listing
+router.delete('/:id', async (req, res) => {
+  const propertyId = Number(req.params.id);
+  try {
+    await query('DELETE FROM applications WHERE property_id = $1;', [propertyId]);
+    await query('DELETE FROM properties WHERE id = $1;', [propertyId]);
+    res.json({ success: true, message: 'Property listing deleted successfully.', deleted_id: propertyId });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
 export default router;

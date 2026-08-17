@@ -186,7 +186,7 @@ export const EXACT_USER_DATASET = [
   },
 ];
 
-export default function TenantDashboard({ properties = [], applications = [], onApply, onWithdraw, currentUser }) {
+export default function TenantDashboard({ properties = [], applications = [], deletedPropertyIds = [], onApply, onWithdraw, currentUser }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [maxRent, setMaxRent] = useState('');
   const [activeTab, setActiveTab] = useState('browse'); // 'browse' | 'my-applications'
@@ -194,10 +194,10 @@ export default function TenantDashboard({ properties = [], applications = [], on
   const [currentPage, setCurrentPage] = useState(1);
   const ITEMS_PER_PAGE = 9;
 
-  const myApplications = applications.filter(a => a.tenant_id === currentUser.id);
+  const myApplications = applications.filter(a => a.tenant_id === currentUser?.id);
 
-  // Always use exact user-provided dataset (18 properties)
-  const catalogue = EXACT_USER_DATASET;
+  // Filter out any deleted properties
+  const catalogue = EXACT_USER_DATASET.filter(p => !deletedPropertyIds.includes(p.id));
 
   const filteredProperties = catalogue.filter(p => {
     const matchesSearch = p.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
