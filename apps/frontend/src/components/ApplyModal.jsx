@@ -130,21 +130,40 @@ export default function ApplyModal({ property, tenant, onClose, onSuccess }) {
     }
   };
 
+  useEffect(() => {
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, []);
+
   return (
-    <div className="modal-backdrop" onClick={onClose}>
+    <div style={{
+      position: 'fixed',
+      inset: 0,
+      background: 'rgba(5, 10, 16, 0.88)',
+      backdropFilter: 'blur(20px)',
+      WebkitBackdropFilter: 'blur(20px)',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      zIndex: 9999,
+      padding: '20px',
+    }} onClick={onClose}>
       <div
-        className="glass-card animate-slide-up"
+        className="glass-card animate-fade-in"
         onClick={(e) => e.stopPropagation()}
         style={{
-          maxWidth: '640px',
+          maxWidth: '600px',
           width: '100%',
-          padding: '32px',
-          background: 'rgba(15, 23, 31, 0.94)',
-          backdropFilter: 'blur(32px)',
+          padding: '30px',
+          background: 'linear-gradient(165deg, rgba(16, 24, 34, 0.98) 0%, rgba(10, 16, 24, 0.99) 100%)',
           border: '1px solid rgba(255, 255, 255, 0.18)',
           borderRadius: '28px',
-          maxHeight: '92vh',
+          maxHeight: '90vh',
           overflowY: 'auto',
+          boxShadow: '0 40px 100px rgba(0, 0, 0, 0.85)',
+          position: 'relative',
         }}
       >
         {/* Header */}

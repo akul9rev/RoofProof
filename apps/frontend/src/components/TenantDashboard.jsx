@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import PropertyCard from './PropertyCard';
-import { Search, Filter, ShieldCheck, Sparkles, AlertCircle, CheckCircle2, Info, X, MapPin } from 'lucide-react';
+import { Search, Filter, ShieldCheck, Sparkles, AlertCircle, XCircle, Info, X } from 'lucide-react';
 
 export default function TenantDashboard({ properties = [], applications = [], onApply, onWithdraw, currentUser }) {
   const [searchTerm, setSearchTerm] = useState('');
@@ -39,9 +39,20 @@ export default function TenantDashboard({ properties = [], applications = [], on
       description: 'Sleek eco-friendly studio apartment in Indiranagar featuring smart home controls and private garden patio.',
       image_url: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80',
     },
+    {
+      id: 4,
+      title: 'Heritage Courtyard Residence',
+      location: 'Udaipur, Rajasthan',
+      monthly_rent: 85000,
+      income_threshold: 255000,
+      description: 'Restored royal courtyard villa overlooking Lake Pichola with marble archways and private terrace.',
+      image_url: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80',
+    },
   ];
 
-  const displayProperties = properties.length > 0 ? properties : defaultProperties;
+  const allAvailableProperties = properties.length > 0 ? properties : defaultProperties;
+  // Reduce listing from 50 to max 8 listings
+  const displayProperties = allAvailableProperties.slice(0, 8);
 
   const filteredProperties = displayProperties.filter(p => {
     const matchesSearch = p.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -52,7 +63,7 @@ export default function TenantDashboard({ properties = [], applications = [], on
   });
 
   return (
-    <div className="animate-fade-in" style={{ padding: '20px 0 60px', width: '100%' }}>
+    <div className="animate-fade-in" style={{ padding: '10px 0 50px', width: '100%' }}>
       {/* Denial Reason Popup Modal */}
       {viewingDenialApp && (
         <div style={{
@@ -71,8 +82,10 @@ export default function TenantDashboard({ properties = [], applications = [], on
             width: '100%',
             padding: '30px',
             borderRadius: '24px',
-            background: 'rgba(14, 22, 31, 0.94)',
+            background: '#ffffff',
+            color: '#1a221b',
             border: '1px solid rgba(239, 68, 68, 0.3)',
+            boxShadow: '0 30px 80px rgba(0,0,0,0.2)',
           }} onClick={e => e.stopPropagation()}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
               <h3 style={{ fontSize: '1.2rem', color: '#ef4444', display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -80,29 +93,30 @@ export default function TenantDashboard({ properties = [], applications = [], on
               </h3>
               <button
                 onClick={() => setViewingDenialApp(null)}
-                style={{ background: 'transparent', border: 'none', color: 'rgba(255, 255, 255, 0.6)', cursor: 'pointer' }}
+                style={{ background: 'transparent', border: 'none', color: '#666', cursor: 'pointer' }}
               >
                 <X size={18} />
               </button>
             </div>
 
             <div style={{
-              background: 'rgba(255, 255, 255, 0.05)',
+              background: '#F9F8F3',
               padding: '14px 16px',
               borderRadius: '14px',
               marginBottom: '16px',
+              border: '1px solid rgba(0,0,0,0.06)',
             }}>
-              <div style={{ fontWeight: 600, fontSize: '0.95rem', color: '#ffffff', marginBottom: '4px' }}>
+              <div style={{ fontWeight: 600, fontSize: '0.95rem', color: '#1a221b', marginBottom: '4px' }}>
                 {viewingDenialApp.property_title || `Property #${viewingDenialApp.property_id}`}
               </div>
-              <div style={{ fontSize: '0.82rem', color: 'rgba(255, 255, 255, 0.5)' }}>
+              <div style={{ fontSize: '0.82rem', color: '#555' }}>
                 {viewingDenialApp.property_location}
               </div>
             </div>
 
             <div style={{
               padding: '16px',
-              background: 'rgba(239, 68, 68, 0.1)',
+              background: 'rgba(239, 68, 68, 0.08)',
               border: '1px solid rgba(239, 68, 68, 0.25)',
               borderRadius: '14px',
               marginBottom: '20px',
@@ -110,12 +124,12 @@ export default function TenantDashboard({ properties = [], applications = [], on
               <div style={{ fontSize: '0.75rem', color: '#ef4444', fontWeight: 700, textTransform: 'uppercase', marginBottom: '6px' }}>
                 Owner's Feedback:
               </div>
-              <p style={{ color: '#ffffff', fontSize: '0.9rem', lineHeight: 1.5 }}>
+              <p style={{ color: '#1a221b', fontSize: '0.9rem', lineHeight: 1.5 }}>
                 {viewingDenialApp.rejection_reason || 'Property requirements or preferred applicant criteria were not met for this listing.'}
               </p>
             </div>
 
-            <div style={{ fontSize: '0.82rem', color: 'rgba(255, 255, 255, 0.5)', marginBottom: '20px' }}>
+            <div style={{ fontSize: '0.82rem', color: '#555', marginBottom: '20px' }}>
               🔒 <em>Your private financial details were <strong>never shared</strong> and remain fully Zero-Knowledge protected on Midnight.</em>
             </div>
 
@@ -129,49 +143,50 @@ export default function TenantDashboard({ properties = [], applications = [], on
       )}
 
       {/* Tenant Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '28px', flexWrap: 'wrap', gap: '16px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '24px', flexWrap: 'wrap', gap: '16px' }}>
         <div>
           <div style={{
             display: 'inline-flex',
             alignItems: 'center',
             gap: '8px',
-            background: 'rgba(235, 168, 52, 0.1)',
-            border: '1px solid rgba(235, 168, 52, 0.25)',
+            background: 'rgba(74, 124, 89, 0.12)',
+            border: '1px solid rgba(74, 124, 89, 0.3)',
             padding: '4px 12px',
             borderRadius: '999px',
-            marginBottom: '12px',
+            marginBottom: '10px',
             fontSize: '0.78rem',
-            color: '#EBA834',
-            fontWeight: 600,
+            color: '#4A7C59',
+            fontWeight: 700,
           }}>
-            <Sparkles size={13} /> Tenant Privacy Portal
+            <Sparkles size={13} /> TENANT PRIVACY PORTAL
           </div>
-          <h2 style={{ fontSize: '2.2rem', fontWeight: 600, color: '#ffffff' }}>Browse & Verify Luxury Rentals</h2>
-          <p style={{ color: 'rgba(255, 255, 255, 0.65)', fontSize: '0.92rem', marginTop: '4px' }}>
-            Logged in as <strong style={{ color: '#ffffff' }}>{currentUser?.name || 'Rahul Sharma'}</strong> • Zero financial statements required.
+          <h2 style={{ fontSize: '2.4rem', fontWeight: 600, color: '#1a221b' }}>Browse & Verify Luxury Rentals</h2>
+          <p style={{ color: '#4a524b', fontSize: '0.92rem', marginTop: '4px' }}>
+            Logged in as <strong style={{ color: '#1a221b' }}>{currentUser?.name || 'Rahul Sharma'}</strong> • Showing up to 8 exclusive properties.
           </p>
         </div>
 
         {/* Tab Buttons */}
         <div style={{
           display: 'flex',
-          gap: '8px',
-          background: 'rgba(255, 255, 255, 0.06)',
+          gap: '6px',
+          background: 'rgba(0, 0, 0, 0.05)',
           padding: '4px',
           borderRadius: '999px',
-          border: '1px solid rgba(255, 255, 255, 0.1)',
+          border: '1px solid rgba(0, 0, 0, 0.08)',
         }}>
           <button
             onClick={() => setActiveTab('browse')}
             style={{
-              padding: '8px 18px',
+              padding: '8px 20px',
               borderRadius: '999px',
-              background: activeTab === 'browse' ? '#ffffff' : 'transparent',
-              color: activeTab === 'browse' ? '#0c141d' : '#ffffff',
+              background: activeTab === 'browse' ? '#141a15' : 'transparent',
+              color: activeTab === 'browse' ? '#ffffff' : '#4a524b',
               border: 'none',
-              fontWeight: 600,
+              fontWeight: 700,
               cursor: 'pointer',
               fontSize: '0.85rem',
+              transition: 'all 0.2s ease',
             }}
           >
             Available Homes ({displayProperties.length})
@@ -179,14 +194,15 @@ export default function TenantDashboard({ properties = [], applications = [], on
           <button
             onClick={() => setActiveTab('my-applications')}
             style={{
-              padding: '8px 18px',
+              padding: '8px 20px',
               borderRadius: '999px',
-              background: activeTab === 'my-applications' ? '#ffffff' : 'transparent',
-              color: activeTab === 'my-applications' ? '#0c141d' : '#ffffff',
+              background: activeTab === 'my-applications' ? '#141a15' : 'transparent',
+              color: activeTab === 'my-applications' ? '#ffffff' : '#4a524b',
               border: 'none',
-              fontWeight: 600,
+              fontWeight: 700,
               cursor: 'pointer',
               fontSize: '0.85rem',
+              transition: 'all 0.2s ease',
             }}
           >
             My Applications ({myApplications.length})
@@ -198,17 +214,18 @@ export default function TenantDashboard({ properties = [], applications = [], on
         <>
           {/* Search & Filter Bar */}
           <div className="glass-card" style={{
-            padding: '16px 20px',
-            marginBottom: '28px',
+            padding: '14px 18px',
+            marginBottom: '24px',
             display: 'flex',
             gap: '16px',
             flexWrap: 'wrap',
             alignItems: 'center',
             borderRadius: '20px',
-            background: 'rgba(12, 18, 25, 0.75)',
+            background: '#ffffff',
+            border: '1px solid rgba(0, 0, 0, 0.08)',
           }}>
-            <div style={{ flex: '1 1 260px', display: 'flex', alignItems: 'center', gap: '10px', background: 'rgba(255, 255, 255, 0.05)', padding: '10px 14px', borderRadius: '14px', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
-              <Search size={16} color="rgba(255,255,255,0.5)" />
+            <div style={{ flex: '1 1 260px', display: 'flex', alignItems: 'center', gap: '10px', background: '#FAF9F5', padding: '10px 14px', borderRadius: '14px', border: '1px solid rgba(0, 0, 0, 0.06)' }}>
+              <Search size={16} color="#666" />
               <input
                 type="text"
                 placeholder="Search location, title, or amenities..."
@@ -218,15 +235,15 @@ export default function TenantDashboard({ properties = [], applications = [], on
                   background: 'transparent',
                   border: 'none',
                   outline: 'none',
-                  color: '#ffffff',
+                  color: '#1a221b',
                   width: '100%',
                   fontSize: '0.88rem',
                 }}
               />
             </div>
 
-            <div style={{ flex: '0 1 200px', display: 'flex', alignItems: 'center', gap: '10px', background: 'rgba(255, 255, 255, 0.05)', padding: '10px 14px', borderRadius: '14px', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
-              <Filter size={16} color="rgba(255,255,255,0.5)" />
+            <div style={{ flex: '0 1 200px', display: 'flex', alignItems: 'center', gap: '10px', background: '#FAF9F5', padding: '10px 14px', borderRadius: '14px', border: '1px solid rgba(0, 0, 0, 0.06)' }}>
+              <Filter size={16} color="#666" />
               <input
                 type="number"
                 placeholder="Max Rent (₹)"
@@ -236,7 +253,7 @@ export default function TenantDashboard({ properties = [], applications = [], on
                   background: 'transparent',
                   border: 'none',
                   outline: 'none',
-                  color: '#ffffff',
+                  color: '#1a221b',
                   width: '100%',
                   fontSize: '0.88rem',
                 }}
@@ -244,7 +261,7 @@ export default function TenantDashboard({ properties = [], applications = [], on
             </div>
           </div>
 
-          {/* Properties Grid with Unsplash Images */}
+          {/* Properties Grid with Max 8 Items */}
           <div style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fill, minmax(330px, 1fr))',
@@ -272,11 +289,11 @@ export default function TenantDashboard({ properties = [], applications = [], on
           </div>
         </>
       ) : (
-        /* My Applications Tab */
+        /* My Applications Tab showing Available Applied Properties */
         <div>
           {myApplications.length === 0 ? (
-            <div className="glass-card" style={{ padding: '48px', textAlign: 'center', borderRadius: '24px' }}>
-              <p style={{ color: 'rgba(255, 255, 255, 0.6)', fontSize: '1.05rem', marginBottom: '20px' }}>
+            <div className="glass-card" style={{ padding: '48px', textAlign: 'center', borderRadius: '24px', background: '#ffffff' }}>
+              <p style={{ color: '#555', fontSize: '1.05rem', marginBottom: '20px' }}>
                 You haven't submitted any Zero-Knowledge rental applications yet.
               </p>
               <button className="btn-white-pill" onClick={() => setActiveTab('browse')}>
@@ -284,65 +301,40 @@ export default function TenantDashboard({ properties = [], applications = [], on
               </button>
             </div>
           ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              {myApplications.map(app => (
-                <div key={app.id} className="glass-card" style={{
-                  padding: '24px',
-                  borderRadius: '20px',
-                  background: 'rgba(12, 18, 25, 0.82)',
-                }}>
-                  <div style={{
-                    display: 'flex',
-                    justify: 'space-between',
-                    alignItems: 'flex-start',
-                    flexWrap: 'wrap',
-                    gap: '12px',
-                  }}>
-                    <div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-                        <span style={{
-                          background: 'rgba(107, 155, 118, 0.15)',
-                          color: '#6B9B76',
-                          border: '1px solid rgba(107, 155, 118, 0.3)',
-                          padding: '3px 10px',
-                          borderRadius: '999px',
-                          fontSize: '0.75rem',
-                          fontWeight: 600,
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '4px',
-                        }}>
-                          <ShieldCheck size={12} /> ZK Verified (Form 16)
-                        </span>
-                        {app.status === 'rejected' ? (
-                          <span style={{ background: 'rgba(239, 68, 68, 0.15)', color: '#ef4444', padding: '3px 10px', borderRadius: '999px', fontSize: '0.75rem', fontWeight: 600 }}>
-                            Owner Denied
-                          </span>
-                        ) : app.status === 'approved' ? (
-                          <span style={{ background: 'rgba(34, 197, 94, 0.15)', color: '#22c55e', padding: '3px 10px', borderRadius: '999px', fontSize: '0.75rem', fontWeight: 600 }}>
-                            Application Approved
-                          </span>
-                        ) : (
-                          <span style={{ background: 'rgba(235, 168, 52, 0.15)', color: '#EBA834', padding: '3px 10px', borderRadius: '999px', fontSize: '0.75rem', fontWeight: 600 }}>
-                            Pending Owner Review
-                          </span>
-                        )}
-                      </div>
-                      <h3 style={{ fontSize: '1.2rem', color: '#ffffff', marginBottom: '4px' }}>{app.property_title || `Property #${app.property_id}`}</h3>
-                      <div style={{ color: 'rgba(255, 255, 255, 0.5)', fontSize: '0.82rem' }}>
-                        Submitted on {new Date(app.created_at || Date.now()).toLocaleDateString()}
-                      </div>
-                    </div>
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fill, minmax(330px, 1fr))',
+              gap: '24px',
+            }}>
+              {myApplications.map(app => {
+                // Find matching property details from available properties list
+                const targetProp = allAvailableProperties.find(p => p.id === app.property_id) || {
+                  id: app.property_id,
+                  title: app.property_title || `Property Listing #${app.property_id}`,
+                  location: app.property_location || 'Prime Location',
+                  monthly_rent: app.monthly_rent || 75000,
+                  income_threshold: app.income_threshold || 225000,
+                  description: 'Zero-Knowledge Verified Application active on Midnight Network.',
+                  image_url: app.image_url || 'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=800&q=80',
+                };
 
-                    <div style={{ textAlign: 'right' }}>
-                      <div style={{ fontSize: '0.75rem', color: 'rgba(255, 255, 255, 0.5)', marginBottom: '2px' }}>Midnight Proof Status</div>
-                      <div style={{ color: '#6B9B76', fontSize: '0.85rem', fontWeight: 600 }}>
-                        🔒 Zero financial figures exposed
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
+                const isDenied = app.status === 'rejected';
+                const hasApplied = app.status === 'pending' || app.status === 'approved';
+
+                return (
+                  <PropertyCard
+                    key={app.id}
+                    property={targetProp}
+                    onApply={onApply}
+                    hasApplied={hasApplied}
+                    isDenied={isDenied}
+                    onViewDenial={() => setViewingDenialApp(app)}
+                    onWithdraw={onWithdraw}
+                    application={app}
+                    userRole="tenant"
+                  />
+                );
+              })}
             </div>
           )}
         </div>

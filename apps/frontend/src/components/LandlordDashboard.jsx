@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Building2, Plus, ShieldCheck, CheckCircle2, XCircle, Users, Sparkles, MapPin } from 'lucide-react';
+import { Building2, Plus, ShieldCheck, CheckCircle2, Users, Sparkles, MapPin } from 'lucide-react';
 
 export default function LandlordDashboard({ properties = [], applications = [], onOpenCreateModal, onUpdateStatus, currentUser }) {
   const [activeTab, setActiveTab] = useState('listings'); // 'listings' | 'applicants'
@@ -7,7 +7,10 @@ export default function LandlordDashboard({ properties = [], applications = [], 
   const [denialReason, setDenialReason] = useState('');
 
   const myProperties = properties.filter(p => p.landlord_id === currentUser.id);
-  const myPropertyIds = myProperties.map(p => p.id);
+  // Reduce listings from 50 to max 8 items
+  const displayListings = myProperties.length > 0 ? myProperties.slice(0, 8) : properties.slice(0, 8);
+
+  const myPropertyIds = displayListings.map(p => p.id);
   const receivedApplications = applications.filter(a => myPropertyIds.includes(a.property_id));
 
   const handleDenySubmit = (e) => {
@@ -19,7 +22,7 @@ export default function LandlordDashboard({ properties = [], applications = [], 
   };
 
   return (
-    <div className="animate-fade-in" style={{ padding: '20px 0 60px', width: '100%' }}>
+    <div className="animate-fade-in" style={{ padding: '10px 0 50px', width: '100%' }}>
       {/* Denial Explanation Modal */}
       {selectedAppForDenial && (
         <div style={{
@@ -38,14 +41,16 @@ export default function LandlordDashboard({ properties = [], applications = [], 
             width: '100%',
             padding: '30px',
             borderRadius: '24px',
-            background: 'rgba(14, 22, 31, 0.94)',
+            background: '#ffffff',
+            color: '#1a221b',
             border: '1px solid rgba(239, 68, 68, 0.3)',
+            boxShadow: '0 30px 80px rgba(0,0,0,0.2)',
           }} onClick={e => e.stopPropagation()}>
             <h3 style={{ fontSize: '1.2rem', color: '#ef4444', marginBottom: '12px' }}>
               Decline Application & Provide Feedback
             </h3>
 
-            <p style={{ fontSize: '0.86rem', color: 'rgba(255, 255, 255, 0.7)', marginBottom: '16px' }}>
+            <p style={{ fontSize: '0.86rem', color: '#555', marginBottom: '16px' }}>
               Specify why this applicant was not selected. Note that their salary and bank statements remain 100% Zero-Knowledge protected.
             </p>
 
@@ -55,12 +60,20 @@ export default function LandlordDashboard({ properties = [], applications = [], 
                 placeholder="e.g., Preferred move-in date was earlier, or another applicant was selected."
                 value={denialReason}
                 onChange={(e) => setDenialReason(e.target.value)}
-                style={{ marginBottom: '20px', fontSize: '0.88rem' }}
+                style={{
+                  width: '100%',
+                  padding: '12px',
+                  borderRadius: '12px',
+                  border: '1px solid rgba(0, 0, 0, 0.15)',
+                  fontSize: '0.88rem',
+                  marginBottom: '20px',
+                  outline: 'none',
+                }}
                 required
               />
 
               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
-                <button type="button" className="btn-glass" onClick={() => setSelectedAppForDenial(null)}>
+                <button type="button" className="btn-white-pill" style={{ background: '#FAF9F5', color: '#1a221b' }} onClick={() => setSelectedAppForDenial(null)}>
                   Cancel
                 </button>
                 <button type="submit" className="btn-white-pill" style={{ background: '#ef4444', color: '#ffffff' }}>
@@ -73,26 +86,26 @@ export default function LandlordDashboard({ properties = [], applications = [], 
       )}
 
       {/* Landlord Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '28px', flexWrap: 'wrap', gap: '16px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '24px', flexWrap: 'wrap', gap: '16px' }}>
         <div>
           <div style={{
             display: 'inline-flex',
             alignItems: 'center',
             gap: '8px',
-            background: 'rgba(107, 155, 118, 0.12)',
-            border: '1px solid rgba(107, 155, 118, 0.3)',
+            background: 'rgba(74, 124, 89, 0.12)',
+            border: '1px solid rgba(74, 124, 89, 0.3)',
             padding: '4px 12px',
             borderRadius: '999px',
-            marginBottom: '12px',
+            marginBottom: '10px',
             fontSize: '0.78rem',
-            color: '#6B9B76',
-            fontWeight: 600,
+            color: '#4A7C59',
+            fontWeight: 700,
           }}>
-            <Building2 size={13} /> Landlord Management Portal
+            <Building2 size={13} /> LANDLORD MANAGEMENT PORTAL
           </div>
-          <h2 style={{ fontSize: '2.2rem', fontWeight: 600, color: '#ffffff' }}>Property Listings & Applicants</h2>
-          <p style={{ color: 'rgba(255, 255, 255, 0.65)', fontSize: '0.92rem', marginTop: '4px' }}>
-            Welcome back, <strong style={{ color: '#ffffff' }}>{currentUser?.name || 'Ananya Verma'}</strong> • Zero liability storing private salary slips.
+          <h2 style={{ fontSize: '2.4rem', fontWeight: 600, color: '#1a221b' }}>Property Listings & Applicants</h2>
+          <p style={{ color: '#4a524b', fontSize: '0.92rem', marginTop: '4px' }}>
+            Welcome back, <strong style={{ color: '#1a221b' }}>{currentUser?.name || 'Ananya Verma'}</strong> • Showing up to 8 managed properties.
           </p>
         </div>
 
@@ -106,12 +119,12 @@ export default function LandlordDashboard({ properties = [], applications = [], 
       {/* Tabs */}
       <div style={{
         display: 'flex',
-        gap: '8px',
-        background: 'rgba(255, 255, 255, 0.06)',
+        gap: '6px',
+        background: 'rgba(0, 0, 0, 0.05)',
         padding: '4px',
         borderRadius: '999px',
-        border: '1px solid rgba(255, 255, 255, 0.1)',
-        marginBottom: '28px',
+        border: '1px solid rgba(0, 0, 0, 0.08)',
+        marginBottom: '24px',
         width: 'fit-content',
       }}>
         <button
@@ -119,27 +132,29 @@ export default function LandlordDashboard({ properties = [], applications = [], 
           style={{
             padding: '8px 20px',
             borderRadius: '999px',
-            background: activeTab === 'listings' ? '#ffffff' : 'transparent',
-            color: activeTab === 'listings' ? '#0c141d' : '#ffffff',
+            background: activeTab === 'listings' ? '#141a15' : 'transparent',
+            color: activeTab === 'listings' ? '#ffffff' : '#4a524b',
             border: 'none',
-            fontWeight: 600,
+            fontWeight: 700,
             cursor: 'pointer',
             fontSize: '0.85rem',
+            transition: 'all 0.2s ease',
           }}
         >
-          My Listings ({myProperties.length})
+          My Listings ({displayListings.length})
         </button>
         <button
           onClick={() => setActiveTab('applicants')}
           style={{
             padding: '8px 20px',
             borderRadius: '999px',
-            background: activeTab === 'applicants' ? '#ffffff' : 'transparent',
-            color: activeTab === 'applicants' ? '#0c141d' : '#ffffff',
+            background: activeTab === 'applicants' ? '#141a15' : 'transparent',
+            color: activeTab === 'applicants' ? '#ffffff' : '#4a524b',
             border: 'none',
-            fontWeight: 600,
+            fontWeight: 700,
             cursor: 'pointer',
             fontSize: '0.85rem',
+            transition: 'all 0.2s ease',
           }}
         >
           Received Applications ({receivedApplications.length})
@@ -152,8 +167,8 @@ export default function LandlordDashboard({ properties = [], applications = [], 
           gridTemplateColumns: 'repeat(auto-fill, minmax(330px, 1fr))',
           gap: '24px',
         }}>
-          {myProperties.map(property => (
-            <div key={property.id} className="glass-card" style={{ padding: '20px', borderRadius: '24px' }}>
+          {displayListings.map(property => (
+            <div key={property.id} className="glass-card" style={{ padding: '20px', borderRadius: '24px', background: '#ffffff', border: '1px solid rgba(0,0,0,0.08)' }}>
               <div style={{
                 height: '190px',
                 borderRadius: '16px',
@@ -182,10 +197,10 @@ export default function LandlordDashboard({ properties = [], applications = [], 
                 </span>
               </div>
 
-              <h3 style={{ fontSize: '1.2rem', fontWeight: 600, color: '#ffffff', marginBottom: '4px' }}>
+              <h3 style={{ fontSize: '1.2rem', fontWeight: 600, color: '#1a221b', marginBottom: '4px' }}>
                 {property.title}
               </h3>
-              <p style={{ fontSize: '0.85rem', color: 'rgba(255, 255, 255, 0.55)', marginBottom: '16px' }}>
+              <p style={{ fontSize: '0.85rem', color: '#555', marginBottom: '16px' }}>
                 {property.location}
               </p>
 
@@ -193,19 +208,20 @@ export default function LandlordDashboard({ properties = [], applications = [], 
                 display: 'grid',
                 gridTemplateColumns: '1fr 1fr',
                 gap: '10px',
-                background: 'rgba(255, 255, 255, 0.04)',
+                background: '#FAF9F5',
                 borderRadius: '14px',
                 padding: '12px',
+                border: '1px solid rgba(0, 0, 0, 0.05)',
               }}>
                 <div>
-                  <div style={{ fontSize: '0.7rem', color: 'rgba(255, 255, 255, 0.45)' }}>Monthly Rent</div>
-                  <div style={{ fontSize: '0.95rem', fontWeight: 700, color: '#ffffff' }}>
+                  <div style={{ fontSize: '0.7rem', color: '#666' }}>Monthly Rent</div>
+                  <div style={{ fontSize: '0.95rem', fontWeight: 700, color: '#1a221b' }}>
                     ₹{(property.monthly_rent || 0).toLocaleString('en-IN')}
                   </div>
                 </div>
                 <div>
-                  <div style={{ fontSize: '0.7rem', color: 'rgba(255, 255, 255, 0.45)' }}>Min Income Req.</div>
-                  <div style={{ fontSize: '0.95rem', fontWeight: 700, color: '#EBA834' }}>
+                  <div style={{ fontSize: '0.7rem', color: '#666' }}>Min Income Req.</div>
+                  <div style={{ fontSize: '0.95rem', fontWeight: 700, color: '#4A7C59' }}>
                     ₹{(property.income_threshold || 0).toLocaleString('en-IN')}
                   </div>
                 </div>
@@ -217,31 +233,31 @@ export default function LandlordDashboard({ properties = [], applications = [], 
         /* Received Applications Tab */
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           {receivedApplications.length === 0 ? (
-            <div className="glass-card" style={{ padding: '48px', textAlign: 'center', borderRadius: '24px' }}>
-              <p style={{ color: 'rgba(255, 255, 255, 0.6)', fontSize: '1.05rem' }}>
+            <div className="glass-card" style={{ padding: '48px', textAlign: 'center', borderRadius: '24px', background: '#ffffff' }}>
+              <p style={{ color: '#555', fontSize: '1.05rem' }}>
                 No applicant submissions received yet.
               </p>
             </div>
           ) : (
             receivedApplications.map(app => (
-              <div key={app.id} className="glass-card" style={{ padding: '24px', borderRadius: '20px' }}>
+              <div key={app.id} className="glass-card" style={{ padding: '24px', borderRadius: '20px', background: '#ffffff', border: '1px solid rgba(0,0,0,0.08)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '12px' }}>
                   <div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
                       <span style={{
-                        background: 'rgba(107, 155, 118, 0.15)',
-                        color: '#6B9B76',
-                        border: '1px solid rgba(107, 155, 118, 0.3)',
+                        background: 'rgba(74, 124, 89, 0.12)',
+                        color: '#4A7C59',
+                        border: '1px solid rgba(74, 124, 89, 0.25)',
                         padding: '3px 10px',
                         borderRadius: '999px',
                         fontSize: '0.75rem',
-                        fontWeight: 600,
+                        fontWeight: 700,
                       }}>
                         <ShieldCheck size={12} /> ZK Income Verified: PASS
                       </span>
                       <span style={{
-                        background: 'rgba(255, 255, 255, 0.08)',
-                        color: 'rgba(255, 255, 255, 0.7)',
+                        background: 'rgba(0, 0, 0, 0.05)',
+                        color: '#555',
                         padding: '3px 10px',
                         borderRadius: '999px',
                         fontSize: '0.75rem',
@@ -250,10 +266,10 @@ export default function LandlordDashboard({ properties = [], applications = [], 
                       </span>
                     </div>
 
-                    <h3 style={{ fontSize: '1.25rem', color: '#ffffff', marginBottom: '4px' }}>
+                    <h3 style={{ fontSize: '1.25rem', color: '#1a221b', marginBottom: '4px' }}>
                       Applicant #{app.tenant_id} &rarr; {app.property_title || `Property #${app.property_id}`}
                     </h3>
-                    <div style={{ fontSize: '0.82rem', color: 'rgba(255, 255, 255, 0.5)' }}>
+                    <div style={{ fontSize: '0.82rem', color: '#666' }}>
                       Submitted on {new Date(app.created_at || Date.now()).toLocaleDateString()}
                     </div>
                   </div>
@@ -270,8 +286,8 @@ export default function LandlordDashboard({ properties = [], applications = [], 
                         </button>
                         <button
                           onClick={() => setSelectedAppForDenial(app)}
-                          className="btn-glass"
-                          style={{ padding: '8px 16px', fontSize: '0.82rem', borderColor: 'rgba(239, 68, 68, 0.4)', color: '#ef4444' }}
+                          className="btn-white-pill"
+                          style={{ padding: '8px 16px', fontSize: '0.82rem', background: '#FAF9F5', color: '#ef4444', border: '1px solid rgba(239, 68, 68, 0.4)' }}
                         >
                           Decline
                         </button>
@@ -279,7 +295,7 @@ export default function LandlordDashboard({ properties = [], applications = [], 
                     ) : (
                       <span style={{
                         fontSize: '0.85rem',
-                        fontWeight: 600,
+                        fontWeight: 700,
                         color: app.status === 'approved' ? '#22c55e' : '#ef4444',
                         textTransform: 'capitalize',
                       }}>

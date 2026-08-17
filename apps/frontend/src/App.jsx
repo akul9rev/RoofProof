@@ -103,8 +103,10 @@ export default function App() {
     }
   };
 
+  const isPortalView = activeView === 'tenant' || activeView === 'landlord';
+
   return (
-    <div className="app-viewport-frame">
+    <div className={`app-viewport-frame ${isPortalView ? 'portal-white-frame' : ''}`}>
       <Navbar
         activeView={activeView}
         setActiveView={setActiveView}

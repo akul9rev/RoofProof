@@ -60,6 +60,45 @@ body {
   min-height: calc(100vh - 3.6rem);
   display: flex;
   flex-direction: column;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+/* White Portal Theme */
+.portal-white-frame {
+  background: #FAF9F5 !important;
+  color: #1a221b !important;
+  border: 1.5px solid rgba(0, 0, 0, 0.12) !important;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.18) !important;
+}
+
+.portal-white-frame h1,
+.portal-white-frame h2,
+.portal-white-frame h3,
+.portal-white-frame h4,
+.portal-white-frame h5,
+.portal-white-frame h6 {
+  color: #1a221b !important;
+}
+
+.portal-white-frame nav button {
+  color: #4a524b !important;
+}
+
+.portal-white-frame nav button:hover {
+  color: #1a221b !important;
+}
+
+.portal-white-frame .glass-card {
+  background: #ffffff !important;
+  color: #1a221b !important;
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04) !important;
+}
+
+.portal-white-frame .glass-card:hover {
+  background: #ffffff !important;
+  border-color: rgba(0, 0, 0, 0.18) !important;
+  transform: translateY(-3px);
 }
 
 @media (max-width: 768px) {
@@ -124,8 +163,8 @@ h1, h2, h3, h4, h5, h6 {
 
 /* White Pill Button */
 .btn-white-pill {
-  background: #ffffff;
-  color: #0c141d;
+  background: #141a15;
+  color: #ffffff;
   font-family: var(--font-body);
   font-weight: 700;
   font-size: 0.92rem;
@@ -138,14 +177,20 @@ h1, h2, h3, h4, h5, h6 {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
   text-decoration: none;
 }
 
+.hero-glass-frame .btn-white-pill,
+#about-section .btn-white-pill {
+  background: #ffffff;
+  color: #0c141d;
+}
+
 .btn-white-pill:hover {
-  background: #f1f5f9;
+  opacity: 0.9;
   transform: translateY(-2px);
-  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.25);
 }
 
 /* About Section Light Cream Box matching Image 2 */
