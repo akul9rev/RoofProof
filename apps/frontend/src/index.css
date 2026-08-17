@@ -44,15 +44,15 @@ body {
   overflow-x: hidden;
 }
 
-/* Glass Frame Wrapper */
+/* Glass Frame Wrapper - Transparent with Cabin Photo */
 .app-viewport-frame {
   max-width: 1280px;
   width: 92%;
   margin: 1.8rem auto;
   border-radius: var(--radius-xl);
-  background: rgba(8, 14, 20, 0.15);
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
+  background: rgba(8, 14, 20, 0.25);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
   border: 1.5px solid var(--border-glass);
   box-shadow: 0 40px 100px rgba(0, 0, 0, 0.75);
   padding: 2.2rem 3.2rem;
@@ -60,45 +60,6 @@ body {
   min-height: calc(100vh - 3.6rem);
   display: flex;
   flex-direction: column;
-  transition: background 0.3s ease, color 0.3s ease;
-}
-
-/* White Portal Theme */
-.portal-white-frame {
-  background: #FAF9F5 !important;
-  color: #1a221b !important;
-  border: 1.5px solid rgba(0, 0, 0, 0.12) !important;
-  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.18) !important;
-}
-
-.portal-white-frame h1,
-.portal-white-frame h2,
-.portal-white-frame h3,
-.portal-white-frame h4,
-.portal-white-frame h5,
-.portal-white-frame h6 {
-  color: #1a221b !important;
-}
-
-.portal-white-frame nav button {
-  color: #4a524b !important;
-}
-
-.portal-white-frame nav button:hover {
-  color: #1a221b !important;
-}
-
-.portal-white-frame .glass-card {
-  background: #ffffff !important;
-  color: #1a221b !important;
-  border: 1px solid rgba(0, 0, 0, 0.08) !important;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04) !important;
-}
-
-.portal-white-frame .glass-card:hover {
-  background: #ffffff !important;
-  border-color: rgba(0, 0, 0, 0.18) !important;
-  transform: translateY(-3px);
 }
 
 @media (max-width: 768px) {
@@ -161,10 +122,26 @@ h1, h2, h3, h4, h5, h6 {
   transform: translateY(-4px);
 }
 
+/* Clean White Property Card matching User Image */
+.white-property-card {
+  background: #ffffff !important;
+  color: #1a221b !important;
+  border-radius: 28px !important;
+  border: 1px solid rgba(255, 255, 255, 0.6) !important;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25) !important;
+  padding: 20px !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.white-property-card:hover {
+  transform: translateY(-5px) !important;
+  box-shadow: 0 22px 50px rgba(0, 0, 0, 0.35) !important;
+}
+
 /* White Pill Button */
 .btn-white-pill {
-  background: #141a15;
-  color: #ffffff;
+  background: #ffffff;
+  color: #0c141d;
   font-family: var(--font-body);
   font-weight: 700;
   font-size: 0.92rem;
@@ -177,20 +154,14 @@ h1, h2, h3, h4, h5, h6 {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
   text-decoration: none;
 }
 
-.hero-glass-frame .btn-white-pill,
-#about-section .btn-white-pill {
-  background: #ffffff;
-  color: #0c141d;
-}
-
 .btn-white-pill:hover {
-  opacity: 0.9;
+  background: #f1f5f9;
   transform: translateY(-2px);
-  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.35);
 }
 
 /* About Section Light Cream Box matching Image 2 */

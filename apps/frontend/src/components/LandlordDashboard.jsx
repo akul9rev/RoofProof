@@ -92,20 +92,20 @@ export default function LandlordDashboard({ properties = [], applications = [], 
             display: 'inline-flex',
             alignItems: 'center',
             gap: '8px',
-            background: 'rgba(74, 124, 89, 0.12)',
-            border: '1px solid rgba(74, 124, 89, 0.3)',
-            padding: '4px 12px',
+            background: 'rgba(107, 155, 118, 0.15)',
+            border: '1px solid rgba(107, 155, 118, 0.35)',
+            padding: '5px 14px',
             borderRadius: '999px',
-            marginBottom: '10px',
+            marginBottom: '12px',
             fontSize: '0.78rem',
-            color: '#4A7C59',
+            color: '#6B9B76',
             fontWeight: 700,
           }}>
             <Building2 size={13} /> LANDLORD MANAGEMENT PORTAL
           </div>
-          <h2 style={{ fontSize: '2.4rem', fontWeight: 600, color: '#1a221b' }}>Property Listings & Applicants</h2>
-          <p style={{ color: '#4a524b', fontSize: '0.92rem', marginTop: '4px' }}>
-            Welcome back, <strong style={{ color: '#1a221b' }}>{currentUser?.name || 'Ananya Verma'}</strong> • Showing up to 8 managed properties.
+          <h2 style={{ fontSize: '2.4rem', fontWeight: 600, color: '#ffffff' }}>Property Listings & Applicants</h2>
+          <p style={{ color: 'rgba(255, 255, 255, 0.75)', fontSize: '0.92rem', marginTop: '4px' }}>
+            Welcome back, <strong style={{ color: '#ffffff' }}>{currentUser?.name || 'Ananya Verma'}</strong> • Showing up to 8 managed properties.
           </p>
         </div>
 
@@ -120,10 +120,10 @@ export default function LandlordDashboard({ properties = [], applications = [], 
       <div style={{
         display: 'flex',
         gap: '6px',
-        background: 'rgba(0, 0, 0, 0.05)',
+        background: 'rgba(255, 255, 255, 0.08)',
         padding: '4px',
         borderRadius: '999px',
-        border: '1px solid rgba(0, 0, 0, 0.08)',
+        border: '1px solid rgba(255, 255, 255, 0.12)',
         marginBottom: '24px',
         width: 'fit-content',
       }}>
@@ -132,8 +132,8 @@ export default function LandlordDashboard({ properties = [], applications = [], 
           style={{
             padding: '8px 20px',
             borderRadius: '999px',
-            background: activeTab === 'listings' ? '#141a15' : 'transparent',
-            color: activeTab === 'listings' ? '#ffffff' : '#4a524b',
+            background: activeTab === 'listings' ? '#ffffff' : 'transparent',
+            color: activeTab === 'listings' ? '#0c141d' : 'rgba(255, 255, 255, 0.75)',
             border: 'none',
             fontWeight: 700,
             cursor: 'pointer',
@@ -148,8 +148,8 @@ export default function LandlordDashboard({ properties = [], applications = [], 
           style={{
             padding: '8px 20px',
             borderRadius: '999px',
-            background: activeTab === 'applicants' ? '#141a15' : 'transparent',
-            color: activeTab === 'applicants' ? '#ffffff' : '#4a524b',
+            background: activeTab === 'applicants' ? '#ffffff' : 'transparent',
+            color: activeTab === 'applicants' ? '#0c141d' : 'rgba(255, 255, 255, 0.75)',
             border: 'none',
             fontWeight: 700,
             cursor: 'pointer',
@@ -168,10 +168,10 @@ export default function LandlordDashboard({ properties = [], applications = [], 
           gap: '24px',
         }}>
           {displayListings.map(property => (
-            <div key={property.id} className="glass-card" style={{ padding: '20px', borderRadius: '24px', background: '#ffffff', border: '1px solid rgba(0,0,0,0.08)' }}>
+            <div key={property.id} className="white-property-card" style={{ padding: '20px' }}>
               <div style={{
                 height: '190px',
-                borderRadius: '16px',
+                borderRadius: '18px',
                 overflow: 'hidden',
                 marginBottom: '16px',
                 position: 'relative',
@@ -197,7 +197,7 @@ export default function LandlordDashboard({ properties = [], applications = [], 
                 </span>
               </div>
 
-              <h3 style={{ fontSize: '1.2rem', fontWeight: 600, color: '#1a221b', marginBottom: '4px' }}>
+              <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: '#1a221b', marginBottom: '4px' }}>
                 {property.title}
               </h3>
               <p style={{ fontSize: '0.85rem', color: '#555', marginBottom: '16px' }}>
@@ -233,14 +233,14 @@ export default function LandlordDashboard({ properties = [], applications = [], 
         /* Received Applications Tab */
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           {receivedApplications.length === 0 ? (
-            <div className="glass-card" style={{ padding: '48px', textAlign: 'center', borderRadius: '24px', background: '#ffffff' }}>
+            <div className="glass-card" style={{ padding: '48px', textAlign: 'center', borderRadius: '24px', background: '#ffffff', color: '#1a221b' }}>
               <p style={{ color: '#555', fontSize: '1.05rem' }}>
                 No applicant submissions received yet.
               </p>
             </div>
           ) : (
             receivedApplications.map(app => (
-              <div key={app.id} className="glass-card" style={{ padding: '24px', borderRadius: '20px', background: '#ffffff', border: '1px solid rgba(0,0,0,0.08)' }}>
+              <div key={app.id} className="white-property-card" style={{ padding: '24px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '12px' }}>
                   <div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
@@ -280,7 +280,7 @@ export default function LandlordDashboard({ properties = [], applications = [], 
                         <button
                           onClick={() => onUpdateStatus(app.id, 'approved')}
                           className="btn-white-pill"
-                          style={{ padding: '8px 18px', fontSize: '0.82rem' }}
+                          style={{ padding: '8px 18px', fontSize: '0.82rem', background: '#141a15', color: '#ffffff' }}
                         >
                           <CheckCircle2 size={14} /> Approve Applicant
                         </button>

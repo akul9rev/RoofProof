@@ -17,22 +17,21 @@ export default function PropertyCard({ property, onApply, hasApplied, isDenied, 
   const imageUrl = property.image_url || UNSPLASH_IMAGES[(property.id || 0) % UNSPLASH_IMAGES.length];
 
   return (
-    <div className="glass-card" style={{
+    <div className="white-property-card" style={{
       padding: '20px',
       display: 'flex',
       flexDirection: 'column',
       justifyContent: 'space-between',
       position: 'relative',
       overflow: 'hidden',
-      borderRadius: '24px',
     }}>
       <div>
-        {/* Unsplash Property Photo Header */}
+        {/* Unsplash Property Photo Header - Matching User Image */}
         <div style={{
-          height: '190px',
-          borderRadius: '16px',
+          height: '210px',
+          borderRadius: '20px',
           overflow: 'hidden',
-          marginBottom: '16px',
+          marginBottom: '18px',
           position: 'relative',
         }}>
           <img
@@ -46,30 +45,31 @@ export default function PropertyCard({ property, onApply, hasApplied, isDenied, 
             right: '12px',
             background: 'rgba(12, 18, 25, 0.88)',
             backdropFilter: 'blur(8px)',
-            padding: '4px 12px',
+            padding: '6px 14px',
             borderRadius: '999px',
-            fontSize: '0.74rem',
+            fontSize: '0.78rem',
             color: '#EBA834',
-            fontWeight: 600,
+            fontWeight: 700,
             display: 'flex',
             alignItems: 'center',
-            gap: '4px',
-            border: '1px solid rgba(235, 168, 52, 0.3)',
+            gap: '5px',
+            border: '1px solid rgba(235, 168, 52, 0.35)',
+            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
           }}>
-            <ShieldCheck size={13} /> ZK Eligible
+            <ShieldCheck size={14} /> ZK Eligible
           </span>
         </div>
 
-        <h3 style={{ fontSize: '1.25rem', marginBottom: '6px', lineHeight: 1.3, color: '#ffffff', fontWeight: 600 }}>
+        <h3 style={{ fontSize: '1.35rem', marginBottom: '6px', lineHeight: 1.25, color: '#1a221b', fontWeight: 700 }}>
           {property.title}
         </h3>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'rgba(255, 255, 255, 0.6)', fontSize: '0.86rem', marginBottom: '12px' }}>
-          <MapPin size={15} color="#EBA834" />
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#555e56', fontSize: '0.88rem', marginBottom: '12px' }}>
+          <MapPin size={15} color="#4A7C59" />
           <span>{property.location}</span>
         </div>
 
-        <p style={{ color: 'rgba(255, 255, 255, 0.7)', fontSize: '0.86rem', marginBottom: '18px', lineHeight: 1.5 }}>
+        <p style={{ color: '#4a524b', fontSize: '0.88rem', marginBottom: '18px', lineHeight: 1.5 }}>
           {property.description}
         </p>
       </div>
@@ -77,8 +77,8 @@ export default function PropertyCard({ property, onApply, hasApplied, isDenied, 
       <div>
         {/* Pricing & Requirement Box */}
         <div style={{
-          background: 'rgba(255, 255, 255, 0.04)',
-          border: '1px solid rgba(255, 255, 255, 0.08)',
+          background: '#FAF9F5',
+          border: '1px solid rgba(0, 0, 0, 0.08)',
           borderRadius: '16px',
           padding: '14px 16px',
           marginBottom: '18px',
@@ -87,19 +87,19 @@ export default function PropertyCard({ property, onApply, hasApplied, isDenied, 
           gap: '12px',
         }}>
           <div>
-            <div style={{ fontSize: '0.72rem', color: 'rgba(255, 255, 255, 0.5)', textTransform: 'uppercase', fontWeight: 600 }}>
+            <div style={{ fontSize: '0.72rem', color: '#666', textTransform: 'uppercase', fontWeight: 700 }}>
               Monthly Rent
             </div>
-            <div style={{ fontSize: '1.15rem', fontWeight: 700, color: '#ffffff' }}>
+            <div style={{ fontSize: '1.18rem', fontWeight: 800, color: '#1a221b' }}>
               {formattedRent}
             </div>
           </div>
 
           <div>
-            <div style={{ fontSize: '0.72rem', color: 'rgba(255, 255, 255, 0.5)', textTransform: 'uppercase', fontWeight: 600 }}>
+            <div style={{ fontSize: '0.72rem', color: '#666', textTransform: 'uppercase', fontWeight: 700 }}>
               Min. Income Req.
             </div>
-            <div style={{ fontSize: '1.15rem', fontWeight: 700, color: '#EBA834' }}>
+            <div style={{ fontSize: '1.18rem', fontWeight: 800, color: '#4A7C59' }}>
               {formattedThreshold}
             </div>
           </div>
@@ -112,18 +112,18 @@ export default function PropertyCard({ property, onApply, hasApplied, isDenied, 
               disabled 
               style={{
                 width: '100%',
-                padding: '10px',
+                padding: '12px',
                 borderRadius: '999px',
-                background: 'rgba(107, 155, 118, 0.15)',
-                color: '#6B9B76',
-                fontWeight: 600,
+                background: 'rgba(74, 124, 89, 0.12)',
+                color: '#4A7C59',
+                fontWeight: 700,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 gap: '8px',
                 cursor: 'default',
-                border: '1px solid rgba(107, 155, 118, 0.3)',
-                fontSize: '0.85rem',
+                border: '1px solid rgba(74, 124, 89, 0.3)',
+                fontSize: '0.88rem',
               }}
             >
               <ShieldCheck size={16} /> Applied with ZK Proof
@@ -138,7 +138,7 @@ export default function PropertyCard({ property, onApply, hasApplied, isDenied, 
                   borderRadius: '999px',
                   background: 'rgba(239, 68, 68, 0.1)',
                   color: '#ef4444',
-                  border: '1px solid rgba(239, 68, 68, 0.4)',
+                  border: '1px solid rgba(239, 68, 68, 0.3)',
                   fontWeight: 600,
                   fontSize: '0.8rem',
                   cursor: 'pointer',
@@ -160,15 +160,15 @@ export default function PropertyCard({ property, onApply, hasApplied, isDenied, 
                 width: '100%',
                 padding: '12px',
                 borderRadius: '999px',
-                background: 'rgba(239, 68, 68, 0.15)',
+                background: 'rgba(239, 68, 68, 0.12)',
                 color: '#ef4444',
-                fontWeight: 600,
+                fontWeight: 700,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 gap: '8px',
                 cursor: 'not-allowed',
-                border: '1px solid rgba(239, 68, 68, 0.4)',
+                border: '1px solid rgba(239, 68, 68, 0.3)',
               }}
             >
               <AlertCircle size={18} /> Owner Denied Application
@@ -180,7 +180,7 @@ export default function PropertyCard({ property, onApply, hasApplied, isDenied, 
                 style={{
                   background: 'transparent',
                   border: 'none',
-                  color: 'rgba(255, 255, 255, 0.7)',
+                  color: '#555',
                   fontSize: '0.8rem',
                   cursor: 'pointer',
                   textAlign: 'center',
@@ -196,13 +196,24 @@ export default function PropertyCard({ property, onApply, hasApplied, isDenied, 
           </div>
         ) : (
           <button
-            className="btn-white-pill"
             onClick={() => onApply(property)}
             style={{
               width: '100%',
-              justifyContent: 'center',
-              padding: '12px',
+              background: '#141a15',
+              color: '#ffffff',
+              fontFamily: 'var(--font-body)',
               fontSize: '0.88rem',
+              fontWeight: 700,
+              padding: '14px',
+              borderRadius: '999px',
+              border: 'none',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '8px',
+              boxShadow: '0 8px 20px rgba(0, 0, 0, 0.15)',
+              transition: 'all 0.2s ease',
             }}
           >
             Apply Privately (ZK Proof) <ArrowRight size={15} />

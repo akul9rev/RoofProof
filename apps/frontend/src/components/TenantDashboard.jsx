@@ -149,20 +149,20 @@ export default function TenantDashboard({ properties = [], applications = [], on
             display: 'inline-flex',
             alignItems: 'center',
             gap: '8px',
-            background: 'rgba(74, 124, 89, 0.12)',
-            border: '1px solid rgba(74, 124, 89, 0.3)',
-            padding: '4px 12px',
+            background: 'rgba(107, 155, 118, 0.15)',
+            border: '1px solid rgba(107, 155, 118, 0.35)',
+            padding: '5px 14px',
             borderRadius: '999px',
-            marginBottom: '10px',
+            marginBottom: '12px',
             fontSize: '0.78rem',
-            color: '#4A7C59',
+            color: '#6B9B76',
             fontWeight: 700,
           }}>
             <Sparkles size={13} /> TENANT PRIVACY PORTAL
           </div>
-          <h2 style={{ fontSize: '2.4rem', fontWeight: 600, color: '#1a221b' }}>Browse & Verify Luxury Rentals</h2>
-          <p style={{ color: '#4a524b', fontSize: '0.92rem', marginTop: '4px' }}>
-            Logged in as <strong style={{ color: '#1a221b' }}>{currentUser?.name || 'Rahul Sharma'}</strong> • Showing up to 8 exclusive properties.
+          <h2 style={{ fontSize: '2.4rem', fontWeight: 600, color: '#ffffff' }}>Browse & Verify Luxury Rentals</h2>
+          <p style={{ color: 'rgba(255, 255, 255, 0.75)', fontSize: '0.92rem', marginTop: '4px' }}>
+            Logged in as <strong style={{ color: '#ffffff' }}>{currentUser?.name || 'Rahul Sharma'}</strong> • Showing up to 8 exclusive properties.
           </p>
         </div>
 
@@ -170,18 +170,18 @@ export default function TenantDashboard({ properties = [], applications = [], on
         <div style={{
           display: 'flex',
           gap: '6px',
-          background: 'rgba(0, 0, 0, 0.05)',
+          background: 'rgba(255, 255, 255, 0.08)',
           padding: '4px',
           borderRadius: '999px',
-          border: '1px solid rgba(0, 0, 0, 0.08)',
+          border: '1px solid rgba(255, 255, 255, 0.12)',
         }}>
           <button
             onClick={() => setActiveTab('browse')}
             style={{
               padding: '8px 20px',
               borderRadius: '999px',
-              background: activeTab === 'browse' ? '#141a15' : 'transparent',
-              color: activeTab === 'browse' ? '#ffffff' : '#4a524b',
+              background: activeTab === 'browse' ? '#ffffff' : 'transparent',
+              color: activeTab === 'browse' ? '#0c141d' : 'rgba(255, 255, 255, 0.75)',
               border: 'none',
               fontWeight: 700,
               cursor: 'pointer',
@@ -196,8 +196,8 @@ export default function TenantDashboard({ properties = [], applications = [], on
             style={{
               padding: '8px 20px',
               borderRadius: '999px',
-              background: activeTab === 'my-applications' ? '#141a15' : 'transparent',
-              color: activeTab === 'my-applications' ? '#ffffff' : '#4a524b',
+              background: activeTab === 'my-applications' ? '#ffffff' : 'transparent',
+              color: activeTab === 'my-applications' ? '#0c141d' : 'rgba(255, 255, 255, 0.75)',
               border: 'none',
               fontWeight: 700,
               cursor: 'pointer',
@@ -221,11 +221,11 @@ export default function TenantDashboard({ properties = [], applications = [], on
             flexWrap: 'wrap',
             alignItems: 'center',
             borderRadius: '20px',
-            background: '#ffffff',
-            border: '1px solid rgba(0, 0, 0, 0.08)',
+            background: 'rgba(12, 18, 25, 0.88)',
+            border: '1px solid rgba(255, 255, 255, 0.14)',
           }}>
-            <div style={{ flex: '1 1 260px', display: 'flex', alignItems: 'center', gap: '10px', background: '#FAF9F5', padding: '10px 14px', borderRadius: '14px', border: '1px solid rgba(0, 0, 0, 0.06)' }}>
-              <Search size={16} color="#666" />
+            <div style={{ flex: '1 1 260px', display: 'flex', alignItems: 'center', gap: '10px', background: 'rgba(255, 255, 255, 0.05)', padding: '10px 14px', borderRadius: '14px', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
+              <Search size={16} color="rgba(255,255,255,0.5)" />
               <input
                 type="text"
                 placeholder="Search location, title, or amenities..."
@@ -235,15 +235,15 @@ export default function TenantDashboard({ properties = [], applications = [], on
                   background: 'transparent',
                   border: 'none',
                   outline: 'none',
-                  color: '#1a221b',
+                  color: '#ffffff',
                   width: '100%',
                   fontSize: '0.88rem',
                 }}
               />
             </div>
 
-            <div style={{ flex: '0 1 200px', display: 'flex', alignItems: 'center', gap: '10px', background: '#FAF9F5', padding: '10px 14px', borderRadius: '14px', border: '1px solid rgba(0, 0, 0, 0.06)' }}>
-              <Filter size={16} color="#666" />
+            <div style={{ flex: '0 1 200px', display: 'flex', alignItems: 'center', gap: '10px', background: 'rgba(255, 255, 255, 0.05)', padding: '10px 14px', borderRadius: '14px', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
+              <Filter size={16} color="rgba(255,255,255,0.5)" />
               <input
                 type="number"
                 placeholder="Max Rent (₹)"
@@ -253,7 +253,7 @@ export default function TenantDashboard({ properties = [], applications = [], on
                   background: 'transparent',
                   border: 'none',
                   outline: 'none',
-                  color: '#1a221b',
+                  color: '#ffffff',
                   width: '100%',
                   fontSize: '0.88rem',
                 }}
@@ -261,7 +261,7 @@ export default function TenantDashboard({ properties = [], applications = [], on
             </div>
           </div>
 
-          {/* Properties Grid with Max 8 Items */}
+          {/* Properties Grid with White Cards */}
           <div style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fill, minmax(330px, 1fr))',
@@ -292,8 +292,8 @@ export default function TenantDashboard({ properties = [], applications = [], on
         /* My Applications Tab showing Available Applied Properties */
         <div>
           {myApplications.length === 0 ? (
-            <div className="glass-card" style={{ padding: '48px', textAlign: 'center', borderRadius: '24px', background: '#ffffff' }}>
-              <p style={{ color: '#555', fontSize: '1.05rem', marginBottom: '20px' }}>
+            <div className="glass-card" style={{ padding: '48px', textAlign: 'center', borderRadius: '24px', background: 'rgba(12, 18, 25, 0.85)' }}>
+              <p style={{ color: 'rgba(255, 255, 255, 0.65)', fontSize: '1.05rem', marginBottom: '20px' }}>
                 You haven't submitted any Zero-Knowledge rental applications yet.
               </p>
               <button className="btn-white-pill" onClick={() => setActiveTab('browse')}>
@@ -307,7 +307,6 @@ export default function TenantDashboard({ properties = [], applications = [], on
               gap: '24px',
             }}>
               {myApplications.map(app => {
-                // Find matching property details from available properties list
                 const targetProp = allAvailableProperties.find(p => p.id === app.property_id) || {
                   id: app.property_id,
                   title: app.property_title || `Property Listing #${app.property_id}`,
