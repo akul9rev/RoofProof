@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
 import { Building2, Plus, ShieldCheck, CheckCircle2, Users, Sparkles } from 'lucide-react';
 import { EXACT_USER_DATASET } from './TenantDashboard';
+import PropertyCard from './PropertyCard';
 
-export default function LandlordDashboard({ properties = [], applications = [], onOpenCreateModal, onUpdateStatus, currentUser }) {
+export default function LandlordDashboard({ properties = [], applications = [], onOpenCreateModal, onUpdateStatus, onDeleteProperty, currentUser }) {
   const [activeTab, setActiveTab] = useState('listings'); // 'listings' | 'applicants'
   const [selectedAppForDenial, setSelectedAppForDenial] = useState(null);
   const [denialReason, setDenialReason] = useState('');
 
-  const myProperties = properties.filter(p => p.landlord_id === currentUser.id);
-  const displayListings = myProperties.length > 0 ? myProperties.slice(0, 8) : EXACT_USER_DATASET.slice(0, 8);
+  const myProperties = properties.filter(p => p.landlord_id === currentUser?.id);
+  const displayListings = myProperties.length > 0 ? myProperties.slice(0, 9) : EXACT_USER_DATASET.slice(0, 9);
 
   const myPropertyIds = displayListings.map(p => p.id);
   const receivedApplications = applications.filter(a => myPropertyIds.includes(a.property_id));
@@ -105,7 +106,7 @@ export default function LandlordDashboard({ properties = [], applications = [], 
           </div>
           <h2 style={{ fontSize: '2.4rem', fontWeight: 600, color: '#ffffff' }}>Property Listings & Applicants</h2>
           <p style={{ color: 'rgba(255, 255, 255, 0.75)', fontSize: '0.92rem', marginTop: '4px' }}>
-            Welcome back, <strong style={{ color: '#ffffff' }}>{currentUser?.name || 'Ananya Verma'}</strong> • Showing up to 8 managed properties.
+            Welcome back, <strong style={{ color: '#ffffff' }}>{currentUser?.name || 'Ananya Verma'}</strong> • Showing up to 9 managed properties per page.
           </p>
         </div>
 
@@ -168,65 +169,12 @@ export default function LandlordDashboard({ properties = [], applications = [], 
           gap: '24px',
         }}>
           {displayListings.map(property => (
-            <div key={property.id} className="white-property-card" style={{ padding: '20px' }}>
-              <div style={{
-                height: '190px',
-                borderRadius: '18px',
-                overflow: 'hidden',
-                marginBottom: '16px',
-                position: 'relative',
-              }}>
-                <img
-                  src={property.image_url || 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800&q=80'}
-                  alt={property.title}
-                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                />
-                <span style={{
-                  position: 'absolute',
-                  top: '12px',
-                  right: '12px',
-                  background: 'rgba(12, 18, 25, 0.85)',
-                  backdropFilter: 'blur(8px)',
-                  padding: '4px 10px',
-                  borderRadius: '999px',
-                  fontSize: '0.72rem',
-                  color: '#6B9B76',
-                  fontWeight: 600,
-                }}>
-                  Active Listing
-                </span>
-              </div>
-
-              <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: '#1a221b', marginBottom: '4px' }}>
-                {property.title}
-              </h3>
-              <p style={{ fontSize: '0.85rem', color: '#555', marginBottom: '16px' }}>
-                {property.location}
-              </p>
-
-              <div style={{
-                display: 'grid',
-                gridTemplateColumns: '1fr 1fr',
-                gap: '10px',
-                background: '#FAF9F5',
-                borderRadius: '14px',
-                padding: '12px',
-                border: '1px solid rgba(0, 0, 0, 0.05)',
-              }}>
-                <div>
-                  <div style={{ fontSize: '0.7rem', color: '#666' }}>Monthly Rent</div>
-                  <div style={{ fontSize: '0.95rem', fontWeight: 700, color: '#1a221b' }}>
-                    ₹{(property.monthly_rent || 0).toLocaleString('en-IN')}
-                  </div>
-                </div>
-                <div>
-                  <div style={{ fontSize: '0.7rem', color: '#666' }}>Min Income Req.</div>
-                  <div style={{ fontSize: '0.95rem', fontWeight: 700, color: '#4A7C59' }}>
-                    ₹{(property.income_threshold || 0).toLocaleString('en-IN')}
-                  </div>
-                </div>
-              </div>
-            </div>
+            <PropertyCard
+              key={property.id}
+              property={property}
+              onDelete={onDeleteProperty}
+              userRole="landlord"
+            />
           ))}
         </div>
       ) : (

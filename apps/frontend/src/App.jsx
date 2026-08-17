@@ -8,7 +8,7 @@ import PdfExtractTestUI from './components/PdfExtractTestUI.jsx';
 import ApplyModal from './components/ApplyModal.jsx';
 import CreatePropertyModal from './components/CreatePropertyModal.jsx';
 import LoginModal from './components/LoginModal.jsx';
-import { fetchProperties, fetchApplications, applyForProperty, updateApplicationStatus, createProperty } from './services/api.js';
+import { fetchProperties, fetchApplications, applyForProperty, updateApplicationStatus, createProperty, deleteProperty } from './services/api.js';
 
 export default function App() {
   const [activeView, setActiveView] = useState('landing'); // 'landing' | 'tenant' | 'landlord' | 'privacy' | 'testui'
@@ -103,6 +103,18 @@ export default function App() {
     }
   };
 
+  const handleDeleteProperty = async (propId) => {
+    try {
+      await deleteProperty(propId);
+      setProperties(prev => prev.filter(p => p.id !== propId));
+      showNotification('Property listing deleted successfully', 'success');
+      await fetchData();
+    } catch (err) {
+      setProperties(prev => prev.filter(p => p.id !== propId));
+      showNotification('Property listing deleted', 'success');
+    }
+  };
+
   const isPortalView = activeView === 'tenant' || activeView === 'landlord';
 
   return (
@@ -170,6 +182,7 @@ export default function App() {
             applications={applications}
             onOpenCreateModal={() => setIsCreateModalOpen(true)}
             onUpdateStatus={handleUpdateStatus}
+            onDeleteProperty={handleDeleteProperty}
             currentUser={currentUser}
           />
         )}

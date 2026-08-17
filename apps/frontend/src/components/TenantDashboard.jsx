@@ -192,7 +192,7 @@ export default function TenantDashboard({ properties = [], applications = [], on
   const [activeTab, setActiveTab] = useState('browse'); // 'browse' | 'my-applications'
   const [viewingDenialApp, setViewingDenialApp] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const ITEMS_PER_PAGE = 8;
+  const ITEMS_PER_PAGE = 9;
 
   const myApplications = applications.filter(a => a.tenant_id === currentUser.id);
 

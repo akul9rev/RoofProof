@@ -24,6 +24,13 @@ export async function createProperty(data) {
   return res.json();
 }
 
+export async function deleteProperty(id) {
+  const res = await fetch(`${API_BASE}/properties/${id}`, {
+    method: 'DELETE',
+  });
+  return res.json();
+}
+
 export async function fetchApplications() {
   const res = await fetch(`${API_BASE}/applications`);
   return res.json();
