@@ -1,7 +1,7 @@
 import { pool } from './index.js';
 
 export async function migrate() {
-  console.log('[DB Migrate] Running PostgreSQL migrations for RoofProof...');
+  console.log('[DB Migrate] Resetting and migrating database with user uploaded house images...');
   const client = await pool.connect();
   try {
     await client.query('BEGIN');
@@ -58,39 +58,37 @@ export async function migrate() {
       ALTER TABLE applications ADD COLUMN IF NOT EXISTS rejection_reason TEXT;
     `);
 
-    // 4. Seed Real Landlords & Tenants if table is empty
-    const userCheck = await client.query('SELECT COUNT(*) FROM users;');
-    if (parseInt(userCheck.rows[0].count, 10) === 0) {
-      console.log('[DB Migrate] Seeding real landlords & tenants...');
-      await client.query(`
-        INSERT INTO users (id, name, email, role, phone, city, occupation, organization) VALUES
-        (1, 'Rohan Mehta', 'rohan.mehta@roofproof.demo', 'landlord', '+91 98200 11223', 'Coorg, KA', NULL, 'Mehta Luxury Estates'),
-        (2, 'Priya Nair', 'priya.nair@roofproof.demo', 'landlord', '+91 98450 33445', 'Jaipur, RJ', NULL, 'Heritage Living India'),
-        (3, 'Arjun Sharma', 'arjun.sharma@roofproof.demo', 'tenant', '+91 98765 43210', 'Bangalore, KA', 'Senior Software Engineer', NULL),
-        (4, 'Neha Kapoor', 'neha.kapoor@roofproof.demo', 'tenant', '+91 98111 22334', 'Mumbai, MH', 'Product Lead', NULL);
-        ALTER SEQUENCE users_id_seq RESTART WITH 5;
-      `);
-    }
+    // 4. Wipe all stale data cleanly
+    await client.query('TRUNCATE TABLE applications, properties, users RESTART IDENTITY CASCADE;');
 
-    // 5. Seed Real Properties from landlords if table is empty
-    const propCheck = await client.query('SELECT COUNT(*) FROM properties;');
-    if (parseInt(propCheck.rows[0].count, 10) === 0) {
-      console.log('[DB Migrate] Seeding real property listings from Rohan Mehta & Priya Nair...');
-      await client.query(`
-        INSERT INTO properties (id, landlord_id, title, property_type, location, monthly_rent, income_threshold, description, image_url) VALUES
-        (1, 1, 'Misty Valley Pool Villa', 'Luxury Villa', 'Coorg, Karnataka', 65000, 195000, '3 BHK luxury villa with a private pool, spacious outdoor area, mountain views, furnished living spaces, and a modern kitchen.', 'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80'),
-        (2, 1, 'Royal Courtyard Residence', 'Heritage House', 'Udaipur, Rajasthan', 55000, 165000, 'Spacious heritage-style residence with a private courtyard, traditional interiors, large living areas, and a peaceful setting.', 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80'),
-        (3, 1, 'Greenview Family Home', 'Family House', 'Bangalore, Karnataka', 38000, 114000, 'Comfortable 3 BHK family home with generous natural light, multiple balconies, a quiet neighborhood, and nearby residential amenities.', 'https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?auto=format&fit=crop&w=800&q=80'),
-        (4, 1, 'Heritage Garden Bungalow', 'Bungalow', 'Ooty, Tamil Nadu', 48000, 144000, 'Charming 3 BHK bungalow with a large garden, traditional architecture, wooden interiors, spacious rooms, and a peaceful hill-station setting.', 'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=800&q=80'),
-        (5, 2, 'Pink Palace Residence', 'Luxury Residence', 'Jaipur, Rajasthan', 72000, 216000, 'Elegant 3 BHK residence inspired by Jaipur architecture, featuring ornate interiors, spacious common areas, and a distinctive heritage character.', 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80'),
-        (6, 2, 'Colorful Heritage Home', 'Independent House', 'Kolkata, West Bengal', 32000, 96000, 'Characterful 2 BHK independent home with colorful traditional architecture, bright interiors, private entry, and a quiet residential setting.', 'https://images.unsplash.com/photo-1567496898669-ee935f5f647a?auto=format&fit=crop&w=800&q=80'),
-        (7, 2, 'Traditional Courtyard House', 'Family House', 'Madurai, Tamil Nadu', 28000, 84000, 'Traditional 3 BHK family house with a covered front veranda, spacious rooms, tiled flooring, classic woodwork, and a private entrance.', 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800&q=80');
-        ALTER SEQUENCE properties_id_seq RESTART WITH 8;
-      `);
-    }
+    // 5. Seed Real Landlords (2) & Tenants (2)
+    console.log('[DB Migrate] Seeding 2 Landlords and 2 Tenants...');
+    await client.query(`
+      INSERT INTO users (id, name, email, role, phone, city, occupation, organization) VALUES
+      (1, 'Rohan Mehta', 'rohan.mehta@roofproof.demo', 'landlord', '+91 98200 11223', 'Coorg, KA', NULL, 'Mehta Luxury Estates'),
+      (2, 'Priya Nair', 'priya.nair@roofproof.demo', 'landlord', '+91 98450 33445', 'Jaipur, RJ', NULL, 'Heritage Living India'),
+      (3, 'Arjun Sharma', 'arjun.sharma@roofproof.demo', 'tenant', '+91 98765 43210', 'Bangalore, KA', 'Senior Software Engineer', NULL),
+      (4, 'Neha Kapoor', 'neha.kapoor@roofproof.demo', 'tenant', '+91 98111 22334', 'Mumbai, MH', 'Product Lead', NULL);
+      ALTER SEQUENCE users_id_seq RESTART WITH 5;
+    `);
+
+    // 6. Seed 7 Real Properties using exact user uploaded house images
+    // Landlord 1 (Rohan Mehta): 4 Houses | Landlord 2 (Priya Nair): 3 Houses
+    console.log('[DB Migrate] Seeding 7 properties (4 by Rohan Mehta, 3 by Priya Nair) with uploaded images...');
+    await client.query(`
+      INSERT INTO properties (id, landlord_id, title, property_type, location, monthly_rent, income_threshold, description, image_url) VALUES
+      (1, 1, 'Misty Valley Pool Villa', 'Luxury Villa', 'Coorg, Karnataka', 65000, 195000, '3 BHK luxury villa with a private pool, spacious outdoor area, mountain views, furnished living spaces, and a modern kitchen.', '/houses/house1.jpg'),
+      (2, 1, 'Royal Courtyard Residence', 'Heritage House', 'Udaipur, Rajasthan', 55000, 165000, 'Spacious heritage-style residence with a private courtyard, traditional interiors, large living areas, and a peaceful setting.', '/houses/house2.jpg'),
+      (3, 1, 'Heritage Garden Bungalow', 'Bungalow', 'Ooty, Tamil Nadu', 48000, 144000, 'Charming 3 BHK bungalow with a large garden, traditional architecture, wooden interiors, spacious rooms, and a peaceful hill-station setting.', '/houses/house3.jpg'),
+      (4, 1, 'Greenview Family Home', 'Family House', 'Bangalore, Karnataka', 38000, 114000, 'Comfortable 3 BHK family home with generous natural light, multiple balconies, a quiet neighborhood, and nearby residential amenities.', '/houses/house4.jpg'),
+      (5, 2, 'Pink Palace Residence', 'Luxury Residence', 'Jaipur, Rajasthan', 72000, 216000, 'Elegant 3 BHK residence inspired by Jaipur architecture, featuring ornate interiors, spacious common areas, and a distinctive heritage character.', '/houses/house5.jpg'),
+      (6, 2, 'Glassfront Modern Estate', 'Modern Villa', 'Kolkata, West Bengal', 52000, 156000, 'Characterful independent modern villa with glass facades, bright interiors, private entry, and a quiet residential setting.', '/houses/house6.jpg'),
+      (7, 2, 'Traditional Courtyard House', 'Family House', 'Madurai, Tamil Nadu', 28000, 84000, 'Traditional 3 BHK family house with a covered front veranda, spacious rooms, tiled flooring, classic woodwork, and a private entrance.', '/houses/house7.jpg');
+      ALTER SEQUENCE properties_id_seq RESTART WITH 8;
+    `);
 
     await client.query('COMMIT');
-    console.log('[DB Migrate] ✓ Migrations & Real Dataset Seeding completed successfully.');
+    console.log('[DB Migrate] ✓ Clean reset completed: 7 properties created with uploaded house images.');
   } catch (err) {
     await client.query('ROLLBACK');
     console.error('[DB Migrate Error]', err.message);
