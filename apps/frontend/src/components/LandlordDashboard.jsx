@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Building2, Plus, ShieldCheck, CheckCircle2, Users, Sparkles, MapPin } from 'lucide-react';
+import { Building2, Plus, ShieldCheck, CheckCircle2, Users, Sparkles } from 'lucide-react';
+import { EXACT_USER_DATASET } from './TenantDashboard';
 
 export default function LandlordDashboard({ properties = [], applications = [], onOpenCreateModal, onUpdateStatus, currentUser }) {
   const [activeTab, setActiveTab] = useState('listings'); // 'listings' | 'applicants'
@@ -7,8 +8,7 @@ export default function LandlordDashboard({ properties = [], applications = [], 
   const [denialReason, setDenialReason] = useState('');
 
   const myProperties = properties.filter(p => p.landlord_id === currentUser.id);
-  // Reduce listings from 50 to max 8 items
-  const displayListings = myProperties.length > 0 ? myProperties.slice(0, 8) : properties.slice(0, 8);
+  const displayListings = myProperties.length > 0 ? myProperties.slice(0, 8) : EXACT_USER_DATASET.slice(0, 8);
 
   const myPropertyIds = displayListings.map(p => p.id);
   const receivedApplications = applications.filter(a => myPropertyIds.includes(a.property_id));
@@ -177,7 +177,7 @@ export default function LandlordDashboard({ properties = [], applications = [], 
                 position: 'relative',
               }}>
                 <img
-                  src={property.image_url || 'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=800&q=80'}
+                  src={property.image_url || 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800&q=80'}
                   alt={property.title}
                   style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                 />

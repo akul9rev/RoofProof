@@ -1,6 +1,190 @@
 import React, { useState } from 'react';
 import PropertyCard from './PropertyCard';
-import { Search, Filter, ShieldCheck, Sparkles, AlertCircle, XCircle, Info, X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Search, Filter, Sparkles, AlertCircle, X, ChevronLeft, ChevronRight } from 'lucide-react';
+
+// Exact User-Provided Property Dataset (18 items)
+export const EXACT_USER_DATASET = [
+  {
+    id: 1,
+    title: 'The Palm Court Residence',
+    type: 'Family Apartment',
+    location: 'Indiranagar, Bangalore',
+    monthly_rent: 42000,
+    income_threshold: 120000,
+    description: 'Spacious 2 BHK in a quiet residential lane.',
+    image_url: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800&q=80',
+  },
+  {
+    id: 2,
+    title: 'Misty Peak Villa',
+    type: 'Villa',
+    location: 'Dehradun, Uttarakhand',
+    monthly_rent: 55000,
+    income_threshold: 165000,
+    description: '3 BHK hillside villa with a private garden.',
+    image_url: 'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=800&q=80',
+  },
+  {
+    id: 3,
+    title: 'Urban Nest Studio',
+    type: 'Bachelor House',
+    location: 'Hinjewadi, Pune',
+    monthly_rent: 18000,
+    income_threshold: 55000,
+    description: 'Compact furnished studio ideal for working professionals.',
+    image_url: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=800&q=80',
+  },
+  {
+    id: 4,
+    title: 'Amber Heights',
+    type: 'Society Apartment',
+    location: 'Noida Sector 137, UP',
+    monthly_rent: 32000,
+    income_threshold: 95000,
+    description: 'Modern 2 BHK in a gated residential society.',
+    image_url: 'https://images.unsplash.com/photo-1570129477492-45c003edd2be?auto=format&fit=crop&w=800&q=80',
+  },
+  {
+    id: 5,
+    title: 'Lakeview Family Home',
+    type: 'Independent House',
+    location: 'Bhopal, Madhya Pradesh',
+    monthly_rent: 28000,
+    income_threshold: 85000,
+    description: 'Peaceful 3 BHK home near Upper Lake.',
+    image_url: 'https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?auto=format&fit=crop&w=800&q=80',
+  },
+  {
+    id: 6,
+    title: 'The Heritage Bungalow',
+    type: 'Bungalow',
+    location: 'Alipore, Kolkata',
+    monthly_rent: 85000,
+    income_threshold: 255000,
+    description: 'Spacious heritage-style bungalow with landscaped grounds.',
+    image_url: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80',
+  },
+  {
+    id: 7,
+    title: 'Coconut Grove Villa',
+    type: 'Villa',
+    location: 'Panaji, Goa',
+    monthly_rent: 70000,
+    income_threshold: 210000,
+    description: 'Tropical 3 BHK villa with an open courtyard.',
+    image_url: 'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80',
+  },
+  {
+    id: 8,
+    title: 'Metroline Residency',
+    type: 'Society Apartment',
+    location: 'Andheri West, Mumbai',
+    monthly_rent: 68000,
+    income_threshold: 205000,
+    description: 'Well-connected 2 BHK close to metro and commercial hubs.',
+    image_url: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=800&q=80',
+  },
+  {
+    id: 9,
+    title: 'Aravali Garden House',
+    type: 'Family House',
+    location: 'Gurugram, Haryana',
+    monthly_rent: 48000,
+    income_threshold: 145000,
+    description: 'Comfortable 3 BHK independent home in a residential area.',
+    image_url: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=800&q=80',
+  },
+  {
+    id: 10,
+    title: 'Snowline Retreat',
+    type: 'Luxury Villa',
+    location: 'Manali, Himachal Pradesh',
+    monthly_rent: 75000,
+    income_threshold: 225000,
+    description: 'Mountain-facing 3 BHK villa designed for long stays.',
+    image_url: 'https://images.unsplash.com/photo-1510798831971-661eb04b3739?auto=format&fit=crop&w=800&q=80',
+  },
+  {
+    id: 11,
+    title: 'Pearl Residency',
+    type: 'Family Apartment',
+    location: 'Kochi, Kerala',
+    monthly_rent: 30000,
+    income_threshold: 90000,
+    description: 'Bright 2 BHK apartment in a secure community.',
+    image_url: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=800&q=80',
+  },
+  {
+    id: 12,
+    title: 'Old City Courtyard Home',
+    type: 'Independent House',
+    location: 'Jaipur, Rajasthan',
+    monthly_rent: 38000,
+    income_threshold: 115000,
+    description: 'Traditional 3 BHK home with a private courtyard.',
+    image_url: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80',
+  },
+  {
+    id: 13,
+    title: 'TechPark Bachelor Loft',
+    type: 'Bachelor House',
+    location: 'Whitefield, Bangalore',
+    monthly_rent: 24000,
+    income_threshold: 72000,
+    description: 'Furnished 1 BHK designed for young professionals.',
+    image_url: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=800&q=80',
+  },
+  {
+    id: 14,
+    title: 'Riverfront Heights',
+    type: 'Society Apartment',
+    location: 'Ahmedabad, Gujarat',
+    monthly_rent: 35000,
+    income_threshold: 105000,
+    description: 'Modern 2 BHK apartment overlooking the Sabarmati Riverfront.',
+    image_url: 'https://images.unsplash.com/photo-1493809842364-78817add7ffb?auto=format&fit=crop&w=800&q=80',
+  },
+  {
+    id: 15,
+    title: 'Green Valley Bungalow',
+    type: 'Bungalow',
+    location: 'Chandigarh',
+    monthly_rent: 62000,
+    income_threshold: 185000,
+    description: 'Spacious 4 BHK bungalow with a private lawn.',
+    image_url: 'https://images.unsplash.com/photo-1600566753376-12c8ab7fb75b?auto=format&fit=crop&w=800&q=80',
+  },
+  {
+    id: 16,
+    title: 'Coral Bay Residence',
+    type: 'Family Apartment',
+    location: 'Chennai, Tamil Nadu',
+    monthly_rent: 36000,
+    income_threshold: 108000,
+    description: 'Airy 2 BHK apartment in a family-friendly neighborhood.',
+    image_url: 'https://images.unsplash.com/photo-1502005229762-cf1b2da7c5d6?auto=format&fit=crop&w=800&q=80',
+  },
+  {
+    id: 17,
+    title: 'Hawa Mahal Residency',
+    type: 'Heritage Apartment',
+    location: 'Jaipur, Rajasthan',
+    monthly_rent: 29000,
+    income_threshold: 87000,
+    description: 'Renovated 2 BHK combining traditional architecture with modern interiors.',
+    image_url: 'https://images.unsplash.com/photo-1600585152220-90363fe7e115?auto=format&fit=crop&w=800&q=80',
+  },
+  {
+    id: 18,
+    title: 'Narmada View House',
+    type: 'Family House',
+    location: 'Indore, Madhya Pradesh',
+    monthly_rent: 26000,
+    income_threshold: 78000,
+    description: 'Practical 3 BHK home suited for a small family.',
+    image_url: 'https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?auto=format&fit=crop&w=800&q=80',
+  },
+];
 
 export default function TenantDashboard({ properties = [], applications = [], onApply, onWithdraw, currentUser }) {
   const [searchTerm, setSearchTerm] = useState('');
@@ -12,195 +196,13 @@ export default function TenantDashboard({ properties = [], applications = [], on
 
   const myApplications = applications.filter(a => a.tenant_id === currentUser.id);
 
-  // 20 Diverse India-Specific Properties across various budgets and home types
-  const defaultProperties = [
-    {
-      id: 1,
-      title: 'Himalayan Pine Wooden Villa',
-      location: 'Manali, Himachal Pradesh',
-      monthly_rent: 45000,
-      income_threshold: 135000,
-      description: 'Cozy 2 BHK pine wood villa with mountain view balcony, fireplace, and private apple orchard yard.',
-      image_url: 'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=800&q=80',
-    },
-    {
-      id: 2,
-      title: 'Cozy 1 BHK Bachelor Pad',
-      location: 'Koramangala, Bangalore',
-      monthly_rent: 18000,
-      income_threshold: 54000,
-      description: 'Compact fully-furnished 1 BHK apartment close to tech parks with high-speed fiber internet and power backup.',
-      image_url: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=800&q=80',
-    },
-    {
-      id: 3,
-      title: 'Seaside Portuguese Villa',
-      location: 'Anjuna, Goa',
-      monthly_rent: 65000,
-      income_threshold: 195000,
-      description: 'Vibrant restored Portuguese bungalow with high ceilings, private swimming pool, and 5-min walk to beach.',
-      image_url: 'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80',
-    },
-    {
-      id: 4,
-      title: 'Comfortable 2 BHK Family Home',
-      location: 'Viman Nagar, Pune',
-      monthly_rent: 25000,
-      income_threshold: 75000,
-      description: 'Spacious 2 BHK family flat in gated society with children play park, gym, covered parking, and 24/7 security.',
-      image_url: 'https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?auto=format&fit=crop&w=800&q=80',
-    },
-    {
-      id: 5,
-      title: 'Modern Techie Studio Room',
-      location: 'HSR Layout, Bangalore',
-      monthly_rent: 15000,
-      income_threshold: 45000,
-      description: 'Sleek budget studio room with kitchenette, balcony, and walking distance to cafes and workspace hubs.',
-      image_url: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=800&q=80',
-    },
-    {
-      id: 6,
-      title: 'Traditional Kerala Courtyard House',
-      location: 'Wayanad, Kerala',
-      monthly_rent: 35000,
-      income_threshold: 105000,
-      description: 'Authentic Nalukettu style 3 BHK home surrounded by tea plantations and peaceful green valleys.',
-      image_url: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80',
-    },
-    {
-      id: 7,
-      title: '3 BHK High-Rise Family Apartment',
-      location: 'Andheri West, Mumbai',
-      monthly_rent: 70000,
-      income_threshold: 210000,
-      description: 'Bright 3 BHK apartment on the 18th floor with city skyline views, sea breeze, and modern modular kitchen.',
-      image_url: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800&q=80',
-    },
-    {
-      id: 8,
-      title: 'Independent Garden Bungalow',
-      location: 'Banjara Hills, Hyderabad',
-      monthly_rent: 55000,
-      income_threshold: 165000,
-      description: 'Charming 3 BHK independent bungalow featuring private lawn, verandah, servant quarter, and solar heating.',
-      image_url: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=800&q=80',
-    },
-    {
-      id: 9,
-      title: 'Compact 1 RK Student Studio',
-      location: 'North Campus, Delhi',
-      monthly_rent: 12000,
-      income_threshold: 36000,
-      description: 'Affordable 1 Room-Kitchen studio unit near Delhi University, fully air-conditioned with study desk.',
-      image_url: 'https://images.unsplash.com/photo-1554995207-c18c203602cb?auto=format&fit=crop&w=800&q=80',
-    },
-    {
-      id: 10,
-      title: 'Heritage Lake View House',
-      location: 'Udaipur, Rajasthan',
-      monthly_rent: 40000,
-      income_threshold: 120000,
-      description: 'Traditional Rajasthani stone home with Jharokha windows overlooking Lake Pichola.',
-      image_url: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80',
-    },
-    {
-      id: 11,
-      title: '2 BHK Gated Society Flat',
-      location: 'Noida Sector 62, Uttar Pradesh',
-      monthly_rent: 22000,
-      income_threshold: 66000,
-      description: 'Well-ventilated 2 BHK flat near metro station with clubhouse access, swimming pool, and grocery store inside.',
-      image_url: 'https://images.unsplash.com/photo-1570129477492-45c003edd2be?auto=format&fit=crop&w=800&q=80',
-    },
-    {
-      id: 12,
-      title: 'Luxury Glass Penthouse',
-      location: 'Golf Course Road, Gurugram',
-      monthly_rent: 110000,
-      income_threshold: 330000,
-      description: '4 BHK luxury duplex penthouse with floor-to-ceiling glass windows and private rooftop terrace garden.',
-      image_url: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=800&q=80',
-    },
-    {
-      id: 13,
-      title: 'Quiet Hilltop Cottage',
-      location: 'Kodaikanal, Tamil Nadu',
-      monthly_rent: 30000,
-      income_threshold: 90000,
-      description: 'Serene 2 BHK stone cottage surrounded by eucalyptus trees with cozy fireplace and private driveway.',
-      image_url: 'https://images.unsplash.com/photo-1510798831971-661eb04b3739?auto=format&fit=crop&w=800&q=80',
-    },
-    {
-      id: 14,
-      title: '1 BHK Working Professional Flat',
-      location: 'Gachibowli, Hyderabad',
-      monthly_rent: 20000,
-      income_threshold: 60000,
-      description: 'Furnished 1 BHK apartment close to IT hubs, with modern kitchen fittings, gym, and 24-hr water supply.',
-      image_url: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=800&q=80',
-    },
-    {
-      id: 15,
-      title: 'Colonial Style Villa',
-      location: 'Whitefield, Bangalore',
-      monthly_rent: 60000,
-      income_threshold: 180000,
-      description: 'Spacious colonial style 3 BHK villa with wooden flooring, large backyard lawn, and garage space.',
-      image_url: 'https://images.unsplash.com/photo-1600566753376-12c8ab7fb75b?auto=format&fit=crop&w=800&q=80',
-    },
-    {
-      id: 16,
-      title: 'Compact 2 BHK Apartment',
-      location: 'Salt Lake City, Kolkata',
-      monthly_rent: 19000,
-      income_threshold: 57000,
-      description: 'Charming 2 BHK flat near IT park, quiet green neighborhood with dual balconies.',
-      image_url: 'https://images.unsplash.com/photo-1493809842364-78817add7ffb?auto=format&fit=crop&w=800&q=80',
-    },
-    {
-      id: 17,
-      title: 'Beachside Studio Room',
-      location: 'ECR Chennai, Tamil Nadu',
-      monthly_rent: 24000,
-      income_threshold: 72000,
-      description: 'Cozy beachside studio apartment with sea views, rooftop access, and 24/7 security guard.',
-      image_url: 'https://images.unsplash.com/photo-1502005229762-cf1b2da7c5d6?auto=format&fit=crop&w=800&q=80',
-    },
-    {
-      id: 18,
-      title: 'Spacious 3 BHK Duplex House',
-      location: 'C-Scheme, Jaipur',
-      monthly_rent: 38000,
-      income_threshold: 114000,
-      description: 'Elegant 3 BHK duplex home with traditional pink-city stonework and terrace garden.',
-      image_url: 'https://images.unsplash.com/photo-1600585152220-90363fe7e115?auto=format&fit=crop&w=800&q=80',
-    },
-    {
-      id: 19,
-      title: 'Budget 1 BHK Bachelor Flat',
-      location: 'Kalyani Nagar, Pune',
-      monthly_rent: 16000,
-      income_threshold: 48000,
-      description: 'Clean 1 BHK apartment for bachelors or young couples near software parks and dining spots.',
-      image_url: 'https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?auto=format&fit=crop&w=800&q=80',
-    },
-    {
-      id: 20,
-      title: 'Luxury Lake View Villa',
-      location: 'Lavasa, Maharashtra',
-      monthly_rent: 50000,
-      income_threshold: 150000,
-      description: 'Picturesque 3 BHK waterfront villa with private garden, barbecue pit, and lake panorama.',
-      image_url: 'https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=800&q=80',
-    },
-  ];
-
-  const catalogue = properties.length >= 20 ? properties : defaultProperties;
+  // Always use exact user-provided dataset (18 properties)
+  const catalogue = EXACT_USER_DATASET;
 
   const filteredProperties = catalogue.filter(p => {
     const matchesSearch = p.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                           p.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                          (p.type || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
                           (p.description || '').toLowerCase().includes(searchTerm.toLowerCase());
     const matchesRent = !maxRent || Number(p.monthly_rent) <= Number(maxRent);
     return matchesSearch && matchesRent;
@@ -313,7 +315,7 @@ export default function TenantDashboard({ properties = [], applications = [], on
           </div>
           <h2 style={{ fontSize: '2.4rem', fontWeight: 600, color: '#ffffff' }}>Browse & Verify Rental Homes</h2>
           <p style={{ color: 'rgba(255, 255, 255, 0.75)', fontSize: '0.92rem', marginTop: '4px' }}>
-            Logged in as <strong style={{ color: '#ffffff' }}>{currentUser?.name || 'Rahul Sharma'}</strong> • 20 curated homes (bachelor rooms, flats, cottages & villas).
+            Logged in as <strong style={{ color: '#ffffff' }}>{currentUser?.name || 'Rahul Sharma'}</strong> • 18 verified homes (apartments, studios, bungalows & villas).
           </p>
         </div>
 
@@ -379,7 +381,7 @@ export default function TenantDashboard({ properties = [], applications = [], on
               <Search size={16} color="rgba(255,255,255,0.5)" />
               <input
                 type="text"
-                placeholder="Search bachelor rooms, 2 BHK, villa, Manali, Mumbai..."
+                placeholder="Search Palm Court, Dehradun, Pune, Bungalow, Mumbai..."
                 value={searchTerm}
                 onChange={(e) => {
                   setSearchTerm(e.target.value);
@@ -470,7 +472,7 @@ export default function TenantDashboard({ properties = [], applications = [], on
                 onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
                 disabled={currentPage === totalPages}
                 className="btn-white-pill"
-                style={{ padding: '8px 18px', fontSize: '0.82rem', opacity: currentPage === totalPages ? 0.4 : 1, cursor: currentPage === totalPages ? 'totalPages' : 'pointer' }}
+                style={{ padding: '8px 18px', fontSize: '0.82rem', opacity: currentPage === totalPages ? 0.4 : 1, cursor: currentPage === totalPages ? 'not-allowed' : 'pointer' }}
               >
                 Next <ChevronRight size={16} />
               </button>
@@ -500,10 +502,10 @@ export default function TenantDashboard({ properties = [], applications = [], on
                   id: app.property_id,
                   title: app.property_title || `Property Listing #${app.property_id}`,
                   location: app.property_location || 'Prime Location',
-                  monthly_rent: app.monthly_rent || 75000,
-                  income_threshold: app.income_threshold || 225000,
+                  monthly_rent: app.monthly_rent || 42000,
+                  income_threshold: app.income_threshold || 120000,
                   description: 'Zero-Knowledge Verified Application active on Midnight Network.',
-                  image_url: app.image_url || 'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=800&q=80',
+                  image_url: app.image_url || 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800&q=80',
                 };
 
                 const isDenied = app.status === 'rejected';
