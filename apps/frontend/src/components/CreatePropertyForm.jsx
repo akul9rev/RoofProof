@@ -57,16 +57,8 @@ export default function CreatePropertyForm({ landlord, onClose, onSuccess }) {
     '24/7 Security & CCTV',
   ]);
 
-  // Multi-Photo Management State
-  const [photos, setPhotos] = useState([
-    {
-      id: 'default_thumb',
-      preview: '/houses/house1.jpg',
-      label: 'Main Facade / Exterior',
-      isThumbnail: true,
-      file: null,
-    },
-  ]);
+  // Multi-Photo Management State (Empty by default)
+  const [photos, setPhotos] = useState([]);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
@@ -310,34 +302,43 @@ export default function CreatePropertyForm({ landlord, onClose, onSuccess }) {
               border: '1px solid rgba(0, 0, 0, 0.08)',
               position: 'relative',
               display: 'flex',
+              flexDirection: 'column',
               alignItems: 'center',
               justifyContent: 'center',
             }}>
-              <img
-                src={currentThumbnail?.preview || '/houses/house1.jpg'}
-                alt="Property Thumbnail"
-                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-              />
-
-              {/* Main Cover Badge */}
-              <span style={{
-                position: 'absolute',
-                top: '10px',
-                left: '10px',
-                background: 'rgba(12, 18, 25, 0.88)',
-                backdropFilter: 'blur(8px)',
-                padding: '4px 10px',
-                borderRadius: '999px',
-                fontSize: '0.7rem',
-                color: '#EBA834',
-                fontWeight: 800,
-                display: 'flex',
-                alignItems: 'center',
-                gap: '4px',
-                border: '1px solid rgba(235, 168, 52, 0.4)',
-              }}>
-                <Star size={11} fill="#EBA834" color="#EBA834" /> Main Thumbnail
-              </span>
+              {currentThumbnail ? (
+                <>
+                  <img
+                    src={currentThumbnail.preview}
+                    alt="Property Thumbnail"
+                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                  />
+                  <span style={{
+                    position: 'absolute',
+                    top: '10px',
+                    left: '10px',
+                    background: 'rgba(12, 18, 25, 0.88)',
+                    backdropFilter: 'blur(8px)',
+                    padding: '4px 10px',
+                    borderRadius: '999px',
+                    fontSize: '0.7rem',
+                    color: '#EBA834',
+                    fontWeight: 800,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                    border: '1px solid rgba(235, 168, 52, 0.4)',
+                  }}>
+                    <Star size={11} fill="#EBA834" color="#EBA834" /> Main Thumbnail
+                  </span>
+                </>
+              ) : (
+                <div style={{ textAlign: 'center', padding: '20px', color: '#888' }}>
+                  <ImageIcon size={38} color="#ccc" style={{ marginBottom: '8px' }} />
+                  <div style={{ fontSize: '0.84rem', fontWeight: 600, color: '#666' }}>No Cover Photo Uploaded</div>
+                  <div style={{ fontSize: '0.72rem', color: '#999', marginTop: '2px' }}>Upload photos below to set thumbnail</div>
+                </div>
+              )}
             </div>
 
             <h3 style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: '6px', color: '#1a221b', lineHeight: 1.25 }}>
@@ -596,127 +597,144 @@ export default function CreatePropertyForm({ landlord, onClose, onSuccess }) {
               </div>
 
               {/* Uploaded Photos Grid & Management */}
-              <div style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
-                gap: '12px',
-                marginTop: '14px',
-              }}>
-                {photos.map((photo) => (
-                  <div
-                    key={photo.id}
-                    style={{
-                      background: '#ffffff',
-                      border: photo.isThumbnail ? '2px solid #EBA834' : '1px solid #e5e5e5',
-                      borderRadius: '14px',
-                      overflow: 'hidden',
-                      position: 'relative',
-                      boxShadow: photo.isThumbnail ? '0 0 14px rgba(235, 168, 52, 0.35)' : '0 2px 6px rgba(0,0,0,0.05)',
-                      display: 'flex',
-                      flexDirection: 'column',
-                    }}
-                  >
-                    {/* Image Preview */}
-                    <div style={{ height: '115px', position: 'relative', background: '#000' }}>
-                      <img
-                        src={photo.preview}
-                        alt={photo.label}
-                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                      />
+              {photos.length === 0 ? (
+                <div style={{
+                  border: '2px dashed rgba(0, 0, 0, 0.15)',
+                  borderRadius: '14px',
+                  padding: '24px',
+                  textAlign: 'center',
+                  marginTop: '14px',
+                  background: '#ffffff',
+                }}>
+                  <Camera size={32} color="#4A7C59" style={{ marginBottom: '6px' }} />
+                  <div style={{ fontSize: '0.86rem', fontWeight: 700, color: '#1a221b' }}>No Property Photos Added Yet</div>
+                  <div style={{ fontSize: '0.78rem', color: '#666', marginTop: '2px' }}>
+                    Click <strong>"+ Add Photos"</strong> to upload images for Living Room, Washroom, Kitchen, and Bedroom.
+                  </div>
+                </div>
+              ) : (
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+                  gap: '12px',
+                  marginTop: '14px',
+                }}>
+                  {photos.map((photo) => (
+                    <div
+                      key={photo.id}
+                      style={{
+                        background: '#ffffff',
+                        border: photo.isThumbnail ? '2px solid #EBA834' : '1px solid #e5e5e5',
+                        borderRadius: '14px',
+                        overflow: 'hidden',
+                        position: 'relative',
+                        boxShadow: photo.isThumbnail ? '0 0 14px rgba(235, 168, 52, 0.35)' : '0 2px 6px rgba(0,0,0,0.05)',
+                        display: 'flex',
+                        flexDirection: 'column',
+                      }}
+                    >
+                      {/* Image Preview */}
+                      <div style={{ height: '115px', position: 'relative', background: '#000' }}>
+                        <img
+                          src={photo.preview}
+                          alt={photo.label}
+                          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                        />
 
-                      {/* Thumbnail Badge */}
-                      {photo.isThumbnail && (
-                        <span style={{
-                          position: 'absolute',
-                          top: '6px',
-                          left: '6px',
-                          background: '#EBA834',
-                          color: '#0c141d',
-                          padding: '3px 8px',
-                          borderRadius: '999px',
-                          fontSize: '0.66rem',
-                          fontWeight: 800,
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '3px',
-                        }}>
-                          <Star size={10} fill="#0c141d" /> COVER THUMBNAIL
-                        </span>
-                      )}
+                        {/* Thumbnail Badge */}
+                        {photo.isThumbnail && (
+                          <span style={{
+                            position: 'absolute',
+                            top: '6px',
+                            left: '6px',
+                            background: '#EBA834',
+                            color: '#0c141d',
+                            padding: '3px 8px',
+                            borderRadius: '999px',
+                            fontSize: '0.66rem',
+                            fontWeight: 800,
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '3px',
+                          }}>
+                            <Star size={10} fill="#0c141d" /> COVER THUMBNAIL
+                          </span>
+                        )}
 
-                      {/* Delete Button */}
-                      <button
-                        type="button"
-                        onClick={() => removePhoto(photo.id)}
-                        title="Remove this photo"
-                        style={{
-                          position: 'absolute',
-                          top: '6px',
-                          right: '6px',
-                          background: 'rgba(239, 68, 68, 0.9)',
-                          color: '#ffffff',
-                          border: 'none',
-                          borderRadius: '50%',
-                          width: '24px',
-                          height: '24px',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          cursor: 'pointer',
-                        }}
-                      >
-                        <Trash2 size={12} />
-                      </button>
-                    </div>
-
-                    {/* Photo Label Selector & Actions */}
-                    <div style={{ padding: '8px 10px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                      <select
-                        value={photo.label}
-                        onChange={(e) => updatePhotoLabel(photo.id, e.target.value)}
-                        style={{
-                          width: '100%',
-                          padding: '5px 8px',
-                          fontSize: '0.76rem',
-                          border: '1px solid #d1d5db',
-                          borderRadius: '6px',
-                          background: '#FAF9F5',
-                          fontWeight: 600,
-                          color: '#1a221b',
-                          outline: 'none',
-                        }}
-                      >
-                        {ROOM_TYPE_OPTIONS.map((opt, oIdx) => (
-                          <option key={oIdx} value={opt}>{opt}</option>
-                        ))}
-                      </select>
-
-                      {!photo.isThumbnail && (
+                        {/* Delete Button */}
                         <button
                           type="button"
-                          onClick={() => setAsThumbnail(photo.id)}
+                          onClick={() => removePhoto(photo.id)}
+                          title="Remove this photo"
                           style={{
-                            background: '#FAF9F5',
-                            border: '1px solid #d1d5db',
-                            borderRadius: '6px',
-                            padding: '4px',
-                            fontSize: '0.72rem',
-                            fontWeight: 700,
-                            color: '#555',
-                            cursor: 'pointer',
+                            position: 'absolute',
+                            top: '6px',
+                            right: '6px',
+                            background: 'rgba(239, 68, 68, 0.9)',
+                            color: '#ffffff',
+                            border: 'none',
+                            borderRadius: '50%',
+                            width: '24px',
+                            height: '24px',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            gap: '4px',
+                            cursor: 'pointer',
                           }}
                         >
-                          <Star size={11} color="#EBA834" /> Set as Cover Thumbnail
+                          <Trash2 size={12} />
                         </button>
-                      )}
+                      </div>
+
+                      {/* Photo Label Selector & Actions */}
+                      <div style={{ padding: '8px 10px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                        <select
+                          value={photo.label}
+                          onChange={(e) => updatePhotoLabel(photo.id, e.target.value)}
+                          style={{
+                            width: '100%',
+                            padding: '5px 8px',
+                            fontSize: '0.76rem',
+                            border: '1px solid #d1d5db',
+                            borderRadius: '6px',
+                            background: '#FAF9F5',
+                            fontWeight: 600,
+                            color: '#1a221b',
+                            outline: 'none',
+                          }}
+                        >
+                          {ROOM_TYPE_OPTIONS.map((opt, oIdx) => (
+                            <option key={oIdx} value={opt}>{opt}</option>
+                          ))}
+                        </select>
+
+                        {!photo.isThumbnail && (
+                          <button
+                            type="button"
+                            onClick={() => setAsThumbnail(photo.id)}
+                            style={{
+                              background: '#FAF9F5',
+                              border: '1px solid #d1d5db',
+                              borderRadius: '6px',
+                              padding: '4px',
+                              fontSize: '0.72rem',
+                              fontWeight: 700,
+                              color: '#555',
+                              cursor: 'pointer',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              gap: '4px',
+                            }}
+                          >
+                            <Star size={11} color="#EBA834" /> Set as Cover Thumbnail
+                          </button>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* Section 4: Specifications */}

@@ -67,18 +67,12 @@ export default function PropertyDetailModal({
   let photos = [];
   if (Array.isArray(property.gallery) && property.gallery.length > 0) {
     photos = property.gallery;
-  } else if (DEFAULT_GALLERIES[propId]) {
-    photos = DEFAULT_GALLERIES[propId];
+  } else if (typeof property.id === 'number' && property.id >= 1 && property.id <= 6 && DEFAULT_GALLERIES[property.id]) {
+    photos = DEFAULT_GALLERIES[property.id];
   } else {
-    // Dynamic gallery generated for custom properties
+    // Single or custom photos uploaded for user-created property
     const mainImg = property.image_url || '/houses/house1.jpg';
-    photos = [
-      { label: 'Main Exterior / Facade', url: mainImg },
-      { label: 'Spacious Living Room', url: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80' },
-      { label: 'Master Bedroom', url: 'https://images.unsplash.com/photo-1616594039964-ae9021a400a0?auto=format&fit=crop&w=1200&q=80' },
-      { label: 'Modular Kitchen', url: 'https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=1200&q=80' },
-      { label: 'Clean Modern Washroom', url: 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=1200&q=80' },
-    ];
+    photos = [{ label: 'Main Property Cover', url: mainImg }];
   }
 
   const currentPhoto = photos[activePhotoIdx] || photos[0];
