@@ -90,17 +90,13 @@ export default function PropertyDetailModal({
   const currentPhoto = photos[activePhotoIdx] || photos[0];
 
   const formatListingDate = (dateStr) => {
-    if (!dateStr) return 'Listed Recently';
+    if (!dateStr) return '';
     try {
       const d = new Date(dateStr);
-      if (isNaN(d.getTime())) return 'Listed Recently';
-      const now = new Date();
-      if (now.toDateString() === d.toDateString()) {
-        return 'Listed Today';
-      }
+      if (isNaN(d.getTime())) return '';
       return `Listed ${d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}`;
     } catch {
-      return 'Listed Recently';
+      return '';
     }
   };
 
