@@ -8,15 +8,15 @@ export default function ErrorPage({ type = '403', onNavigate, onOpenLogin, curre
     403: {
       code: '403',
       title: 'Access Restricted',
-      subtitle: isLandlordRole ? 'Tenant Portal Restricted for Landlords' : 'Landlord Portal Restricted for Tenants',
+      subtitle: isLandlordRole ? 'Browse Homes Restricted for Landlords' : 'Landlord Portal Restricted for Tenants',
       description: isLandlordRole 
-        ? 'You are signed in as a Landlord. Landlord accounts are restricted from viewing the Tenant Portal. Please access the Landlord Portal to manage your properties and review tenant applications.'
-        : 'You are signed in as a Tenant. Tenant accounts do not have permission to view the Landlord Management Portal or publish new property listings. Please switch or sign in as a Landlord.',
+        ? 'You are signed in as a Landlord. Landlord accounts are restricted from viewing Browse Homes. Please access the Landlord Portal to manage your properties and review tenant applications.'
+        : 'You are signed in as a Tenant. Tenant accounts are restricted from viewing the Landlord Portal. Please browse properties and track your applications.',
       icon: Lock,
       color: '#ef4444',
       bgGlow: 'rgba(239, 68, 68, 0.15)',
       borderColor: 'rgba(239, 68, 68, 0.3)',
-      primaryActionText: isLandlordRole ? 'Go to Landlord Portal' : 'Go to Tenant Portal',
+      primaryActionText: isLandlordRole ? 'Go to Landlord Portal' : 'Browse Homes',
       primaryActionView: isLandlordRole ? 'landlord' : 'tenant',
       showLoginButton: true,
       loginButtonText: 'Switch Account',

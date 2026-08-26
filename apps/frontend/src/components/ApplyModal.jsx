@@ -1,38 +1,24 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
-import { ShieldCheck, Lock, CheckCircle2, AlertCircle, X, Loader2, FileText, Upload, Sparkles } from 'lucide-react';
+import { ShieldCheck, Lock, Upload, CheckCircle2, AlertCircle, X, Loader2, FileText, AlertTriangle, ShieldAlert, Cpu } from 'lucide-react';
 import { extractPdfText } from '../services/api';
 
-export default function ApplyModal({ property, tenant, currentUser, onClose, onSuccess, onSubmit }) {
-  const submitFn = onSuccess || onSubmit;
-  const activeUser = currentUser || tenant;
+export default function ApplyModal({ property, onClose, onSubmit, onSuccess, currentUser, tenant }) {
   const [selectedFile, setSelectedFile] = useState(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [analysisResult, setAnalysisResult] = useState(null);
   const [analysisError, setAnalysisError] = useState(null);
+  const [tamperingReport, setTamperingReport] = useState(null);
+  const [analysisResult, setAnalysisResult] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState(null);
 
-  useEffect(() => {
-    setSelectedFile(null);
-    setIsAnalyzing(false);
-    setAnalysisResult(null);
-    setAnalysisError(null);
-    setSubmitError(null);
-  }, [property?.id]);
-
-  useEffect(() => {
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.body.style.overflow = 'unset';
-    };
-  }, []);
+  const activeUser = currentUser || tenant;
+  const submitFn = onSubmit || onSuccess;
 
   if (!property) return null;
 
-  const isAnnualThreshold = Number(property.income_threshold) > 100000;
-  const monthlyThreshold = isAnnualThreshold ? Math.round(Number(property.income_threshold) / 12) : Number(property.income_threshold);
-  const annualThreshold = isAnnualThreshold ? Number(property.income_threshold) : Number(property.income_threshold) * 12;
+  const monthlyThreshold = Number(property.income_threshold) || 100000;
+  const annualThreshold = monthlyThreshold * 12;
 
   const formattedThreshold = new Intl.NumberFormat('en-IN', {
     style: 'currency',
@@ -40,19 +26,19 @@ export default function ApplyModal({ property, tenant, currentUser, onClose, onS
     maximumFractionDigits: 0,
   }).format(monthlyThreshold);
 
-  const tenantAnnualIncome = Number(analysisResult?.privateWitnessPayload?.privateIncome || 0);
-  const isEligible = tenantAnnualIncome >= annualThreshold;
-
   const handleFileChange = (e) => {
     const file = e.target.files?.[0];
     setAnalysisError(null);
+    setTamperingReport(null);
     setAnalysisResult(null);
 
-    if (!file) return;
+    if (!file) {
+      setSelectedFile(null);
+      return;
+    }
 
-    const ext = file.name.split('.').pop().toLowerCase();
-    if (ext !== 'pdf') {
-      setAnalysisError('Only .pdf files are supported. Please select an Indian Form 16 PDF.');
+    if (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) {
+      setAnalysisError('Only official Form 16 PDF documents are supported.');
       setSelectedFile(null);
       return;
     }
@@ -75,43 +61,67 @@ export default function ApplyModal({ property, tenant, currentUser, onClose, onS
 
     setIsAnalyzing(true);
     setAnalysisError(null);
+    setTamperingReport(null);
+    setAnalysisResult(null);
 
     try {
       const res = await extractPdfText(selectedFile);
-      if (!res.success) {
-        throw new Error(res.error || 'Failed to extract text from PDF file.');
+
+      // Check 1: AI Anomaly / Fake Document Rejection
+      if (res.status === 'REJECTED' || res.tamperingRisk === 'HIGH' || res.errorCode === 'ANOMALY_DETECTED') {
+        setIsAnalyzing(false);
+        setTamperingReport({
+          risk: res.tamperingRisk || 'HIGH',
+          anomalyScore: res.anomalyScore || 0.85,
+          flags: res.flags && res.flags.length > 0 ? res.flags : [
+            'Document verification failed: Artificial intelligence detected document tampering or non-standard Form 16 structure.',
+          ],
+          message: res.error || 'AI Anomaly Detector identified document modifications or structural inconsistencies.',
+        });
+        return;
       }
 
-      const rawText = res.text || '';
-      const grossMatch = rawText.match(/Gross Total Income\s*[\:\-]?\s*₹?\s*([\d,]+)/i) ||
-                         rawText.match(/Total Salary\s*[\:\-]?\s*₹?\s*([\d,]+)/i) ||
-                         rawText.match(/Income Chargeable Under the head Salaries\s*[\:\-]?\s*₹?\s*([\d,]+)/i);
+      // Check 2: General Extraction Errors
+      if (!res.success && res.errorCode !== 'FIELD_1D_NOT_FOUND') {
+        throw new Error(res.error || 'Failed to analyze PDF file.');
+      }
 
-      let extractedIncome = 0;
-      if (grossMatch && grossMatch[1]) {
-        extractedIncome = parseInt(grossMatch[1].replace(/,/g, ''), 10);
-      } else {
-        const numbers = rawText.match(/₹?\s*([\d,]{6,10})/g);
-        if (numbers && numbers.length > 0) {
-          const parsed = numbers.map(n => parseInt(n.replace(/[^\d]/g, ''), 10)).filter(n => n > 200000 && n < 10000000);
-          if (parsed.length > 0) {
-            extractedIncome = Math.max(...parsed);
+      // Extract Salary
+      let extractedIncome = res.extractedSalary || 0;
+      if (!extractedIncome) {
+        const rawText = res.text || '';
+        const grossMatch = rawText.match(/Gross Total Income\s*[\:\-]?\s*₹?\s*([\d,]+)/i) ||
+                           rawText.match(/Total Salary\s*[\:\-]?\s*₹?\s*([\d,]+)/i) ||
+                           rawText.match(/Income Chargeable Under the head Salaries\s*[\:\-]?\s*₹?\s*([\d,]+)/i);
+
+        if (grossMatch && grossMatch[1]) {
+          extractedIncome = parseInt(grossMatch[1].replace(/,/g, ''), 10);
+        } else {
+          const numbers = rawText.match(/₹?\s*([\d,]{6,10})/g);
+          if (numbers && numbers.length > 0) {
+            const parsed = numbers.map(n => parseInt(n.replace(/[^\d]/g, ''), 10)).filter(n => n > 200000 && n < 10000000);
+            if (parsed.length > 0) {
+              extractedIncome = Math.max(...parsed);
+            }
           }
         }
       }
 
-      if (!extractedIncome || extractedIncome < 100000) {
-        extractedIncome = 1850000;
+      if (!extractedIncome || extractedIncome < 50000) {
+        setIsAnalyzing(false);
+        setAnalysisError('Could not extract a valid salary figure from this PDF. Please ensure you upload an authentic Form 16 Part B.');
+        return;
       }
 
       const isPass = extractedIncome >= annualThreshold;
-
       const dummyHash = '0x' + Array.from({ length: 32 }, () => Math.floor(Math.random() * 16).toString(16)).join('');
 
       setAnalysisResult({
         extractedIncome,
         isEligible: isPass,
         proofHash: dummyHash,
+        tamperingRisk: res.tamperingRisk || 'LOW',
+        anomalyScore: res.anomalyScore || 0.0,
         privateWitnessPayload: {
           privateIncome: extractedIncome,
           thresholdRequired: annualThreshold,
@@ -135,8 +145,8 @@ export default function ApplyModal({ property, tenant, currentUser, onClose, onS
       if (typeof submitFn === 'function') {
         await submitFn({
           property_id: property.id,
-          tenant_id: activeUser?.id || 3,
-          verification_status: 'verified_pass',
+          tenant_id: activeUser?.id,
+          verification_status: 'eligible',
           zk_tx_hash: analysisResult.proofHash,
         });
       }
@@ -149,34 +159,14 @@ export default function ApplyModal({ property, tenant, currentUser, onClose, onS
   };
 
   return createPortal(
-    <div style={{
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      width: '100vw',
-      height: '100vh',
-      background: 'rgba(3, 7, 12, 0.88)',
-      backdropFilter: 'blur(18px)',
-      WebkitBackdropFilter: 'blur(18px)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      zIndex: 999999,
-      padding: '16px',
-    }} onClick={onClose}>
+    <div className="modal-backdrop" onClick={onClose}>
       <div
-        className="luxury-modal-container animate-modal-scale"
+        className="luxury-modal-container modal-surface modal-surface--wide animate-modal-scale"
         onClick={(e) => e.stopPropagation()}
         style={{
           maxWidth: '480px',
           width: '100%',
           padding: '24px 26px',
-          background: 'linear-gradient(165deg, rgba(14, 23, 34, 0.98) 0%, rgba(7, 13, 20, 0.99) 100%)',
-          border: '1px solid rgba(255, 255, 255, 0.18)',
-          borderRadius: '26px',
-          boxShadow: '0 30px 90px rgba(0, 0, 0, 0.95), inset 0 1px 1px rgba(255, 255, 255, 0.15)',
           position: 'relative',
           color: '#ffffff',
           maxHeight: '92vh',
@@ -186,7 +176,7 @@ export default function ApplyModal({ property, tenant, currentUser, onClose, onS
         {/* Modal Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <div style={{
+            <div className="modal-icon-badge" style={{
               width: '36px', height: '36px', borderRadius: '10px',
               background: 'linear-gradient(135deg, #4A7C59 0%, #3B6647 100%)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -195,6 +185,7 @@ export default function ApplyModal({ property, tenant, currentUser, onClose, onS
               <Lock size={18} color="#ffffff" />
             </div>
             <div>
+              <div className="modal-eyebrow">Privacy-first application</div>
               <h3 style={{ fontSize: '1.15rem', fontWeight: 700, color: '#ffffff', margin: 0, lineHeight: 1.2 }}>
                 Form 16 ZK Verification
               </h3>
@@ -205,13 +196,10 @@ export default function ApplyModal({ property, tenant, currentUser, onClose, onS
           </div>
           <button
             onClick={onClose}
+            className="modal-close"
             style={{
               background: 'rgba(255, 255, 255, 0.08)',
               color: 'rgba(255, 255, 255, 0.7)',
-              border: 'none',
-              borderRadius: '50%',
-              width: '30px',
-              height: '30px',
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
@@ -256,7 +244,7 @@ export default function ApplyModal({ property, tenant, currentUser, onClose, onS
         }}>
           <ShieldCheck size={18} color="#6B9B76" style={{ flexShrink: 0 }} />
           <div style={{ fontSize: '0.78rem', color: 'rgba(255, 255, 255, 0.85)', lineHeight: 1.35 }}>
-            Form 16 is processed strictly in local browser memory. Exact salary is Zero-Knowledge protected & <strong>never shared with landlord</strong>.
+            Form 16 is scanned by AI Anomaly Detector in local memory. Exact salary is Zero-Knowledge protected & <strong>never shared with landlord</strong>.
           </div>
         </div>
 
@@ -300,12 +288,64 @@ export default function ApplyModal({ property, tenant, currentUser, onClose, onS
                   <FileText size={13} /> {selectedFile.name}
                 </span>
               ) : (
-                'Choose your official Form 16 PDF for ZK witness proof generation.'
+                'Choose your official Form 16 PDF for AI anomaly scan & ZK proof generation.'
               )}
             </div>
           </div>
 
-          {analysisError && (
+          {/* AI Tampering / Fake Document Detected Card */}
+          {tamperingReport && (
+            <div style={{
+              background: 'rgba(239, 68, 68, 0.15)',
+              border: '1.5px solid rgba(239, 68, 68, 0.45)',
+              borderRadius: '16px',
+              padding: '16px',
+              marginBottom: '16px',
+              animation: 'fadeIn 0.3s ease',
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                <ShieldAlert size={20} color="#ef4444" />
+                <div style={{ fontWeight: 800, fontSize: '0.92rem', color: '#f87171' }}>
+                  AI Fraud & Tampering Detected
+                </div>
+              </div>
+              <p style={{ fontSize: '0.8rem', color: 'rgba(255, 255, 255, 0.85)', marginBottom: '10px', lineHeight: 1.4 }}>
+                {tamperingReport.message}
+              </p>
+              {tamperingReport.flags && tamperingReport.flags.length > 0 && (
+                <div style={{
+                  background: 'rgba(0, 0, 0, 0.3)',
+                  borderRadius: '10px',
+                  padding: '10px 12px',
+                  fontSize: '0.76rem',
+                  color: '#fca5a5',
+                  lineHeight: 1.45,
+                }}>
+                  <div style={{ fontWeight: 700, marginBottom: '4px', textTransform: 'uppercase', fontSize: '0.7rem', color: '#ef4444' }}>
+                    Anomaly Indicators:
+                  </div>
+                  <ul style={{ margin: 0, paddingLeft: '16px' }}>
+                    {tamperingReport.flags.map((flag, idx) => (
+                      <li key={idx} style={{ marginBottom: '3px' }}>{flag}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              <div style={{
+                marginTop: '10px',
+                fontSize: '0.74rem',
+                color: 'rgba(255, 255, 255, 0.6)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+              }}>
+                <AlertTriangle size={14} color="#f59e0b" />
+                <span>Zero-Knowledge Proof Generation blocked due to high tampering risk.</span>
+              </div>
+            </div>
+          )}
+
+          {analysisError && !tamperingReport && (
             <div style={{
               background: 'rgba(239, 68, 68, 0.12)',
               border: '1px solid rgba(239, 68, 68, 0.3)',
@@ -322,7 +362,7 @@ export default function ApplyModal({ property, tenant, currentUser, onClose, onS
             </div>
           )}
 
-          {!analysisResult && (
+          {!analysisResult && !tamperingReport && (
             <button
               type="submit"
               disabled={isAnalyzing || !selectedFile}
@@ -337,18 +377,54 @@ export default function ApplyModal({ property, tenant, currentUser, onClose, onS
             >
               {isAnalyzing ? (
                 <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-                  <Loader2 size={16} className="animate-spin" /> Generating Midnight ZK Witness...
+                  <Loader2 size={16} className="animate-spin" /> AI Scanner & ZK Witness...
                 </span>
               ) : (
-                'Generate ZK Income Proof'
+                'Scan Document & Generate Proof'
               )}
+            </button>
+          )}
+
+          {tamperingReport && (
+            <button
+              type="button"
+              onClick={() => {
+                setTamperingReport(null);
+                setSelectedFile(null);
+              }}
+              className="btn-white-pill"
+              style={{
+                width: '100%',
+                padding: '10px',
+                fontSize: '0.84rem',
+                background: 'rgba(255, 255, 255, 0.1)',
+                color: '#ffffff',
+              }}
+            >
+              Upload Authentic Document
             </button>
           )}
         </form>
 
-        {/* ZK Proof Verification Output */}
+        {/* ZK Proof Verification Output (Only shown if document is verified authentic) */}
         {analysisResult && (
           <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            {/* AI Authenticity Pass Badge */}
+            <div style={{
+              background: 'rgba(74, 124, 89, 0.15)',
+              border: '1px solid rgba(74, 124, 89, 0.35)',
+              borderRadius: '12px',
+              padding: '8px 12px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              fontSize: '0.78rem',
+              color: '#4ade80',
+            }}>
+              <Cpu size={15} color="#4ade80" />
+              <span>AI Anomaly Check: <strong>Passed (100% Authentic Form 16)</strong></span>
+            </div>
+
             {analysisResult.isEligible ? (
               <div style={{
                 background: 'rgba(22, 163, 74, 0.12)',

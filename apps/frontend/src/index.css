@@ -26,6 +26,12 @@
   --radius-lg: 24px;
   --radius-xl: 40px;
   --radius-pill: 9999px;
+
+  --modal-ink: #f8fafc;
+  --modal-muted: rgba(226, 232, 240, 0.62);
+  --modal-line: rgba(255, 255, 255, 0.12);
+  --modal-surface: rgba(13, 22, 31, 0.94);
+  --modal-shadow: 0 32px 100px rgba(0, 0, 0, 0.62), 0 8px 24px rgba(0, 0, 0, 0.24);
 }
 
 * {
@@ -267,6 +273,37 @@ h1, h2, h3, h4, h5, h6 {
   }
 }
 
+@keyframes modalBackdropIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes modalSurfaceIn {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.965);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes modalGlowDrift {
+  0%, 100% { transform: translate3d(-4%, -3%, 0) scale(1); opacity: 0.55; }
+  50% { transform: translate3d(5%, 4%, 0) scale(1.08); opacity: 0.8; }
+}
+
+@keyframes toastIn {
+  from { opacity: 0; transform: translate3d(0, 18px, 0) scale(0.97); }
+  to { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+}
+
+@keyframes shimmer {
+  0%, 42% { transform: translateX(-90%) rotate(12deg); }
+  68%, 100% { transform: translateX(90%) rotate(12deg); }
+}
+
 .animate-fade-in {
   animation: fadeIn 0.4s ease-out forwards;
 }
@@ -275,12 +312,251 @@ h1, h2, h3, h4, h5, h6 {
   animation: modalScaleUp 0.32s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-/* Luxurious Aesthetic Modal Container */
-.luxury-modal-container {
-  background: linear-gradient(165deg, rgba(16, 26, 38, 0.98) 0%, rgba(8, 14, 22, 0.99) 100%) !important;
-  border: 1px solid rgba(255, 255, 255, 0.18) !important;
-  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.88), inset 0 1px 1px rgba(255, 255, 255, 0.15) !important;
-  border-radius: 28px !important;
+/* Shared popup language. Components keep their existing inline layouts and
+   behavior; these classes provide the consistent visual treatment. */
+.modal-backdrop {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  z-index: 999999 !important;
+  padding: clamp(16px, 3vw, 32px) !important;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(107, 155, 118, 0.12), transparent 34%),
+    radial-gradient(circle at 85% 100%, rgba(235, 168, 52, 0.09), transparent 30%),
+    rgba(3, 8, 13, 0.78) !important;
+  backdrop-filter: blur(20px) saturate(125%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(125%) !important;
+  animation: modalBackdropIn 0.24s ease-out both;
+  overflow-y: auto !important;
+  isolation: isolate;
+}
+
+.modal-backdrop::before {
+  content: '';
+  position: absolute;
+  width: 360px;
+  height: 360px;
+  top: -170px;
+  left: 50%;
+  border-radius: 50%;
+  background: rgba(107, 155, 118, 0.14);
+  filter: blur(70px);
+  pointer-events: none;
+  z-index: -1;
+  animation: modalGlowDrift 7s ease-in-out infinite;
+}
+
+.modal-surface {
+  position: relative !important;
+  width: min(100%, 520px) !important;
+  max-width: 520px !important;
+  max-height: min(92vh, 820px) !important;
+  overflow: auto !important;
+  color: var(--modal-ink) !important;
+  background:
+    linear-gradient(145deg, rgba(29, 44, 56, 0.94), rgba(8, 15, 22, 0.98) 68%),
+    var(--modal-surface) !important;
+  border: 1px solid rgba(255, 255, 255, 0.16) !important;
+  border-radius: 30px !important;
+  box-shadow: var(--modal-shadow), inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
+  animation: modalSurfaceIn 0.42s cubic-bezier(0.16, 1, 0.3, 1) both;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+}
+
+.modal-surface::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(120deg, rgba(255, 255, 255, 0.08), transparent 24%, transparent 72%, rgba(107, 155, 118, 0.06));
+  pointer-events: none;
+}
+
+.modal-surface::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 12%;
+  right: 12%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.42), transparent);
+  pointer-events: none;
+}
+
+.modal-surface--wide {
+  width: min(100%, 560px) !important;
+  max-width: 560px !important;
+}
+
+.modal-surface--light {
+  color: #1a221b !important;
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.99), rgba(247, 249, 244, 0.98)) !important;
+  border-color: rgba(26, 34, 27, 0.1) !important;
+  box-shadow: 0 32px 90px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.95) !important;
+}
+
+.modal-surface--danger {
+  border-color: rgba(239, 68, 68, 0.25) !important;
+}
+
+.modal-close {
+  z-index: 2;
+  width: 34px !important;
+  height: 34px !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: 12px !important;
+  background: rgba(255, 255, 255, 0.07) !important;
+  color: rgba(255, 255, 255, 0.68) !important;
+  transition: transform 0.2s ease, background 0.2s ease, color 0.2s ease, border-color 0.2s ease !important;
+}
+
+.modal-close:hover {
+  transform: rotate(6deg) scale(1.05);
+  background: rgba(255, 255, 255, 0.14) !important;
+  border-color: rgba(255, 255, 255, 0.25) !important;
+  color: #ffffff !important;
+}
+
+.modal-surface--light .modal-close {
+  border-color: rgba(26, 34, 27, 0.1) !important;
+  background: rgba(26, 34, 27, 0.06) !important;
+  color: rgba(26, 34, 27, 0.58) !important;
+}
+
+.modal-header {
+  position: relative;
+  z-index: 1;
+}
+
+.modal-icon-badge {
+  position: relative;
+  overflow: hidden;
+  flex: 0 0 auto;
+  box-shadow: 0 10px 24px rgba(235, 168, 52, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.35) !important;
+}
+
+.modal-icon-badge::after {
+  content: '';
+  position: absolute;
+  inset: -40%;
+  background: linear-gradient(120deg, transparent 35%, rgba(255, 255, 255, 0.34), transparent 65%);
+  transform: translateX(-80%) rotate(12deg);
+  animation: shimmer 4.8s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.modal-eyebrow {
+  color: var(--amber-accent) !important;
+  font-size: 0.66rem !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.14em !important;
+  text-transform: uppercase !important;
+}
+
+.modal-surface .luxury-input {
+  min-height: 46px;
+  border-radius: 13px;
+  border-color: rgba(255, 255, 255, 0.13);
+  background: rgba(255, 255, 255, 0.055);
+  transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.modal-surface .luxury-input:hover {
+  background: rgba(255, 255, 255, 0.075);
+}
+
+.modal-surface .luxury-input:focus {
+  transform: translateY(-1px);
+  border-color: rgba(235, 168, 52, 0.72);
+  box-shadow: 0 0 0 4px rgba(235, 168, 52, 0.1), 0 12px 26px rgba(0, 0, 0, 0.16);
+}
+
+.modal-surface .btn-white-pill {
+  min-height: 46px;
+  transition: transform 0.22s ease, box-shadow 0.22s ease, filter 0.22s ease !important;
+}
+
+.modal-surface .btn-white-pill:hover:not(:disabled) {
+  filter: brightness(1.04);
+  transform: translateY(-2px) !important;
+}
+
+.modal-surface .btn-white-pill:active:not(:disabled) {
+  transform: translateY(0) scale(0.985) !important;
+}
+
+.toast-notification {
+  position: fixed;
+  right: clamp(16px, 3vw, 32px);
+  bottom: clamp(16px, 3vw, 32px);
+  z-index: 99999;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  width: min(410px, calc(100vw - 32px));
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: rgba(13, 22, 31, 0.92);
+  border: 1px solid rgba(107, 155, 118, 0.35);
+  color: #f8fafc;
+  box-shadow: 0 22px 50px rgba(0, 0, 0, 0.38), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  animation: toastIn 0.38s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.toast-notification--error {
+  border-color: rgba(239, 68, 68, 0.45);
+}
+
+.toast-notification__icon {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  flex: 0 0 auto;
+  border-radius: 10px;
+  color: #d8f4dc;
+  background: rgba(74, 124, 89, 0.3);
+}
+
+.toast-notification--error .toast-notification__icon {
+  color: #fecaca;
+  background: rgba(239, 68, 68, 0.2);
+}
+
+.toast-notification__copy {
+  min-width: 0;
+  padding-top: 2px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  line-height: 1.45;
+}
+
+@media (max-width: 640px) {
+  .modal-surface {
+    width: 100% !important;
+    max-height: 94vh !important;
+    border-radius: 24px !important;
+  }
+
+  .modal-surface--wide {
+    max-width: 100% !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 /* Modern Input Fields */
@@ -300,4 +576,24 @@ h1, h2, h3, h4, h5, h6 {
   border-color: rgba(235, 168, 52, 0.5);
   background: rgba(255, 255, 255, 0.08);
   box-shadow: 0 0 12px rgba(235, 168, 52, 0.2);
+}
+
+.luxury-modal-container.modal-surface {
+  background:
+    linear-gradient(145deg, rgba(29, 44, 56, 0.94), rgba(8, 15, 22, 0.98) 68%),
+    var(--modal-surface) !important;
+  border: 1px solid rgba(255, 255, 255, 0.16) !important;
+  box-shadow: var(--modal-shadow), inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
+  border-radius: 30px !important;
+}
+
+.modal-surface.modal-surface--light {
+  color: #1a221b !important;
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.99), rgba(247, 249, 244, 0.98)) !important;
+  border-color: rgba(26, 34, 27, 0.1) !important;
+  box-shadow: 0 32px 90px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.95) !important;
+}
+
+.modal-surface.modal-surface--danger {
+  border-color: rgba(239, 68, 68, 0.25) !important;
 }

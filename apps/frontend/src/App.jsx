@@ -11,6 +11,141 @@ import LoginModal from './components/LoginModal.jsx';
 import ErrorPage from './components/ErrorPage.jsx';
 import { fetchProperties, fetchApplications, applyForProperty, updateApplicationStatus, createProperty, deleteProperty, withdrawApplication } from './services/api.js';
 
+const DEFAULT_PROPERTIES = [
+  {
+    id: 1,
+    landlord_id: 1,
+    title: 'Misty Valley Villa',
+    property_type: 'Luxury Villa',
+    location: 'Coorg, Karnataka',
+    monthly_rent: 65000,
+    income_threshold: 195000,
+    description: '3 BHK luxury villa with a private outdoor area, mountain views, furnished living spaces, and a modern kitchen.',
+    image_url: '/houses/house1.jpg',
+    landlord_name: 'Rohan Mehta',
+    landlord_email: 'rohan.mehta@roofproof.demo',
+    bedrooms: '3 BHK',
+    bathrooms: '3 Bathrooms',
+    furnishing: 'Fully Furnished',
+    area_sqft: '2,400 sq.ft',
+    parking: 'Covered (2 Cars + 2 Bikes)',
+    deposit: '₹1,30,000 (2 Months)',
+    preferred_tenants: 'Families & Working Professionals',
+    available_from: 'Immediate Move-in',
+    amenities: ['Mountain View', 'Private Balcony', 'Modular Kitchen', '24/7 Power Backup', 'Gated Community', 'High-Speed Fiber Ready'],
+  },
+  {
+    id: 2,
+    landlord_id: 1,
+    title: 'Royal Courtyard Residence',
+    property_type: 'Heritage House',
+    location: 'Udaipur, Rajasthan',
+    monthly_rent: 55000,
+    income_threshold: 165000,
+    description: 'Spacious heritage-style residence with a private courtyard, traditional interiors, large living areas, and a peaceful setting.',
+    image_url: '/houses/house2.jpg',
+    landlord_name: 'Rohan Mehta',
+    landlord_email: 'rohan.mehta@roofproof.demo',
+    bedrooms: '3 BHK',
+    bathrooms: '3 Bathrooms',
+    furnishing: 'Fully Furnished',
+    area_sqft: '2,100 sq.ft',
+    parking: 'Open Courtyard Parking (2 Cars)',
+    deposit: '₹1,10,000 (2 Months)',
+    preferred_tenants: 'Families & Expats',
+    available_from: 'Immediate Move-in',
+    amenities: ['Private Courtyard', 'Traditional Architecture', 'Modular Kitchen', '24/7 Security & CCTV', 'High-Speed Fiber Ready'],
+  },
+  {
+    id: 3,
+    landlord_id: 1,
+    title: 'Heritage Garden Bungalow',
+    property_type: 'Bungalow',
+    location: 'Ooty, Tamil Nadu',
+    monthly_rent: 48000,
+    income_threshold: 144000,
+    description: 'Charming 3 BHK bungalow with a large garden, traditional architecture, wooden interiors, spacious rooms, and a peaceful hill-station setting.',
+    image_url: '/houses/house3.jpg',
+    landlord_name: 'Rohan Mehta',
+    landlord_email: 'rohan.mehta@roofproof.demo',
+    bedrooms: '3 BHK',
+    bathrooms: '2 Bathrooms',
+    furnishing: 'Semi-Furnished',
+    area_sqft: '1,950 sq.ft',
+    parking: 'Dedicated Car Porch (1 Car)',
+    deposit: '₹96,000 (2 Months)',
+    preferred_tenants: 'Families & Remote Workers',
+    available_from: 'Immediate Move-in',
+    amenities: ['Private Botanical Garden', 'Fireplace', 'Hill Station Views', 'Power Backup', 'Pet Friendly'],
+  },
+  {
+    id: 4,
+    landlord_id: 1,
+    title: 'Greenview Family Home',
+    property_type: 'Family House',
+    location: 'Bangalore, Karnataka',
+    monthly_rent: 38000,
+    income_threshold: 114000,
+    description: 'Comfortable 3 BHK family home with generous natural light, multiple balconies, a quiet neighborhood, and nearby residential amenities.',
+    image_url: '/houses/house4.jpg',
+    landlord_name: 'Rohan Mehta',
+    landlord_email: 'rohan.mehta@roofproof.demo',
+    bedrooms: '3 BHK',
+    bathrooms: '2 Bathrooms',
+    furnishing: 'Semi-Furnished',
+    area_sqft: '1,650 sq.ft',
+    parking: 'Covered Parking (1 Car)',
+    deposit: '₹76,000 (2 Months)',
+    preferred_tenants: 'Families & Professionals',
+    available_from: 'Immediate Move-in',
+    amenities: ['Multiple Balconies', 'Park Facing', '24/7 Security', 'High-Speed Fiber Ready', 'Children Play Area'],
+  },
+  {
+    id: 5,
+    landlord_id: 2,
+    title: 'Pink Palace Residence',
+    property_type: 'Luxury Residence',
+    location: 'Jaipur, Rajasthan',
+    monthly_rent: 72000,
+    income_threshold: 216000,
+    description: 'Elegant 3 BHK residence inspired by Jaipur architecture, featuring ornate interiors, spacious common areas, and a distinctive heritage character.',
+    image_url: '/houses/house5.jpg',
+    landlord_name: 'Priya Nair',
+    landlord_email: 'priya.nair@roofproof.demo',
+    bedrooms: '3 BHK',
+    bathrooms: '3 Bathrooms',
+    furnishing: 'Fully Furnished',
+    area_sqft: '2,600 sq.ft',
+    parking: 'Covered Parking (2 Cars)',
+    deposit: '₹1,44,000 (2 Months)',
+    preferred_tenants: 'Families & Corporate Executives',
+    available_from: 'Immediate Move-in',
+    amenities: ['Rooftop Terrace', 'Jaipur Architecture', 'Modular Kitchen', 'Gym & Fitness', '24/7 Security & CCTV'],
+  },
+  {
+    id: 6,
+    landlord_id: 2,
+    title: 'Glassfront Modern Estate',
+    property_type: 'Modern Villa',
+    location: 'Kolkata, West Bengal',
+    monthly_rent: 52000,
+    income_threshold: 156000,
+    description: 'Characterful independent modern villa with glass facades, bright interiors, private entry, and a quiet residential setting.',
+    image_url: '/houses/house6.jpg',
+    landlord_name: 'Priya Nair',
+    landlord_email: 'priya.nair@roofproof.demo',
+    bedrooms: '3 BHK',
+    bathrooms: '3 Bathrooms',
+    furnishing: 'Fully Furnished',
+    area_sqft: '2,300 sq.ft',
+    parking: 'Covered Parking (1 Car + 2 Bikes)',
+    deposit: '₹1,04,000 (2 Months)',
+    preferred_tenants: 'Any Working Professionals',
+    available_from: 'Immediate Move-in',
+    amenities: ['Floor-to-Ceiling Glass', 'Private Garden', 'Modular Kitchen', '24/7 Power Backup', 'Smart Home Ready'],
+  },
+];
+
 export default function App() {
   const getViewFromPath = () => {
     const path = window.location.pathname.toLowerCase();
@@ -27,7 +162,6 @@ export default function App() {
 
   const [activeView, setActiveView] = useState(getViewFromPath);
 
-  // Read logged-in user from localStorage so authentication survives browser refresh
   const [currentUser, setCurrentUser] = useState(() => {
     try {
       const saved = localStorage.getItem('roofproof_logged_user');
@@ -66,14 +200,12 @@ export default function App() {
   };
 
   useEffect(() => {
-    const handlePopState = () => {
-      setActiveView(getViewFromPath());
-    };
+    const handlePopState = () => setActiveView(getViewFromPath());
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
   }, []);
 
-  const [properties, setProperties] = useState([]);
+  const [properties, setProperties] = useState(DEFAULT_PROPERTIES);
   const [applications, setApplications] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedPropertyForApply, setSelectedPropertyForApply] = useState(null);
@@ -100,13 +232,16 @@ export default function App() {
         fetchProperties(),
         fetchApplications(),
       ]);
-      const loadedProperties = Array.isArray(propsRes) ? propsRes : (propsRes?.properties || []);
+      const loadedProperties = Array.isArray(propsRes)
+        ? propsRes
+        : (propsRes?.properties && propsRes.properties.length > 0 ? propsRes.properties : DEFAULT_PROPERTIES);
       const loadedApplications = Array.isArray(appsRes) ? appsRes : (appsRes?.applications || []);
 
       setProperties(loadedProperties);
       setApplications(loadedApplications);
     } catch (err) {
-      console.error('Failed to fetch DApp data:', err);
+      console.error('Failed to fetch DApp data, using fallback properties:', err);
+      setProperties(DEFAULT_PROPERTIES);
     } finally {
       setIsLoading(false);
     }
@@ -152,22 +287,26 @@ export default function App() {
     try {
       const res = await applyForProperty(payload.property_id, applicationPayload);
       const newApp = res?.application || {
-        id: Date.now(),
+        id: `local_${Date.now()}`,
         property_id: payload.property_id,
         tenant_id: currentUser.id,
         tenant_name: currentUser.name,
         tenant_email: currentUser.email,
         status: 'pending',
-        verification_status: payload.verification_status || 'verified_pass',
+        verification_status: payload.verification_status || 'eligible',
         zk_tx_hash: payload.zk_tx_hash,
         created_at: new Date().toISOString(),
       };
 
-      setApplications(prev => [newApp, ...prev.filter(a => !(Number(a.property_id) === Number(payload.property_id) && Number(a.tenant_id) === Number(currentUser.id)))]);
+      setApplications(prev => [newApp, ...prev.filter(a =>
+        !(String(a.property_id) === String(payload.property_id) && String(a.tenant_id) === String(currentUser.id))
+      )]);
 
       try {
         const stored = JSON.parse(localStorage.getItem('roofproof_my_apps') || '[]');
-        const filteredStored = stored.filter(a => !(Number(a.property_id) === Number(payload.property_id) && Number(a.tenant_id) === Number(currentUser.id)));
+        const filteredStored = stored.filter(a =>
+          !(String(a.property_id) === String(payload.property_id) && String(a.tenant_id) === String(currentUser.id))
+        );
         localStorage.setItem('roofproof_my_apps', JSON.stringify([newApp, ...filteredStored]));
       } catch (e) {}
 
@@ -176,20 +315,24 @@ export default function App() {
       await fetchData();
     } catch (err) {
       const fallbackApp = {
-        id: Date.now(),
+        id: `local_${Date.now()}`,
         property_id: payload.property_id,
         tenant_id: currentUser.id,
         tenant_name: currentUser.name,
         tenant_email: currentUser.email,
         status: 'pending',
-        verification_status: payload.verification_status || 'verified_pass',
+        verification_status: payload.verification_status || 'eligible',
         zk_tx_hash: payload.zk_tx_hash,
         created_at: new Date().toISOString(),
       };
-      setApplications(prev => [fallbackApp, ...prev.filter(a => !(Number(a.property_id) === Number(payload.property_id) && Number(a.tenant_id) === Number(currentUser.id)))]);
+      setApplications(prev => [fallbackApp, ...prev.filter(a =>
+        !(String(a.property_id) === String(payload.property_id) && String(a.tenant_id) === String(currentUser.id))
+      )]);
       try {
         const stored = JSON.parse(localStorage.getItem('roofproof_my_apps') || '[]');
-        const filteredStored = stored.filter(a => !(Number(a.property_id) === Number(payload.property_id) && Number(a.tenant_id) === Number(currentUser.id)));
+        const filteredStored = stored.filter(a =>
+          !(String(a.property_id) === String(payload.property_id) && String(a.tenant_id) === String(currentUser.id))
+        );
         localStorage.setItem('roofproof_my_apps', JSON.stringify([fallbackApp, ...filteredStored]));
       } catch (e) {}
       showNotification('Application submitted with ZK proof!', 'success');
@@ -212,21 +355,24 @@ export default function App() {
 
     try {
       const res = await createProperty(payload);
-      const newProp = res?.property ? { ...res.property, landlord_id: currentUser.id, landlord_name: currentUser.name } : { ...payload, id: Date.now() };
+      const newProp = res?.property
+        ? { ...res.property, landlord_id: currentUser.id, landlord_name: currentUser.name }
+        : { ...payload, id: `local_${Date.now()}` };
 
-      setProperties(prev => [newProp, ...prev.filter(p => Number(p.id) !== Number(newProp.id))]);
+      setProperties(prev => [newProp, ...prev.filter(p => String(p.id) !== String(newProp.id))]);
       showNotification('Property listing published & saved to database!', 'success');
       navigateTo('landlord');
       await fetchData();
     } catch (err) {
       console.error('Property creation error:', err);
-      const fallbackProp = { ...payload, id: Date.now() };
-      setProperties(prev => [fallbackProp, ...prev.filter(p => Number(p.id) !== Number(fallbackProp.id))]);
+      const fallbackProp = { ...payload, id: `local_${Date.now()}` };
+      setProperties(prev => [fallbackProp, ...prev.filter(p => String(p.id) !== String(fallbackProp.id))]);
       showNotification('Published listing: ' + (err.message || 'Saved'), 'success');
       navigateTo('landlord');
     }
   };
 
+  // FIX: Only match on a.id (not a.property_id) to avoid bulk-updating wrong applications
   const handleUpdateStatus = async (appId, newStatus, reason = '') => {
     try {
       await updateApplicationStatus(appId, newStatus, reason);
@@ -234,16 +380,16 @@ export default function App() {
       console.log('Backend sync updateStatus fallback');
     }
 
-    setApplications(prev => prev.map(a => 
-      (Number(a.id) === Number(appId) || Number(a.property_id) === Number(appId))
+    setApplications(prev => prev.map(a =>
+      String(a.id) === String(appId)
         ? { ...a, status: newStatus, rejection_reason: reason }
         : a
     ));
 
     try {
       const stored = JSON.parse(localStorage.getItem('roofproof_my_apps') || '[]');
-      const updatedStored = stored.map(a => 
-        (Number(a.id) === Number(appId) || Number(a.property_id) === Number(appId))
+      const updatedStored = stored.map(a =>
+        String(a.id) === String(appId)
           ? { ...a, status: newStatus, rejection_reason: reason }
           : a
       );
@@ -254,18 +400,26 @@ export default function App() {
     await fetchData();
   };
 
-  const handleWithdrawApplication = async (appId) => {
+  const handleWithdrawApplication = async (appId, propertyId) => {
     try {
-      await withdrawApplication(appId);
+      if (appId) {
+        await withdrawApplication(appId);
+      }
     } catch (err) {
       console.log('Backend sync withdraw');
     }
 
-    setApplications(prev => prev.filter(a => Number(a.id) !== Number(appId) && Number(a.property_id) !== Number(appId)));
+    setApplications(prev => prev.filter(a =>
+      String(a.id) !== String(appId) &&
+      (!propertyId || String(a.property_id) !== String(propertyId))
+    ));
 
     try {
       const stored = JSON.parse(localStorage.getItem('roofproof_my_apps') || '[]');
-      const filtered = stored.filter(a => Number(a.id) !== Number(appId) && Number(a.property_id) !== Number(appId));
+      const filtered = stored.filter(a =>
+        String(a.id) !== String(appId) &&
+        (!propertyId || String(a.property_id) !== String(propertyId))
+      );
       localStorage.setItem('roofproof_my_apps', JSON.stringify(filtered));
     } catch (e) {}
 
@@ -278,7 +432,7 @@ export default function App() {
     } catch (err) {
       console.log('Backend sync delete');
     }
-    const nextDeleted = Array.from(new Set([...deletedPropertyIds, propId, Number(propId)]));
+    const nextDeleted = Array.from(new Set([...deletedPropertyIds, propId, String(propId)]));
     setDeletedPropertyIds(nextDeleted);
     try {
       localStorage.setItem('roofproof_deleted_props', JSON.stringify(nextDeleted));
@@ -286,27 +440,23 @@ export default function App() {
 
     try {
       const custom = JSON.parse(localStorage.getItem('roofproof_custom_properties') || '[]');
-      const filteredCustom = custom.filter(p => Number(p.id) !== Number(propId));
+      const filteredCustom = custom.filter(p => String(p.id) !== String(propId));
       localStorage.setItem('roofproof_custom_properties', JSON.stringify(filteredCustom));
     } catch (e) {}
 
     try {
       const storedApps = JSON.parse(localStorage.getItem('roofproof_my_apps') || '[]');
-      const filteredApps = storedApps.filter(a => Number(a.property_id) !== Number(propId));
+      const filteredApps = storedApps.filter(a => String(a.property_id) !== String(propId));
       localStorage.setItem('roofproof_my_apps', JSON.stringify(filteredApps));
     } catch (e) {}
 
-    setProperties(prev => prev.filter(p => Number(p.id) !== Number(propId)));
+    setProperties(prev => prev.filter(p => String(p.id) !== String(propId)));
     showNotification('Property listing deleted successfully', 'success');
   };
 
-  // 1. Unauthenticated Security Guard: User NOT signed in attempting to access Tenant/Landlord portals
+  // Security guards
   const isUnauthenticatedRestricted = !currentUser && (activeView === 'tenant' || activeView === 'landlord' || activeView === 'list-property');
-
-  // 2. Tenant Role Security Guard: Tenant attempting to access Landlord Portal or Create Property
   const isTenantRestricted = currentUser && currentRole === 'tenant' && (activeView === 'landlord' || activeView === 'list-property');
-
-  // 3. Landlord Role Security Guard: Landlord attempting to access Tenant Portal
   const isLandlordRestricted = currentUser && currentRole === 'landlord' && activeView === 'tenant';
 
   return (
@@ -333,41 +483,20 @@ export default function App() {
 
       {/* Global Toast Notification */}
       {notification && (
-        <div style={{
-          position: 'fixed',
-          bottom: '24px',
-          right: '24px',
-          zIndex: 99999,
-          background: notification.type === 'success' ? 'var(--bg-secondary)' : 'rgba(239, 68, 68, 0.95)',
-          border: `1px solid ${notification.type === 'success' ? 'var(--success-border)' : 'rgba(239, 68, 68, 0.5)'}`,
-          color: notification.type === 'success' ? 'var(--success-text)' : '#ffffff',
-          padding: '16px 24px',
-          borderRadius: 'var(--radius-md)',
-          boxShadow: '0 20px 50px rgba(0,0,0,0.5)',
-          fontSize: '0.95rem',
-          fontWeight: 600,
-          animation: 'slideUp 0.3s ease-out',
-        }}>
-          {notification.type === 'success' ? '✓' : '⚠️'} {notification.message}
+        <div className={`toast-notification ${notification.type === 'error' ? 'toast-notification--error' : ''}`} role="status">
+          <div className="toast-notification__icon" aria-hidden="true">
+            {notification.type === 'success' ? '✓' : '!'}
+          </div>
+          <div className="toast-notification__copy">{notification.message}</div>
         </div>
       )}
 
       {/* Main Content Area */}
       <main style={{ flex: 1 }}>
         {isUnauthenticatedRestricted ? (
-          <ErrorPage
-            type="401"
-            onNavigate={navigateTo}
-            onOpenLogin={() => setIsLoginModalOpen(true)}
-            currentRole={currentRole}
-          />
+          <ErrorPage type="401" onNavigate={navigateTo} onOpenLogin={() => setIsLoginModalOpen(true)} currentRole={currentRole} />
         ) : (isTenantRestricted || isLandlordRestricted) ? (
-          <ErrorPage
-            type="403"
-            onNavigate={navigateTo}
-            onOpenLogin={() => setIsLoginModalOpen(true)}
-            currentRole={currentRole}
-          />
+          <ErrorPage type="403" onNavigate={navigateTo} onOpenLogin={() => setIsLoginModalOpen(true)} currentRole={currentRole} />
         ) : (
           <>
             {activeView === 'landing' && (

@@ -31,7 +31,7 @@ export default function TenantDashboard({ properties = [], applications = [], de
     }
   });
   const uniqueApps = Array.from(appMap.values());
-  const myApplications = uniqueApps.filter(a => (Number(a.tenant_id) === Number(currentUser?.id || 3) || !a.tenant_id) && a.status !== 'withdrawn');
+  const myApplications = uniqueApps.filter(a => (String(a.tenant_id) === String(currentUser?.id || '') || !a.tenant_id) && a.status !== 'withdrawn');
 
   const customProps = (() => {
     try {
@@ -42,8 +42,9 @@ export default function TenantDashboard({ properties = [], applications = [], de
   })();
 
   const mergedProperties = [...customProps, ...properties];
-  const uniqueProperties = Array.from(new Map(mergedProperties.map(p => [Number(p.id), p])).values());
-  const catalogue = uniqueProperties.filter(p => !deletedPropertyIds.includes(p.id) && !deletedPropertyIds.includes(Number(p.id)) && !deletedPropertyIds.includes(String(p.id)));
+  const uniqueProperties = Array.from(new Map(mergedProperties.map(p => [String(p.id), p])).values());
+
+  const catalogue = uniqueProperties.filter(p => !deletedPropertyIds.includes(p.id) && !deletedPropertyIds.includes(String(p.id)));
 
   const filteredProperties = catalogue.filter(p => {
     const matchesSearch = p.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -65,26 +66,12 @@ export default function TenantDashboard({ properties = [], applications = [], de
     <div className="animate-fade-in" style={{ padding: '10px 0 50px', width: '100%' }}>
       {/* Denial Reason Popup Modal */}
       {viewingDenialApp && (
-        <div style={{
-          position: 'fixed',
-          inset: 0,
-          background: 'rgba(8, 14, 20, 0.85)',
-          backdropFilter: 'blur(12px)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 9999,
-          padding: '20px',
-        }} onClick={() => setViewingDenialApp(null)}>
-          <div className="glass-card animate-fade-in" style={{
+        <div className="modal-backdrop" onClick={() => setViewingDenialApp(null)}>
+          <div className="modal-surface modal-surface--light modal-surface--danger animate-modal-scale" style={{
             maxWidth: '480px',
             width: '100%',
             padding: '30px',
-            borderRadius: '24px',
-            background: '#ffffff',
-            color: '#1a221b',
-            border: '1px solid rgba(239, 68, 68, 0.3)',
-            boxShadow: '0 30px 80px rgba(0,0,0,0.2)',
+            position: 'relative',
           }} onClick={e => e.stopPropagation()}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
               <h3 style={{ fontSize: '1.2rem', color: '#ef4444', display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -92,7 +79,8 @@ export default function TenantDashboard({ properties = [], applications = [], de
               </h3>
               <button
                 onClick={() => setViewingDenialApp(null)}
-                style={{ background: 'transparent', border: 'none', color: '#666', cursor: 'pointer' }}
+                className="modal-close"
+                style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
               >
                 <X size={18} />
               </button>
@@ -274,7 +262,7 @@ export default function TenantDashboard({ properties = [], applications = [], de
             marginBottom: '32px',
           }}>
             {currentListings.map(property => {
-              const app = myApplications.find(a => Number(a.property_id) === Number(property.id));
+              const app = myApplications.find(a => String(a.property_id) === String(property.id));
               const hasApplied = app && (app.status === 'pending' || app.status === 'approved');
               const isDenied = app && app.status === 'rejected';
 

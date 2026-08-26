@@ -1,7 +1,37 @@
 import React, { useState, useEffect } from 'react';
-import { Building2, Plus, ArrowLeft, Upload, Check, ShieldCheck, MapPin, Sparkles, AlertCircle, Home, FileText } from 'lucide-react';
-
+import {
+  Building2, Plus, ArrowLeft, Upload, Check, ShieldCheck, MapPin, Sparkles,
+  AlertCircle, Home, Layers, CheckSquare, Square, Trash2, Star, Image as ImageIcon,
+  Camera, PlusCircle
+} from 'lucide-react';
 import { uploadImageToCloudinaryApi } from '../services/api.js';
+
+const AVAILABLE_AMENITIES = [
+  'Private Balcony',
+  'Modular Kitchen',
+  '24/7 Power Backup',
+  '24/7 Security & CCTV',
+  'Private Garden',
+  'Covered Car Parking',
+  'Swimming Pool',
+  'Gym & Fitness Center',
+  'High-Speed Fiber Ready',
+  'Pet Friendly',
+  'Gated Community',
+  'Mountain / City Views',
+];
+
+const ROOM_TYPE_OPTIONS = [
+  'Main Facade / Exterior',
+  'Spacious Living Room',
+  'Master Bedroom',
+  'Modular Kitchen',
+  'Luxury Washroom / Bathroom',
+  'Private Balcony / Terrace',
+  'Dining Area',
+  'Garden / Backyard',
+  'Other Room',
+];
 
 export default function CreatePropertyPage({ landlord, onBack, onSuccess }) {
   const [title, setTitle] = useState('');
@@ -10,8 +40,35 @@ export default function CreatePropertyPage({ landlord, onBack, onSuccess }) {
   const [monthlyRent, setMonthlyRent] = useState('');
   const [incomeThreshold, setIncomeThreshold] = useState('');
   const [description, setDescription] = useState('');
-  const [imageFile, setImageFile] = useState(null);
-  const [imagePreview, setImagePreview] = useState('');
+
+  // Extended Specs
+  const [bedrooms, setBedrooms] = useState('3 BHK');
+  const [bathrooms, setBathrooms] = useState('3 Bathrooms');
+  const [furnishing, setFurnishing] = useState('Fully Furnished');
+  const [areaSqft, setAreaSqft] = useState('1,850 sq.ft');
+  const [parking, setParking] = useState('Covered Parking (1 Car + 1 Bike)');
+  const [deposit, setDeposit] = useState('');
+  const [preferredTenants, setPreferredTenants] = useState('Families & Working Professionals');
+  const [availableFrom, setAvailableFrom] = useState('Immediate Move-in');
+  const [selectedAmenities, setSelectedAmenities] = useState([
+    'Private Balcony',
+    'Modular Kitchen',
+    '24/7 Power Backup',
+    '24/7 Security & CCTV',
+  ]);
+
+  // Multi-Photo Management State
+  // Each photo: { id, file, preview, label, isThumbnail }
+  const [photos, setPhotos] = useState([
+    {
+      id: 'default_thumb',
+      preview: '/houses/house1.jpg',
+      label: 'Main Facade / Exterior',
+      isThumbnail: true,
+      file: null,
+    },
+  ]);
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
 
@@ -19,28 +76,91 @@ export default function CreatePropertyPage({ landlord, onBack, onSuccess }) {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, []);
 
-  const handleImageFileChange = (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  // Find currently designated thumbnail
+  const currentThumbnail = photos.find(p => p.isThumbnail) || photos[0];
 
-    if (!file.type.startsWith('image/')) {
-      setError('Please select a valid image file (JPG, PNG, WebP).');
-      return;
-    }
-
-    if (file.size > 10 * 1024 * 1024) {
-      setError('Image file size must be under 10 MB.');
-      return;
-    }
+  // Add multiple files from file input
+  const handleMultipleFiles = (e) => {
+    const files = Array.from(e.target.files || []);
+    if (!files.length) return;
 
     setError(null);
-    setImageFile(file);
+    const labelOrder = ['Main Facade / Exterior', 'Spacious Living Room', 'Master Bedroom', 'Modular Kitchen', 'Luxury Washroom / Bathroom', 'Private Balcony / Terrace'];
 
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setImagePreview(reader.result);
-    };
-    reader.readAsDataURL(file);
+    files.forEach((file, idx) => {
+      if (!file.type.startsWith('image/')) {
+        setError('Please select valid image files (JPG, PNG, WebP).');
+        return;
+      }
+      if (file.size > 10 * 1024 * 1024) {
+        setError('File size must be under 10 MB per image.');
+        return;
+      }
+
+      const reader = new FileReader();
+      const tempId = `photo_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
+
+      reader.onloadend = () => {
+        setPhotos(prev => {
+          const filtered = prev.filter(p => p.id !== 'default_thumb');
+          const isFirst = filtered.length === 0;
+          const defaultLabel = labelOrder[filtered.length % labelOrder.length] || 'Room Photo';
+
+          return [
+            ...filtered,
+            {
+              id: tempId,
+              file,
+              preview: reader.result,
+              label: defaultLabel,
+              isThumbnail: isFirst,
+            },
+          ];
+        });
+      };
+      reader.readAsDataURL(file);
+    });
+
+    // Reset file input target so user can re-click and upload more photos immediately
+    e.target.value = '';
+  };
+
+  const setAsThumbnail = (id) => {
+    setPhotos(prev =>
+      prev.map(p => ({
+        ...p,
+        isThumbnail: p.id === id,
+      }))
+    );
+  };
+
+  const updatePhotoLabel = (id, newLabel) => {
+    setPhotos(prev =>
+      prev.map(p => (p.id === id ? { ...p, label: newLabel } : p))
+    );
+  };
+
+  const removePhoto = (id) => {
+    if (photos.length <= 1) {
+      setError('Please keep at least 1 photo for your listing thumbnail.');
+      return;
+    }
+    setPhotos(prev => {
+      const remaining = prev.filter(p => p.id !== id);
+      const hadThumb = prev.find(p => p.id === id)?.isThumbnail;
+      if (hadThumb && remaining.length > 0) {
+        remaining[0].isThumbnail = true;
+      }
+      return remaining;
+    });
+  };
+
+  const toggleAmenity = (amenity) => {
+    setSelectedAmenities(prev =>
+      prev.includes(amenity)
+        ? prev.filter(a => a !== amenity)
+        : [...prev, amenity]
+    );
   };
 
   const handleSubmit = async (e) => {
@@ -52,25 +172,38 @@ export default function CreatePropertyPage({ landlord, onBack, onSuccess }) {
       return;
     }
 
+    if (photos.length === 0) {
+      setError('Please upload at least 1 property photo for the cover thumbnail.');
+      return;
+    }
+
     setIsSubmitting(true);
-    let finalImageUrl = imagePreview || 'https://res.cloudinary.com/omfiwspt/image/upload/v1723900001/roofproof/properties/house1_colonial_mansion.jpg';
 
     try {
-      if (imageFile || imagePreview) {
-        try {
-          const uploadRes = await uploadImageToCloudinaryApi(imageFile || imagePreview);
-          if (uploadRes?.url && !uploadRes.isFallback) {
-            finalImageUrl = uploadRes.url;
-          } else if (imagePreview) {
-            finalImageUrl = imagePreview;
+      // Process and upload all photos
+      const uploadedGallery = await Promise.all(
+        photos.map(async (photo) => {
+          let url = photo.preview;
+          if (photo.file) {
+            try {
+              const uploadRes = await uploadImageToCloudinaryApi(photo.file);
+              if (uploadRes?.url && !uploadRes.isFallback) {
+                url = uploadRes.url;
+              }
+            } catch (err) {
+              console.warn('[Cloudinary Upload Fallback]', err);
+            }
           }
-        } catch (uploadErr) {
-          console.warn('[Cloudinary Upload Fallback]', uploadErr);
-          if (imagePreview) {
-            finalImageUrl = imagePreview;
-          }
-        }
-      }
+          return {
+            label: photo.label || 'Property Photo',
+            url,
+            isThumbnail: photo.isThumbnail,
+          };
+        })
+      );
+
+      const mainThumb = uploadedGallery.find(p => p.isThumbnail) || uploadedGallery[0];
+      const finalImageUrl = mainThumb?.url || '/houses/house1.jpg';
 
       await onSuccess({
         title: title.trim(),
@@ -80,11 +213,23 @@ export default function CreatePropertyPage({ landlord, onBack, onSuccess }) {
         income_threshold: Number(incomeThreshold),
         description: description.trim(),
         image_url: finalImageUrl,
+        gallery: uploadedGallery,
+        // Extended specs
+        bedrooms,
+        bathrooms,
+        furnishing,
+        area_sqft: areaSqft.trim(),
+        parking,
+        deposit: deposit.trim() || `₹${(Number(monthlyRent) * 2).toLocaleString('en-IN')}`,
+        preferred_tenants: preferredTenants,
+        available_from: availableFrom,
+        amenities: selectedAmenities,
       });
+
       setIsSubmitting(false);
     } catch (err) {
       setIsSubmitting(false);
-      setError(err.message || 'Failed to publish property listing to database.');
+      setError(err.message || 'Failed to publish property listing.');
     }
   };
 
@@ -119,14 +264,14 @@ export default function CreatePropertyPage({ landlord, onBack, onSuccess }) {
         </div>
       </div>
 
-      {/* Main 2-Column Luxury Split Workspace */}
+      {/* Main 2-Column Split Workspace */}
       <div style={{
         display: 'grid',
-        gridTemplateColumns: 'minmax(320px, 400px) 1fr',
+        gridTemplateColumns: 'minmax(320px, 380px) 1fr',
         gap: '28px',
         alignItems: 'start',
       }}>
-        {/* Left Column: Live Card Preview matching site's white card design */}
+        {/* Left Column: Live Card Preview with Designated Thumbnail */}
         <div style={{ position: 'sticky', top: '20px' }}>
           <div className="white-property-card" style={{
             padding: '22px',
@@ -134,24 +279,34 @@ export default function CreatePropertyPage({ landlord, onBack, onSuccess }) {
             boxShadow: '0 20px 50px rgba(0, 0, 0, 0.15)',
           }}>
             <div style={{
-              display: 'inline-flex',
+              display: 'flex',
+              justifyContent: 'space-between',
               alignItems: 'center',
-              gap: '6px',
-              background: 'rgba(74, 124, 89, 0.12)',
-              color: '#4A7C59',
-              padding: '4px 12px',
-              borderRadius: '999px',
-              fontSize: '0.74rem',
-              fontWeight: 700,
               marginBottom: '16px',
-              border: '1px solid rgba(74, 124, 89, 0.25)',
             }}>
-              <Sparkles size={13} /> LIVE CARD PREVIEW
+              <div style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                background: 'rgba(74, 124, 89, 0.12)',
+                color: '#4A7C59',
+                padding: '4px 12px',
+                borderRadius: '999px',
+                fontSize: '0.74rem',
+                fontWeight: 700,
+                border: '1px solid rgba(74, 124, 89, 0.25)',
+              }}>
+                <Sparkles size={13} /> LIVE CARD PREVIEW
+              </div>
+
+              <span style={{ fontSize: '0.74rem', color: '#666', fontWeight: 600 }}>
+                {photos.length} Photo{photos.length > 1 ? 's' : ''}
+              </span>
             </div>
 
-            {/* Photo Box */}
+            {/* Thumbnail Photo Box */}
             <div style={{
-              height: '230px',
+              height: '210px',
               borderRadius: '18px',
               overflow: 'hidden',
               background: '#FAF9F5',
@@ -162,30 +317,42 @@ export default function CreatePropertyPage({ landlord, onBack, onSuccess }) {
               alignItems: 'center',
               justifyContent: 'center',
             }}>
-              {imagePreview ? (
-                <img
-                  src={imagePreview}
-                  alt="Property Preview"
-                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                />
-              ) : (
-                <div style={{ textAlign: 'center', color: '#666666', padding: '20px' }}>
-                  <Building2 size={42} color="#4A7C59" style={{ margin: '0 auto 8px', opacity: 0.6 }} />
-                  <div style={{ fontSize: '0.88rem', fontWeight: 600, color: '#1a221b' }}>No Photo Uploaded Yet</div>
-                  <div style={{ fontSize: '0.76rem', color: '#777' }}>Upload photo file on right to view</div>
-                </div>
-              )}
+              <img
+                src={currentThumbnail?.preview || '/houses/house1.jpg'}
+                alt="Property Thumbnail"
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+              />
+
+              {/* Main Cover Badge */}
+              <span style={{
+                position: 'absolute',
+                top: '10px',
+                left: '10px',
+                background: 'rgba(12, 18, 25, 0.88)',
+                backdropFilter: 'blur(8px)',
+                padding: '4px 10px',
+                borderRadius: '999px',
+                fontSize: '0.7rem',
+                color: '#EBA834',
+                fontWeight: 800,
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px',
+                border: '1px solid rgba(235, 168, 52, 0.4)',
+              }}>
+                <Star size={11} fill="#EBA834" color="#EBA834" /> Main Thumbnail
+              </span>
             </div>
 
-            <h3 style={{ fontSize: '1.3rem', fontWeight: 700, marginBottom: '6px', color: '#1a221b', lineHeight: 1.25 }}>
+            <h3 style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: '6px', color: '#1a221b', lineHeight: 1.25 }}>
               {title || 'Property Title'}
             </h3>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#555e56', fontSize: '0.85rem', marginBottom: '16px' }}>
-              <MapPin size={15} color="#4A7C59" />
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#555e56', fontSize: '0.82rem', marginBottom: '14px' }}>
+              <MapPin size={14} color="#4A7C59" />
               <span>{location || 'City, State'}</span>
               <span style={{ margin: '0 4px', color: '#ccc' }}>•</span>
-              <span style={{ color: '#EBA834', fontWeight: 700 }}>{propertyType}</span>
+              <span style={{ color: '#EBA834', fontWeight: 700 }}>{bedrooms} {propertyType}</span>
             </div>
 
             <div style={{
@@ -196,6 +363,7 @@ export default function CreatePropertyPage({ landlord, onBack, onSuccess }) {
               display: 'grid',
               gridTemplateColumns: '1fr 1fr',
               gap: '10px',
+              marginBottom: '14px',
             }}>
               <div>
                 <div style={{ fontSize: '0.7rem', color: '#666', textTransform: 'uppercase', fontWeight: 700 }}>Monthly Rent</div>
@@ -206,10 +374,23 @@ export default function CreatePropertyPage({ landlord, onBack, onSuccess }) {
                 <div style={{ fontSize: '1.15rem', fontWeight: 800, color: '#4A7C59' }}>{formattedThreshold}</div>
               </div>
             </div>
+
+            {/* Quick Badges Preview */}
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+              <span style={{ background: '#FAF9F5', border: '1px solid #e5e5e5', padding: '3px 8px', borderRadius: '6px', fontSize: '0.72rem', color: '#555' }}>
+                {furnishing}
+              </span>
+              <span style={{ background: '#FAF9F5', border: '1px solid #e5e5e5', padding: '3px 8px', borderRadius: '6px', fontSize: '0.72rem', color: '#555' }}>
+                {areaSqft}
+              </span>
+              <span style={{ background: '#FAF9F5', border: '1px solid #e5e5e5', padding: '3px 8px', borderRadius: '6px', fontSize: '0.72rem', color: '#555' }}>
+                {bathrooms}
+              </span>
+            </div>
           </div>
         </div>
 
-        {/* Right Column: Luxury White Rectangle Form Container */}
+        {/* Right Column: Listing Form Container */}
         <div style={{
           background: '#ffffff',
           borderRadius: '26px',
@@ -221,7 +402,7 @@ export default function CreatePropertyPage({ landlord, onBack, onSuccess }) {
           <div style={{ marginBottom: '24px', borderBottom: '1px solid rgba(0, 0, 0, 0.08)', paddingBottom: '18px' }}>
             <h2 style={{ fontSize: '1.8rem', fontWeight: 700, margin: 0, color: '#1a221b' }}>List New Rental Property</h2>
             <p style={{ color: '#555e56', fontSize: '0.92rem', marginTop: '4px', margin: '4px 0 0' }}>
-              Publish listing directly to PostgreSQL database with Midnight Zero-Knowledge income privacy bounds.
+              Upload property photos (Living Room, Washroom, Kitchen, Bedroom) and specify which image is the cover thumbnail.
             </p>
           </div>
 
@@ -243,10 +424,10 @@ export default function CreatePropertyPage({ landlord, onBack, onSuccess }) {
           )}
 
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '22px' }}>
-            {/* Title & Type */}
+            {/* Section 1: Basic Information */}
             <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '16px' }}>
               <div>
-                <label style={{ display: 'block', fontSize: '0.88rem', fontWeight: 700, color: '#1a221b', marginBottom: '6px' }}>
+                <label style={{ display: 'block', fontSize: '0.86rem', fontWeight: 700, color: '#1a221b', marginBottom: '6px' }}>
                   Property Title *
                 </label>
                 <input
@@ -257,12 +438,12 @@ export default function CreatePropertyPage({ landlord, onBack, onSuccess }) {
                   required
                   style={{
                     width: '100%',
-                    padding: '12px 16px',
+                    padding: '11px 14px',
                     background: '#FAF9F5',
                     border: '1px solid rgba(0, 0, 0, 0.12)',
-                    borderRadius: '14px',
+                    borderRadius: '12px',
                     color: '#1a221b',
-                    fontSize: '0.92rem',
+                    fontSize: '0.9rem',
                     outline: 'none',
                     fontWeight: 500,
                   }}
@@ -270,7 +451,7 @@ export default function CreatePropertyPage({ landlord, onBack, onSuccess }) {
               </div>
 
               <div>
-                <label style={{ display: 'block', fontSize: '0.88rem', fontWeight: 700, color: '#1a221b', marginBottom: '6px' }}>
+                <label style={{ display: 'block', fontSize: '0.86rem', fontWeight: 700, color: '#1a221b', marginBottom: '6px' }}>
                   Housing Type *
                 </label>
                 <select
@@ -278,12 +459,12 @@ export default function CreatePropertyPage({ landlord, onBack, onSuccess }) {
                   onChange={e => setPropertyType(e.target.value)}
                   style={{
                     width: '100%',
-                    padding: '12px 16px',
+                    padding: '11px 14px',
                     background: '#FAF9F5',
                     border: '1px solid rgba(0, 0, 0, 0.12)',
-                    borderRadius: '14px',
+                    borderRadius: '12px',
                     color: '#1a221b',
-                    fontSize: '0.92rem',
+                    fontSize: '0.9rem',
                     outline: 'none',
                     fontWeight: 600,
                   }}
@@ -299,49 +480,49 @@ export default function CreatePropertyPage({ landlord, onBack, onSuccess }) {
               </div>
             </div>
 
-            {/* Location, Rent, Income */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr 1fr', gap: '16px' }}>
+            {/* Section 2: Location, Rent, Income Requirement */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr 1fr', gap: '14px' }}>
               <div>
-                <label style={{ display: 'block', fontSize: '0.88rem', fontWeight: 700, color: '#1a221b', marginBottom: '6px' }}>
+                <label style={{ display: 'block', fontSize: '0.86rem', fontWeight: 700, color: '#1a221b', marginBottom: '6px' }}>
                   Location / City *
                 </label>
                 <input
                   type="text"
                   value={location}
                   onChange={e => setLocation(e.target.value)}
-                  placeholder="e.g. Dehradun, Uttarakhand"
+                  placeholder="e.g. Coorg, Karnataka"
                   required
                   style={{
                     width: '100%',
-                    padding: '12px 16px',
+                    padding: '11px 14px',
                     background: '#FAF9F5',
                     border: '1px solid rgba(0, 0, 0, 0.12)',
-                    borderRadius: '14px',
+                    borderRadius: '12px',
                     color: '#1a221b',
-                    fontSize: '0.92rem',
+                    fontSize: '0.9rem',
                     outline: 'none',
                   }}
                 />
               </div>
 
               <div>
-                <label style={{ display: 'block', fontSize: '0.88rem', fontWeight: 700, color: '#1a221b', marginBottom: '6px' }}>
+                <label style={{ display: 'block', fontSize: '0.86rem', fontWeight: 700, color: '#1a221b', marginBottom: '6px' }}>
                   Monthly Rent (₹) *
                 </label>
                 <input
                   type="number"
                   value={monthlyRent}
                   onChange={e => setMonthlyRent(e.target.value)}
-                  placeholder="55000"
+                  placeholder="65000"
                   required
                   style={{
                     width: '100%',
-                    padding: '12px 16px',
+                    padding: '11px 14px',
                     background: '#FAF9F5',
                     border: '1px solid rgba(0, 0, 0, 0.12)',
-                    borderRadius: '14px',
+                    borderRadius: '12px',
                     color: '#1a221b',
-                    fontSize: '0.92rem',
+                    fontSize: '0.9rem',
                     outline: 'none',
                     fontWeight: 600,
                   }}
@@ -349,23 +530,23 @@ export default function CreatePropertyPage({ landlord, onBack, onSuccess }) {
               </div>
 
               <div>
-                <label style={{ display: 'block', fontSize: '0.88rem', fontWeight: 700, color: '#1a221b', marginBottom: '6px' }}>
+                <label style={{ display: 'block', fontSize: '0.86rem', fontWeight: 700, color: '#1a221b', marginBottom: '6px' }}>
                   Min. Income Req. (₹) *
                 </label>
                 <input
                   type="number"
                   value={incomeThreshold}
                   onChange={e => setIncomeThreshold(e.target.value)}
-                  placeholder="165000"
+                  placeholder="195000"
                   required
                   style={{
                     width: '100%',
-                    padding: '12px 16px',
+                    padding: '11px 14px',
                     background: '#FAF9F5',
                     border: '1px solid rgba(0, 0, 0, 0.12)',
-                    borderRadius: '14px',
+                    borderRadius: '12px',
                     color: '#1a221b',
-                    fontSize: '0.92rem',
+                    fontSize: '0.9rem',
                     outline: 'none',
                     fontWeight: 600,
                   }}
@@ -373,10 +554,344 @@ export default function CreatePropertyPage({ landlord, onBack, onSuccess }) {
               </div>
             </div>
 
-            {/* Description */}
+            {/* Section 3: Multi-Photo Upload Studio & Thumbnail Selection */}
+            <div style={{
+              background: '#FAF9F5',
+              border: '1px solid rgba(0, 0, 0, 0.08)',
+              borderRadius: '18px',
+              padding: '20px',
+            }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                <div>
+                  <div style={{ fontSize: '0.88rem', fontWeight: 800, color: '#1a221b' }}>
+                    📸 Property Photos & Thumbnail Studio
+                  </div>
+                  <p style={{ fontSize: '0.78rem', color: '#666', margin: '2px 0 0' }}>
+                    Upload multiple room photos (Facade, Living Room, Washroom, Kitchen, Bedroom). Choose <strong>one picture as the Cover Thumbnail</strong>.
+                  </p>
+                </div>
+
+                <label
+                  htmlFor="multi-photo-upload-input"
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    background: '#4A7C59',
+                    color: '#ffffff',
+                    padding: '8px 18px',
+                    borderRadius: '999px',
+                    fontSize: '0.82rem',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    boxShadow: '0 2px 8px rgba(74, 124, 89, 0.3)',
+                  }}
+                >
+                  <PlusCircle size={15} /> Add Photos
+                </label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  onChange={handleMultipleFiles}
+                  style={{ display: 'none' }}
+                  id="multi-photo-upload-input"
+                />
+              </div>
+
+              {/* Uploaded Photos Grid & Management */}
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+                gap: '12px',
+                marginTop: '14px',
+              }}>
+                {photos.map((photo) => (
+                  <div
+                    key={photo.id}
+                    style={{
+                      background: '#ffffff',
+                      border: photo.isThumbnail ? '2px solid #EBA834' : '1px solid #e5e5e5',
+                      borderRadius: '14px',
+                      overflow: 'hidden',
+                      position: 'relative',
+                      boxShadow: photo.isThumbnail ? '0 0 14px rgba(235, 168, 52, 0.35)' : '0 2px 6px rgba(0,0,0,0.05)',
+                      display: 'flex',
+                      flexDirection: 'column',
+                    }}
+                  >
+                    {/* Image Preview */}
+                    <div style={{ height: '115px', position: 'relative', background: '#000' }}>
+                      <img
+                        src={photo.preview}
+                        alt={photo.label}
+                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                      />
+
+                      {/* Thumbnail Badge */}
+                      {photo.isThumbnail && (
+                        <span style={{
+                          position: 'absolute',
+                          top: '6px',
+                          left: '6px',
+                          background: '#EBA834',
+                          color: '#0c141d',
+                          padding: '3px 8px',
+                          borderRadius: '999px',
+                          fontSize: '0.66rem',
+                          fontWeight: 800,
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '3px',
+                        }}>
+                          <Star size={10} fill="#0c141d" /> COVER THUMBNAIL
+                        </span>
+                      )}
+
+                      {/* Delete Button */}
+                      <button
+                        type="button"
+                        onClick={() => removePhoto(photo.id)}
+                        title="Remove this photo"
+                        style={{
+                          position: 'absolute',
+                          top: '6px',
+                          right: '6px',
+                          background: 'rgba(239, 68, 68, 0.9)',
+                          color: '#ffffff',
+                          border: 'none',
+                          borderRadius: '50%',
+                          width: '24px',
+                          height: '24px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        <Trash2 size={12} />
+                      </button>
+                    </div>
+
+                    {/* Photo Label Selector & Actions */}
+                    <div style={{ padding: '8px 10px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                      <select
+                        value={photo.label}
+                        onChange={(e) => updatePhotoLabel(photo.id, e.target.value)}
+                        style={{
+                          width: '100%',
+                          padding: '5px 8px',
+                          fontSize: '0.76rem',
+                          border: '1px solid #d1d5db',
+                          borderRadius: '6px',
+                          background: '#FAF9F5',
+                          fontWeight: 600,
+                          color: '#1a221b',
+                          outline: 'none',
+                        }}
+                      >
+                        {ROOM_TYPE_OPTIONS.map((opt, oIdx) => (
+                          <option key={oIdx} value={opt}>{opt}</option>
+                        ))}
+                      </select>
+
+                      {!photo.isThumbnail && (
+                        <button
+                          type="button"
+                          onClick={() => setAsThumbnail(photo.id)}
+                          style={{
+                            background: '#FAF9F5',
+                            border: '1px solid #d1d5db',
+                            borderRadius: '6px',
+                            padding: '4px',
+                            fontSize: '0.72rem',
+                            fontWeight: 700,
+                            color: '#555',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: '4px',
+                          }}
+                        >
+                          <Star size={11} color="#EBA834" /> Set as Cover Thumbnail
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Section 4: Specifications */}
+            <div style={{
+              background: '#FAF9F5',
+              border: '1px solid rgba(0, 0, 0, 0.08)',
+              borderRadius: '16px',
+              padding: '18px',
+            }}>
+              <div style={{ fontSize: '0.82rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#4A7C59', marginBottom: '14px' }}>
+                Home Detail Specifications (Displayed in Detail Popup)
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '12px', marginBottom: '14px' }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: '#555', marginBottom: '4px' }}>
+                    Bedrooms / Config
+                  </label>
+                  <select
+                    value={bedrooms}
+                    onChange={e => setBedrooms(e.target.value)}
+                    style={{ width: '100%', padding: '9px 12px', background: '#ffffff', border: '1px solid #d1d5db', borderRadius: '8px', fontSize: '0.85rem' }}
+                  >
+                    <option value="1 BHK">1 BHK</option>
+                    <option value="2 BHK">2 BHK</option>
+                    <option value="3 BHK">3 BHK</option>
+                    <option value="4 BHK">4 BHK</option>
+                    <option value="5+ BHK">5+ BHK / Villa</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: '#555', marginBottom: '4px' }}>
+                    Bathrooms / Washrooms
+                  </label>
+                  <select
+                    value={bathrooms}
+                    onChange={e => setBathrooms(e.target.value)}
+                    style={{ width: '100%', padding: '9px 12px', background: '#ffffff', border: '1px solid #d1d5db', borderRadius: '8px', fontSize: '0.85rem' }}
+                  >
+                    <option value="1 Bathroom">1 Bathroom</option>
+                    <option value="2 Bathrooms">2 Bathrooms</option>
+                    <option value="3 Bathrooms">3 Bathrooms</option>
+                    <option value="4+ Bathrooms">4+ Bathrooms</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: '#555', marginBottom: '4px' }}>
+                    Furnishing Status
+                  </label>
+                  <select
+                    value={furnishing}
+                    onChange={e => setFurnishing(e.target.value)}
+                    style={{ width: '100%', padding: '9px 12px', background: '#ffffff', border: '1px solid #d1d5db', borderRadius: '8px', fontSize: '0.85rem' }}
+                  >
+                    <option value="Fully Furnished">Fully Furnished</option>
+                    <option value="Semi-Furnished">Semi-Furnished</option>
+                    <option value="Unfurnished">Unfurnished</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: '#555', marginBottom: '4px' }}>
+                    Super Area (Sq.Ft)
+                  </label>
+                  <input
+                    type="text"
+                    value={areaSqft}
+                    onChange={e => setAreaSqft(e.target.value)}
+                    placeholder="e.g. 2,150 sq.ft"
+                    style={{ width: '100%', padding: '9px 12px', background: '#ffffff', border: '1px solid #d1d5db', borderRadius: '8px', fontSize: '0.85rem' }}
+                  />
+                </div>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '12px' }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: '#555', marginBottom: '4px' }}>
+                    Parking
+                  </label>
+                  <input
+                    type="text"
+                    value={parking}
+                    onChange={e => setParking(e.target.value)}
+                    placeholder="e.g. Covered Parking (1 Car)"
+                    style={{ width: '100%', padding: '9px 12px', background: '#ffffff', border: '1px solid #d1d5db', borderRadius: '8px', fontSize: '0.85rem' }}
+                  />
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: '#555', marginBottom: '4px' }}>
+                    Security Deposit
+                  </label>
+                  <input
+                    type="text"
+                    value={deposit}
+                    onChange={e => setDeposit(e.target.value)}
+                    placeholder="e.g. ₹1,30,000 (2 Months)"
+                    style={{ width: '100%', padding: '9px 12px', background: '#ffffff', border: '1px solid #d1d5db', borderRadius: '8px', fontSize: '0.85rem' }}
+                  />
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: '#555', marginBottom: '4px' }}>
+                    Preferred Tenants
+                  </label>
+                  <input
+                    type="text"
+                    value={preferredTenants}
+                    onChange={e => setPreferredTenants(e.target.value)}
+                    placeholder="e.g. Families & Professionals"
+                    style={{ width: '100%', padding: '9px 12px', background: '#ffffff', border: '1px solid #d1d5db', borderRadius: '8px', fontSize: '0.85rem' }}
+                  />
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: '#555', marginBottom: '4px' }}>
+                    Available From
+                  </label>
+                  <input
+                    type="text"
+                    value={availableFrom}
+                    onChange={e => setAvailableFrom(e.target.value)}
+                    placeholder="e.g. Immediate Move-in"
+                    style={{ width: '100%', padding: '9px 12px', background: '#ffffff', border: '1px solid #d1d5db', borderRadius: '8px', fontSize: '0.85rem' }}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Section 5: Amenities */}
             <div>
-              <label style={{ display: 'block', fontSize: '0.88rem', fontWeight: 700, color: '#1a221b', marginBottom: '6px' }}>
-                Description & Amenities *
+              <label style={{ display: 'block', fontSize: '0.86rem', fontWeight: 700, color: '#1a221b', marginBottom: '8px' }}>
+                Select Amenities & Highlights
+              </label>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '8px' }}>
+                {AVAILABLE_AMENITIES.map((amenity, idx) => {
+                  const isChecked = selectedAmenities.includes(amenity);
+                  return (
+                    <div
+                      key={idx}
+                      onClick={() => toggleAmenity(amenity)}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        padding: '8px 12px',
+                        borderRadius: '10px',
+                        background: isChecked ? 'rgba(74, 124, 89, 0.12)' : '#FAF9F5',
+                        border: isChecked ? '1px solid #4A7C59' : '1px solid #e5e5e5',
+                        color: isChecked ? '#4A7C59' : '#555',
+                        cursor: 'pointer',
+                        fontSize: '0.82rem',
+                        fontWeight: isChecked ? 700 : 500,
+                        userSelect: 'none',
+                        transition: 'all 0.15s ease',
+                      }}
+                    >
+                      {isChecked ? <CheckSquare size={16} color="#4A7C59" /> : <Square size={16} color="#999" />}
+                      <span>{amenity}</span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Section 6: Description */}
+            <div>
+              <label style={{ display: 'block', fontSize: '0.86rem', fontWeight: 700, color: '#1a221b', marginBottom: '6px' }}>
+                Description & Detailed Overview *
               </label>
               <textarea
                 rows="4"
@@ -386,71 +901,34 @@ export default function CreatePropertyPage({ landlord, onBack, onSuccess }) {
                 required
                 style={{
                   width: '100%',
-                  padding: '12px 16px',
+                  padding: '12px 14px',
                   background: '#FAF9F5',
                   border: '1px solid rgba(0, 0, 0, 0.12)',
                   borderRadius: '14px',
                   color: '#1a221b',
-                  fontSize: '0.92rem',
+                  fontSize: '0.9rem',
                   outline: 'none',
                   resize: 'none',
                 }}
               />
             </div>
 
-            {/* Photo Upload Dropzone */}
-            <div>
-              <label style={{ display: 'block', fontSize: '0.88rem', fontWeight: 700, color: '#1a221b', marginBottom: '8px' }}>
-                Property Photo Upload
-              </label>
-
-              <div style={{
-                border: '2px dashed rgba(74, 124, 89, 0.35)',
-                borderRadius: '18px',
-                padding: '28px',
-                textAlign: 'center',
-                background: '#FAF9F5',
-              }}>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageFileChange}
-                  style={{ display: 'none' }}
-                  id="luxury-form-image-file"
-                />
-                <label
-                  htmlFor="luxury-form-image-file"
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                    background: '#141a15',
-                    color: '#ffffff',
-                    padding: '12px 28px',
-                    borderRadius: '999px',
-                    fontSize: '0.9rem',
-                    fontWeight: 700,
-                    cursor: 'pointer',
-                    boxShadow: '0 4px 16px rgba(0,0,0,0.15)',
-                  }}
-                >
-                  <Upload size={18} /> {imageFile ? 'Change Selected Photo' : 'Upload Property Photo'}
-                </label>
-                <div style={{ fontSize: '0.82rem', color: '#666', marginTop: '10px' }}>
-                  {imageFile ? `${imageFile.name} (${(imageFile.size / 1024).toFixed(1)} KB)` : 'Select a JPG, PNG, or WebP photo file.'}
-                </div>
-              </div>
-            </div>
-
-            {/* Submit Action Bar */}
-            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '14px', marginTop: '14px', paddingTop: '20px', borderTop: '1px solid rgba(0, 0, 0, 0.08)' }}>
+            {/* Submit Action Bar with "List Property Now" Button */}
+            <div style={{
+              display: 'flex',
+              justifyContent: 'flex-end',
+              gap: '14px',
+              marginTop: '12px',
+              paddingTop: '20px',
+              borderTop: '1px solid rgba(0, 0, 0, 0.08)',
+            }}>
               <button
                 type="button"
                 onClick={onBack}
                 style={{
                   background: '#FAF9F5',
                   color: '#1a221b',
-                  padding: '12px 28px',
+                  padding: '13px 28px',
                   borderRadius: '999px',
                   border: '1px solid rgba(0, 0, 0, 0.12)',
                   fontWeight: 600,
@@ -464,21 +942,22 @@ export default function CreatePropertyPage({ landlord, onBack, onSuccess }) {
                 type="submit"
                 disabled={isSubmitting}
                 style={{
-                  background: '#141a15',
+                  background: 'linear-gradient(135deg, #141a15 0%, #1f2a21 100%)',
                   color: '#ffffff',
-                  padding: '12px 32px',
+                  padding: '13px 36px',
                   borderRadius: '999px',
                   border: 'none',
-                  fontWeight: 700,
-                  fontSize: '0.95rem',
+                  fontWeight: 800,
+                  fontSize: '1rem',
                   cursor: isSubmitting ? 'not-allowed' : 'pointer',
                   display: 'flex',
                   alignItems: 'center',
                   gap: '8px',
-                  boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
+                  boxShadow: '0 10px 28px rgba(0,0,0,0.22)',
+                  letterSpacing: '-0.01em',
                 }}
               >
-                <Plus size={18} /> {isSubmitting ? 'Publishing to Database...' : 'Publish Listing to Database'}
+                <Plus size={19} /> {isSubmitting ? 'Publishing Property...' : 'List Property Now'}
               </button>
             </div>
           </form>

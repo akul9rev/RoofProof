@@ -78,37 +78,17 @@ export default function LoginModal({ isOpen, onClose, currentRole, onLoginSucces
   };
 
   return createPortal(
-    <div 
-      style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        width: '100vw',
-        height: '100vh',
-        background: 'rgba(5, 10, 16, 0.88)',
-        backdropFilter: 'blur(16px)',
-        WebkitBackdropFilter: 'blur(16px)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        zIndex: 999999,
-        padding: '16px',
-      }}
+    <div
+      className="modal-backdrop"
       onClick={onClose}
     >
       <div 
-        className="luxury-modal-container animate-modal-scale"
+        className="luxury-modal-container modal-surface animate-modal-scale"
         onClick={(e) => e.stopPropagation()}
         style={{
           maxWidth: '460px',
           width: '100%',
           padding: '28px 30px',
-          borderRadius: '26px',
-          background: 'linear-gradient(165deg, rgba(16, 24, 34, 0.98) 0%, rgba(10, 16, 24, 0.99) 100%)',
-          border: '1px solid rgba(255, 255, 255, 0.18)',
-          boxShadow: '0 30px 80px rgba(0, 0, 0, 0.85), inset 0 1px 1px rgba(255, 255, 255, 0.15)',
           position: 'relative',
           maxHeight: '90vh',
           overflowY: 'auto',
@@ -117,28 +97,15 @@ export default function LoginModal({ isOpen, onClose, currentRole, onLoginSucces
         {/* Close Button */}
         <button
           onClick={onClose}
-          style={{
-            position: 'absolute',
-            top: '20px',
-            right: '20px',
-            background: 'rgba(255, 255, 255, 0.08)',
-            border: '1px solid rgba(255, 255, 255, 0.12)',
-            borderRadius: '50%',
-            width: '30px',
-            height: '30px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: 'rgba(255, 255, 255, 0.7)',
-            cursor: 'pointer',
-          }}
+          className="modal-close"
+          style={{ position: 'absolute', top: '20px', right: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
         >
           <X size={16} />
         </button>
 
         {/* Modal Header */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px' }}>
-          <div style={{
+        <div className="modal-header" style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px' }}>
+          <div className="modal-icon-badge" style={{
             width: '38px',
             height: '38px',
             borderRadius: '10px',
@@ -151,6 +118,7 @@ export default function LoginModal({ isOpen, onClose, currentRole, onLoginSucces
             <Shield size={20} color="#0c141d" />
           </div>
           <div>
+            <div className="modal-eyebrow">Private access layer</div>
             <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: '#ffffff', margin: 0 }}>
               {authMode === 'signin' ? 'Sign In to RoofProof' : 'Create RoofProof Account'}
             </h3>

@@ -1,12 +1,13 @@
 import { pool } from './index.js';
 
-export async function migrate() {
-  console.log('[DB Migrate] Running PostgreSQL migration and seeding schema...');
+/**
+ * Initializes tables if they do not exist, and automatically seeds initial
+ * users and listings if the database is empty on server startup.
+ */
+export async function initDb() {
   const client = await pool.connect();
   try {
-    await client.query('BEGIN');
-
-    // 1. Users Table
+    // 1. Create tables if they do not exist
     await client.query(`
       CREATE TABLE IF NOT EXISTS users (
         id SERIAL PRIMARY KEY,
@@ -20,10 +21,7 @@ export async function migrate() {
         organization VARCHAR(100),
         created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
       );
-    `);
 
-    // 2. Properties Table
-    await client.query(`
       CREATE TABLE IF NOT EXISTS properties (
         id SERIAL PRIMARY KEY,
         landlord_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -36,10 +34,7 @@ export async function migrate() {
         image_url TEXT,
         created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
       );
-    `);
 
-    // 3. Applications Table (with valid verification_status constraint)
-    await client.query(`
       CREATE TABLE IF NOT EXISTS applications (
         id SERIAL PRIMARY KEY,
         property_id INTEGER NOT NULL REFERENCES properties(id) ON DELETE CASCADE,
@@ -52,10 +47,35 @@ export async function migrate() {
       );
     `);
 
-    // 4. Clean tables and restart IDs
+    // 2. Check if users table is empty; if so, automatically seed
+    const userCountRes = await client.query('SELECT COUNT(*)::int AS count FROM users');
+    const userCount = userCountRes.rows[0]?.count || 0;
+
+    if (userCount === 0) {
+      console.log('[RoofProof DB] Fresh database detected. Auto-seeding initial users and properties...');
+      await seedData(client);
+    } else {
+      console.log(`[RoofProof DB] ✓ Database connected (${userCount} users found).`);
+    }
+  } catch (err) {
+    console.error('[RoofProof DB] Init error:', err.message);
+  } finally {
+    client.release();
+  }
+}
+
+/**
+ * Seeds initial demo landlords, tenants, and properties.
+ */
+export async function seedData(clientOrPool = pool) {
+  const client = clientOrPool.connect ? await clientOrPool.connect() : clientOrPool;
+  const shouldRelease = Boolean(clientOrPool.connect);
+
+  try {
+    await client.query('BEGIN');
     await client.query('TRUNCATE TABLE applications, properties, users RESTART IDENTITY CASCADE;');
 
-    // 5. Seed Users
+    // Seed 2 Landlords & 2 Tenants
     await client.query(`
       INSERT INTO users (id, name, email, password, role, phone, city, occupation, organization) VALUES
       (1, 'Rohan Mehta', 'rohan.mehta@roofproof.demo', 'password123', 'landlord', '+91 98200 11223', 'Coorg, KA', NULL, 'Mehta Luxury Estates'),
@@ -65,7 +85,7 @@ export async function migrate() {
       ALTER SEQUENCE users_id_seq RESTART WITH 5;
     `);
 
-    // 6. Seed Properties
+    // Seed 6 Properties
     await client.query(`
       INSERT INTO properties (id, landlord_id, title, property_type, location, monthly_rent, income_threshold, description, image_url) VALUES
       (1, 1, 'Misty Valley Villa', 'Luxury Villa', 'Coorg, Karnataka', 65000, 195000, '3 BHK luxury villa with a private outdoor area, mountain views, furnished living spaces, and a modern kitchen.', '/houses/house1.jpg'),
@@ -78,16 +98,13 @@ export async function migrate() {
     `);
 
     await client.query('COMMIT');
-    console.log('[DB Migrate] ✓ PostgreSQL schema and initial data seeded successfully.');
+    console.log('[RoofProof DB] ✓ Successfully seeded database with 4 users and 6 properties.');
+    return { success: true, message: 'Database seeded with 4 users and 6 properties' };
   } catch (err) {
     await client.query('ROLLBACK');
-    console.error('[DB Migrate Error]', err.message);
+    console.error('[RoofProof DB] Seed failed:', err.message);
     throw err;
   } finally {
-    client.release();
+    if (shouldRelease) client.release();
   }
-}
-
-if (process.argv[1]?.endsWith('migrate.js')) {
-  migrate().then(() => process.exit(0)).catch(() => process.exit(1));
 }

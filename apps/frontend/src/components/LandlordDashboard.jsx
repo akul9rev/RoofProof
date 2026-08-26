@@ -12,17 +12,17 @@ export default function LandlordDashboard({ properties = [], applications = [], 
   const [currentPage, setCurrentPage] = useState(1);
   const ITEMS_PER_PAGE = 9;
 
-  const uniqueProps = Array.from(new Map(properties.map(p => [Number(p.id), p])).values());
+  const uniqueProps = Array.from(new Map(properties.map(p => [String(p.id), p])).values());
+
   // Strictly filter out deleted properties permanently
-  const allActiveListings = uniqueProps.filter(p => !deletedPropertyIds.includes(p.id) && !deletedPropertyIds.includes(Number(p.id)) && !deletedPropertyIds.includes(String(p.id)));
+  const allActiveListings = uniqueProps.filter(p => !deletedPropertyIds.includes(p.id) && !deletedPropertyIds.includes(String(p.id)));
 
   // Filter listings belonging to current landlord
   const myProperties = allActiveListings.filter(p => {
     if (!currentUser) return true;
-    const matchesId = Number(p.landlord_id) === Number(currentUser.id);
-    const matchesName = p.landlord_name && p.landlord_name.toLowerCase() === currentUser.name.toLowerCase();
-    const isRohanDefault = (!p.landlord_id || Number(p.landlord_id) === 1) && Number(currentUser.id) === 1;
-    return matchesId || matchesName || isRohanDefault;
+    const matchesId = String(p.landlord_id) === String(currentUser.id);
+    const matchesName = p.landlord_name && p.landlord_name.toLowerCase() === currentUser.name?.toLowerCase();
+    return matchesId || matchesName;
   });
 
   const totalPages = Math.ceil(myProperties.length / ITEMS_PER_PAGE) || 1;
@@ -50,10 +50,10 @@ export default function LandlordDashboard({ properties = [], applications = [], 
   });
   const uniqueApps = Array.from(appMap.values());
 
-  const myPropertyIds = myProperties.map(p => Number(p.id));
+  const myPropertyIds = myProperties.map(p => String(p.id));
   const receivedApplications = uniqueApps.filter(a =>
-    myPropertyIds.includes(Number(a.property_id)) ||
-    Number(a.landlord_id) === Number(currentUser?.id || 1)
+    myPropertyIds.includes(String(a.property_id)) ||
+    String(a.landlord_id) === String(currentUser?.id || '')
   );
 
   const handleDenySubmit = (e) => {
@@ -79,30 +79,30 @@ export default function LandlordDashboard({ properties = [], applications = [], 
     <div className="animate-fade-in" style={{ padding: '10px 0 50px', width: '100%' }}>
       {/* Denial Explanation Modal */}
       {selectedAppForDenial && (
-        <div style={{
-          position: 'fixed',
-          inset: 0,
-          background: 'rgba(8, 14, 20, 0.85)',
-          backdropFilter: 'blur(12px)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 9999,
-          padding: '20px',
-        }} onClick={() => setSelectedAppForDenial(null)}>
-          <div className="glass-card animate-fade-in" style={{
+        <div className="modal-backdrop" onClick={() => setSelectedAppForDenial(null)}>
+          <div className="modal-surface modal-surface--light modal-surface--danger animate-modal-scale" style={{
             maxWidth: '480px',
             width: '100%',
             padding: '30px',
-            borderRadius: '24px',
-            background: '#ffffff',
-            color: '#1a221b',
-            border: '1px solid rgba(239, 68, 68, 0.3)',
-            boxShadow: '0 30px 80px rgba(0,0,0,0.2)',
+            position: 'relative',
           }} onClick={e => e.stopPropagation()}>
-            <h3 style={{ fontSize: '1.2rem', color: '#ef4444', marginBottom: '12px' }}>
-              Decline Application & Provide Feedback
-            </h3>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '16px', marginBottom: '12px' }}>
+              <div>
+                <div className="modal-eyebrow" style={{ color: '#ef4444' }}>Application decision</div>
+                <h3 style={{ fontSize: '1.2rem', color: '#ef4444', marginTop: '3px' }}>
+                  Decline Application & Provide Feedback
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setSelectedAppForDenial(null)}
+                className="modal-close"
+                style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
+                aria-label="Close decline dialog"
+              >
+                <X size={17} />
+              </button>
+            </div>
 
             <p style={{ fontSize: '0.86rem', color: '#555', marginBottom: '16px' }}>
               Specify why this applicant was not selected. Note that their salary and bank statements remain 100% Zero-Knowledge protected.

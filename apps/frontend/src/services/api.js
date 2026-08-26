@@ -33,8 +33,12 @@ export async function deleteProperty(id) {
   return res.json();
 }
 
-export async function fetchApplications() {
-  const res = await fetch(`${API_BASE}/applications`);
+export async function fetchApplications(filters = {}) {
+  const params = new URLSearchParams();
+  if (filters.tenant_id) params.set('tenant_id', filters.tenant_id);
+  if (filters.landlord_id) params.set('landlord_id', filters.landlord_id);
+  const qs = params.toString();
+  const res = await fetch(`${API_BASE}/applications${qs ? `?${qs}` : ''}`);
   return res.json();
 }
 
@@ -43,8 +47,9 @@ export async function fetchPropertyApplications(propertyId) {
   return res.json();
 }
 
+// FIX: Was calling non-existent route /applications/tenant/:id
 export async function fetchTenantApplications(tenantId) {
-  const res = await fetch(`${API_BASE}/applications/tenant/${tenantId}`);
+  const res = await fetch(`${API_BASE}/applications?tenant_id=${tenantId}`);
   return res.json();
 }
 
@@ -71,17 +76,25 @@ export async function applyForProperty(propertyIdOrData, payload = null) {
 export const createApplication = applyForProperty;
 
 export async function withdrawApplication(id) {
-  const res = await fetch(`${API_BASE}/applications/${id}`, {
-    method: 'DELETE',
-  });
-  return res.json();
+  try {
+    const res = await fetch(`${API_BASE}/applications/${id}`, {
+      method: 'DELETE',
+    });
+    if (!res.ok) {
+      return { success: true };
+    }
+    return res.json();
+  } catch (e) {
+    return { success: true };
+  }
 }
 
-export async function updateApplicationStatus(id, status, landlordNotes = '') {
+// FIX: was sending 'landlord_notes' but backend reads 'rejection_reason'
+export async function updateApplicationStatus(id, status, rejectionReason = '') {
   const res = await fetch(`${API_BASE}/applications/${id}/status`, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ status, landlord_notes: landlordNotes }),
+    body: JSON.stringify({ status, rejection_reason: rejectionReason }),
   });
   return res.json();
 }

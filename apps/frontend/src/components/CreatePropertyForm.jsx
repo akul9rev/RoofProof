@@ -1,5 +1,18 @@
 import React, { useState } from 'react';
-import { Building2, Plus, AlertCircle, Upload, X, Check, Image as ImageIcon } from 'lucide-react';
+import { Building2, Plus, AlertCircle, Upload, X, Check, Loader, Star, Trash2, PlusCircle } from 'lucide-react';
+import { uploadImageToCloudinaryApi } from '../services/api.js';
+
+const ROOM_TYPE_OPTIONS = [
+  'Main Facade / Exterior',
+  'Spacious Living Room',
+  'Master Bedroom',
+  'Modular Kitchen',
+  'Luxury Washroom / Bathroom',
+  'Private Balcony / Terrace',
+  'Dining Area',
+  'Garden / Backyard',
+  'Other Room',
+];
 
 export default function CreatePropertyForm({ landlord, onClose, onSuccess }) {
   const [title, setTitle] = useState('');
@@ -8,33 +21,93 @@ export default function CreatePropertyForm({ landlord, onClose, onSuccess }) {
   const [monthlyRent, setMonthlyRent] = useState('');
   const [incomeThreshold, setIncomeThreshold] = useState('');
   const [description, setDescription] = useState('');
-  const [imageFile, setImageFile] = useState(null);
-  const [imagePreview, setImagePreview] = useState(''); // EMPTY initially
+
+  // Multi-Photo Management State
+  const [photos, setPhotos] = useState([
+    {
+      id: 'default_thumb',
+      preview: '/houses/house1.jpg',
+      label: 'Main Facade / Exterior',
+      isThumbnail: true,
+      file: null,
+    },
+  ]);
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
 
-  const handleImageFileChange = (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    if (!file.type.startsWith('image/')) {
-      setError('Please select a valid image file (JPG, PNG, WebP).');
-      return;
-    }
-
-    if (file.size > 10 * 1024 * 1024) {
-      setError('Image file size must be under 10 MB.');
-      return;
-    }
+  const handleMultipleFiles = (e) => {
+    const files = Array.from(e.target.files || []);
+    if (!files.length) return;
 
     setError(null);
-    setImageFile(file);
+    const labelOrder = ['Main Facade / Exterior', 'Spacious Living Room', 'Master Bedroom', 'Modular Kitchen', 'Luxury Washroom / Bathroom', 'Private Balcony / Terrace'];
 
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setImagePreview(reader.result);
-    };
-    reader.readAsDataURL(file);
+    files.forEach((file, idx) => {
+      if (!file.type.startsWith('image/')) {
+        setError('Please select valid image files (JPG, PNG, WebP).');
+        return;
+      }
+      if (file.size > 10 * 1024 * 1024) {
+        setError('File size must be under 10 MB per image.');
+        return;
+      }
+
+      const reader = new FileReader();
+      const tempId = `photo_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
+
+      reader.onloadend = () => {
+        setPhotos(prev => {
+          const filtered = prev.filter(p => p.id !== 'default_thumb');
+          const isFirst = filtered.length === 0;
+          const defaultLabel = labelOrder[filtered.length % labelOrder.length] || 'Room Photo';
+
+          return [
+            ...filtered,
+            {
+              id: tempId,
+              file,
+              preview: reader.result,
+              label: defaultLabel,
+              isThumbnail: isFirst,
+            },
+          ];
+        });
+      };
+      reader.readAsDataURL(file);
+    });
+
+    e.target.value = '';
+  };
+
+  const setAsThumbnail = (id) => {
+    setPhotos(prev =>
+      prev.map(p => ({
+        ...p,
+        isThumbnail: p.id === id,
+      }))
+    );
+  };
+
+  const updatePhotoLabel = (id, newLabel) => {
+    setPhotos(prev =>
+      prev.map(p => (p.id === id ? { ...p, label: newLabel } : p))
+    );
+  };
+
+  const removePhoto = (id) => {
+    if (photos.length <= 1) {
+      setError('Please keep at least 1 photo for your listing thumbnail.');
+      return;
+    }
+    setPhotos(prev => {
+      const remaining = prev.filter(p => p.id !== id);
+      const hadThumb = prev.find(p => p.id === id)?.isThumbnail;
+      if (hadThumb && remaining.length > 0) {
+        remaining[0].isThumbnail = true;
+      }
+      return remaining;
+    });
   };
 
   const handleSubmit = async (e) => {
@@ -46,21 +119,50 @@ export default function CreatePropertyForm({ landlord, onClose, onSuccess }) {
       return;
     }
 
-    // Default image if no file uploaded
-    const finalImage = imagePreview || 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800&q=80';
+    if (photos.length === 0) {
+      setError('Please upload at least 1 property photo for the cover thumbnail.');
+      return;
+    }
 
     setIsSubmitting(true);
+
     try {
+      const uploadedGallery = await Promise.all(
+        photos.map(async (photo) => {
+          let url = photo.preview;
+          if (photo.file) {
+            try {
+              const uploadRes = await uploadImageToCloudinaryApi(photo.file);
+              if (uploadRes?.url && !uploadRes.isFallback) {
+                url = uploadRes.url;
+              }
+            } catch (err) {
+              console.warn('[Cloudinary Upload Fallback]', err);
+            }
+          }
+          return {
+            label: photo.label || 'Property Photo',
+            url,
+            isThumbnail: photo.isThumbnail,
+          };
+        })
+      );
+
+      const mainThumb = uploadedGallery.find(p => p.isThumbnail) || uploadedGallery[0];
+      const finalImageUrl = mainThumb?.url || '/houses/house1.jpg';
+
       await onSuccess({
-        landlord_id: landlord?.id || 2,
+        landlord_id: landlord?.id || 1,
         title: title.trim(),
         property_type: propertyType,
         location: location.trim(),
         monthly_rent: Number(monthlyRent),
         income_threshold: Number(incomeThreshold),
         description: description.trim(),
-        image_url: finalImage,
+        image_url: finalImageUrl,
+        gallery: uploadedGallery,
       });
+
       setIsSubmitting(false);
     } catch (err) {
       setIsSubmitting(false);
@@ -82,7 +184,7 @@ export default function CreatePropertyForm({ landlord, onClose, onSuccess }) {
         color: '#ffffff',
       }}
     >
-      {/* Form Rectangle Header */}
+      {/* Form Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', borderBottom: '1px solid rgba(255, 255, 255, 0.1)', paddingBottom: '16px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <div style={{
@@ -94,7 +196,7 @@ export default function CreatePropertyForm({ landlord, onClose, onSuccess }) {
           <div>
             <h3 style={{ fontSize: '1.4rem', fontWeight: 700, color: '#ffffff', margin: 0 }}>List New Rental Property</h3>
             <p style={{ fontSize: '0.84rem', color: 'rgba(255, 255, 255, 0.6)', margin: 0 }}>
-              Create a new property listing with complete details & photos stored in database.
+              Upload property photos (Living Room, Washroom, Kitchen, Bedroom) and set your main cover thumbnail.
             </p>
           </div>
         </div>
@@ -289,89 +391,167 @@ export default function CreatePropertyForm({ landlord, onClose, onSuccess }) {
           />
         </div>
 
-        {/* Row 4: Image File Upload (NO URL field, empty preview initially, large preview when uploaded) */}
-        <div>
-          <label style={{ display: 'block', fontSize: '0.86rem', fontWeight: 600, color: 'rgba(255, 255, 255, 0.9)', marginBottom: '8px' }}>
-            Property Photo Upload
-          </label>
+        {/* Row 4: Multi-Photo Studio */}
+        <div style={{
+          background: 'rgba(0, 0, 0, 0.3)',
+          border: '1px solid rgba(255, 255, 255, 0.12)',
+          borderRadius: '18px',
+          padding: '20px',
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+            <div>
+              <div style={{ fontSize: '0.88rem', fontWeight: 800, color: '#ffffff' }}>
+                📸 Property Photos & Thumbnail Studio
+              </div>
+              <p style={{ fontSize: '0.78rem', color: 'rgba(255, 255, 255, 0.6)', margin: '2px 0 0' }}>
+                Upload multiple room photos (Facade, Living Room, Washroom, Kitchen, Bedroom). Choose <strong>one picture as Cover Thumbnail</strong>.
+              </p>
+            </div>
 
-          <div style={{
-            border: '2px dashed rgba(255, 255, 255, 0.2)',
-            borderRadius: '16px',
-            padding: '24px',
-            textAlign: 'center',
-            background: 'rgba(0, 0, 0, 0.25)',
-          }}>
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleImageFileChange}
-              style={{ display: 'none' }}
-              id="rectangle-form-image-file"
-            />
             <label
-              htmlFor="rectangle-form-image-file"
+              htmlFor="modal-multi-photo-upload"
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
-                gap: '8px',
-                background: '#ffffff',
-                color: '#0c141d',
-                padding: '10px 24px',
+                gap: '6px',
+                background: '#4A7C59',
+                color: '#ffffff',
+                padding: '8px 18px',
                 borderRadius: '999px',
-                fontSize: '0.88rem',
+                fontSize: '0.82rem',
                 fontWeight: 700,
                 cursor: 'pointer',
-                boxShadow: '0 4px 14px rgba(0,0,0,0.2)',
+                boxShadow: '0 2px 8px rgba(74, 124, 89, 0.4)',
               }}
             >
-              <Upload size={16} /> {imageFile ? 'Change Photo File' : 'Upload Property Photo'}
+              <PlusCircle size={15} /> Add Photos
             </label>
-            <div style={{ fontSize: '0.8rem', color: 'rgba(255, 255, 255, 0.5)', marginTop: '8px' }}>
-              {imageFile ? `${imageFile.name} (${(imageFile.size / 1024).toFixed(1)} KB)` : 'Select a JPG, PNG, or WebP photo from your computer.'}
-            </div>
+            <input
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={handleMultipleFiles}
+              style={{ display: 'none' }}
+              id="modal-multi-photo-upload"
+            />
           </div>
 
-          {/* Large Image Preview Container - EMPTY initially, renders ONLY when user uploads */}
-          {imagePreview && (
-            <div style={{
-              marginTop: '16px',
-              width: '100%',
-              height: '300px',
-              borderRadius: '18px',
-              overflow: 'hidden',
-              border: '2px solid rgba(74, 124, 89, 0.5)',
-              position: 'relative',
-              background: '#060a0f',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              boxShadow: '0 10px 30px rgba(0, 0, 0, 0.4)',
-            }}>
-              <img
-                src={imagePreview}
-                alt="Property Full Preview"
-                style={{ width: '100%', height: '100%', objectFit: 'contain' }}
-              />
-              <div style={{
-                position: 'absolute',
-                top: '12px',
-                left: '12px',
-                background: 'rgba(12, 18, 25, 0.88)',
-                color: '#6B9B76',
-                border: '1px solid rgba(107, 155, 118, 0.4)',
-                padding: '4px 12px',
-                borderRadius: '999px',
-                fontSize: '0.78rem',
-                fontWeight: 700,
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px',
-              }}>
-                <Check size={13} color="#22c55e" /> Photo Preview (Whole Image Fitted)
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))',
+            gap: '12px',
+            marginTop: '14px',
+          }}>
+            {photos.map((photo) => (
+              <div
+                key={photo.id}
+                style={{
+                  background: 'rgba(255, 255, 255, 0.05)',
+                  border: photo.isThumbnail ? '2px solid #EBA834' : '1px solid rgba(255, 255, 255, 0.15)',
+                  borderRadius: '14px',
+                  overflow: 'hidden',
+                  position: 'relative',
+                  display: 'flex',
+                  flexDirection: 'column',
+                }}
+              >
+                <div style={{ height: '110px', position: 'relative', background: '#000' }}>
+                  <img
+                    src={photo.preview}
+                    alt={photo.label}
+                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                  />
+
+                  {photo.isThumbnail && (
+                    <span style={{
+                      position: 'absolute',
+                      top: '6px',
+                      left: '6px',
+                      background: '#EBA834',
+                      color: '#0c141d',
+                      padding: '3px 8px',
+                      borderRadius: '999px',
+                      fontSize: '0.66rem',
+                      fontWeight: 800,
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '3px',
+                    }}>
+                      <Star size={10} fill="#0c141d" /> COVER THUMBNAIL
+                    </span>
+                  )}
+
+                  <button
+                    type="button"
+                    onClick={() => removePhoto(photo.id)}
+                    title="Remove photo"
+                    style={{
+                      position: 'absolute',
+                      top: '6px',
+                      right: '6px',
+                      background: 'rgba(239, 68, 68, 0.9)',
+                      color: '#ffffff',
+                      border: 'none',
+                      borderRadius: '50%',
+                      width: '24px',
+                      height: '24px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    <Trash2 size={12} />
+                  </button>
+                </div>
+
+                <div style={{ padding: '8px 10px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                  <select
+                    value={photo.label}
+                    onChange={(e) => updatePhotoLabel(photo.id, e.target.value)}
+                    style={{
+                      width: '100%',
+                      padding: '5px 8px',
+                      fontSize: '0.76rem',
+                      border: '1px solid rgba(255, 255, 255, 0.2)',
+                      borderRadius: '6px',
+                      background: '#0e1722',
+                      fontWeight: 600,
+                      color: '#ffffff',
+                      outline: 'none',
+                    }}
+                  >
+                    {ROOM_TYPE_OPTIONS.map((opt, oIdx) => (
+                      <option key={oIdx} value={opt}>{opt}</option>
+                    ))}
+                  </select>
+
+                  {!photo.isThumbnail && (
+                    <button
+                      type="button"
+                      onClick={() => setAsThumbnail(photo.id)}
+                      style={{
+                        background: 'rgba(255, 255, 255, 0.08)',
+                        border: '1px solid rgba(255, 255, 255, 0.15)',
+                        borderRadius: '6px',
+                        padding: '4px',
+                        fontSize: '0.72rem',
+                        fontWeight: 700,
+                        color: 'rgba(255, 255, 255, 0.9)',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '4px',
+                      }}
+                    >
+                      <Star size={11} color="#EBA834" /> Set as Cover
+                    </button>
+                  )}
+                </div>
               </div>
-            </div>
-          )}
+            ))}
+          </div>
         </div>
 
         {/* Submit Action Buttons */}
@@ -400,11 +580,11 @@ export default function CreatePropertyForm({ landlord, onClose, onSuccess }) {
             style={{
               background: '#ffffff',
               color: '#0c141d',
-              padding: '12px 28px',
+              padding: '12px 32px',
               borderRadius: '999px',
               border: 'none',
-              fontWeight: 700,
-              fontSize: '0.92rem',
+              fontWeight: 800,
+              fontSize: '0.95rem',
               cursor: isSubmitting ? 'not-allowed' : 'pointer',
               display: 'flex',
               alignItems: 'center',
@@ -412,7 +592,7 @@ export default function CreatePropertyForm({ landlord, onClose, onSuccess }) {
               boxShadow: '0 8px 24px rgba(0,0,0,0.3)',
             }}
           >
-            <Plus size={18} /> {isSubmitting ? 'Publishing to DB...' : 'Publish Listing to Database'}
+            <Plus size={18} /> {isSubmitting ? 'Publishing Property...' : 'List Property Now'}
           </button>
         </div>
       </form>

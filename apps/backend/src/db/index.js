@@ -1,34 +1,14 @@
-import pg from 'pg';
+import pkg from 'pg';
+const { Pool } = pkg;
 import { config } from '../config.js';
 
-const { Pool } = pg;
-
-const connectionConfig = process.env.DATABASE_URL
-  ? {
-      connectionString: process.env.DATABASE_URL,
-      ssl: (process.env.DATABASE_URL.includes('render.com') || process.env.NODE_ENV === 'production')
-        ? { rejectUnauthorized: false }
-        : false,
-    }
-  : {
-      host: config.db.host,
-      port: config.db.port,
-      database: config.db.database,
-      user: config.db.user,
-      password: config.db.password,
-    };
-
 export const pool = new Pool({
-  ...connectionConfig,
-  max: 10,
-  idleTimeoutMillis: 30000,
+  connectionString: config.db.connectionString,
+  ssl: config.db.ssl,
 });
 
 pool.on('error', (err) => {
-  console.error('[DB Pool Error]', err.message);
+  console.error('[RoofProof DB] Unexpected error on idle client:', err);
 });
 
-export async function query(text, params) {
-  const res = await pool.query(text, params);
-  return res;
-}
+export default pool;
