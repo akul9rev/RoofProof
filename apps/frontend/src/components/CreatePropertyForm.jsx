@@ -313,24 +313,6 @@ export default function CreatePropertyForm({ landlord, onClose, onSuccess }) {
                     alt="Property Thumbnail"
                     style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                   />
-                  <span style={{
-                    position: 'absolute',
-                    top: '10px',
-                    left: '10px',
-                    background: 'rgba(12, 18, 25, 0.88)',
-                    backdropFilter: 'blur(8px)',
-                    padding: '4px 10px',
-                    borderRadius: '999px',
-                    fontSize: '0.7rem',
-                    color: '#EBA834',
-                    fontWeight: 800,
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '4px',
-                    border: '1px solid rgba(235, 168, 52, 0.4)',
-                  }}>
-                    <Star size={11} fill="#EBA834" color="#EBA834" /> Main Thumbnail
-                  </span>
                 </>
               ) : (
                 <div style={{ textAlign: 'center', padding: '20px', color: '#888' }}>
