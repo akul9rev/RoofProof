@@ -36,26 +36,39 @@ export default function PropertyCard({
     maximumFractionDigits: 0,
   }).format(property.income_threshold);
 
-  // Consistent fallback image
+  // Consistent image URL resolution
   const getImageUrl = (prop) => {
-    if (prop.image_url && typeof prop.image_url === 'string' && prop.image_url.trim().length > 5) {
+    // Check gallery array or JSON string first
+    let galleryArr = [];
+    if (Array.isArray(prop.gallery)) {
+      galleryArr = prop.gallery;
+    } else if (typeof prop.gallery === 'string' && prop.gallery.trim().startsWith('[')) {
+      try { galleryArr = JSON.parse(prop.gallery); } catch (e) {}
+    }
+
+    const thumbFromGallery = galleryArr.find(g => g.isThumbnail)?.url || galleryArr[0]?.url;
+    const targetUrl = thumbFromGallery || prop.image_url;
+
+    if (targetUrl && typeof targetUrl === 'string' && targetUrl.trim().length > 5) {
       if (
-        prop.image_url.startsWith('http://') ||
-        prop.image_url.startsWith('https://') ||
-        prop.image_url.startsWith('data:image/') ||
-        prop.image_url.startsWith('blob:') ||
-        prop.image_url.startsWith('/houses/')
+        targetUrl.startsWith('http://') ||
+        targetUrl.startsWith('https://') ||
+        targetUrl.startsWith('data:image/') ||
+        targetUrl.startsWith('blob:') ||
+        targetUrl.startsWith('/houses/')
       ) {
-        return prop.image_url;
+        return targetUrl;
       }
     }
-    const idStr = String(prop.id || '1');
-    let hash = 0;
-    for (let i = 0; i < idStr.length; i++) {
-      hash = (hash * 31 + idStr.charCodeAt(i)) & 0xffffffff;
+
+    // Default fallback ONLY for initial pre-seeded houses 1-6
+    if (typeof prop.id === 'number' && prop.id >= 1 && prop.id <= 6) {
+      const idx = (prop.id - 1) % HOUSE_IMAGES.length;
+      return HOUSE_IMAGES[idx];
     }
-    const idx = Math.abs(hash) % HOUSE_IMAGES.length;
-    return HOUSE_IMAGES[idx];
+
+    // Custom property without image
+    return targetUrl || null;
   };
 
   const imageUrl = getImageUrl(property);

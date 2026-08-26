@@ -63,16 +63,28 @@ export default function PropertyDetailModal({
 
   const propId = Number(property.id) || 1;
 
-  // Build the complete photo gallery
+  // Robust parsing for gallery (handles arrays, JSON strings, or single cover)
+  let parsedGallery = [];
+  if (Array.isArray(property.gallery)) {
+    parsedGallery = property.gallery;
+  } else if (typeof property.gallery === 'string' && property.gallery.trim().startsWith('[')) {
+    try {
+      parsedGallery = JSON.parse(property.gallery);
+    } catch (e) {}
+  }
+
   let photos = [];
-  if (Array.isArray(property.gallery) && property.gallery.length > 0) {
-    photos = property.gallery;
-  } else if (typeof property.id === 'number' && property.id >= 1 && property.id <= 6 && DEFAULT_GALLERIES[property.id]) {
+  if (parsedGallery && parsedGallery.length > 0) {
+    // Landlord uploaded custom photos -> Use ONLY these uploaded photos!
+    photos = parsedGallery;
+  } else if (property.image_url && typeof property.image_url === 'string' && property.image_url.trim().length > 5) {
+    // Single cover image uploaded
+    photos = [{ label: 'Main Property Cover', url: property.image_url }];
+  } else if (DEFAULT_GALLERIES[property.id]) {
+    // Fallback ONLY for the initial 6 pre-seeded demo houses
     photos = DEFAULT_GALLERIES[property.id];
   } else {
-    // Single or custom photos uploaded for user-created property
-    const mainImg = property.image_url || '/houses/house1.jpg';
-    photos = [{ label: 'Main Property Cover', url: mainImg }];
+    photos = [{ label: 'No Cover Photo Uploaded', url: '' }];
   }
 
   const currentPhoto = photos[activePhotoIdx] || photos[0];
