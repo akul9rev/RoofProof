@@ -3,7 +3,11 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+// Load backend .env file first
+dotenv.config({ path: path.resolve(__dirname, '../.env') });
 dotenv.config({ path: path.resolve(__dirname, '../../.env') });
+dotenv.config();
 
 export const config = {
   port: Number(process.env.PORT ?? 3001),
