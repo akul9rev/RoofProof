@@ -133,7 +133,7 @@ Under `apps/backend/src/services/anomalyDetector/`, RoofProof incorporates a mac
         ├── 🔒 Private Income (Browser Memory Only)
         │
         ▼
-[ Midnight Compact Circuit (verifyEligibility) ] ── (Lace Wallet / Proof Provider)
+[ Midnight Compact Circuit (verifyEligibility) ] ── (Midnight Proof Provider / JS SDK)
         │
         ├── 🔏 Zero-Knowledge Witness Evaluation (income >= threshold)
         ▼
@@ -157,7 +157,7 @@ Under `apps/backend/src/services/anomalyDetector/`, RoofProof incorporates a mac
 ### Prerequisites
 * **Node.js**: v18+ or v20+
 * **npm**: v9+
-* **Browser**: Chrome or Brave (with official Midnight Lace Wallet extension installed for Preview testing)
+* **Browser**: Chrome, Brave, or Edge
 
 ### 1. Clone & Install Dependencies
 ```bash
@@ -225,7 +225,7 @@ npm run build
 1. **Client-Side Witness Isolation**: Tenant income exists solely in local browser memory as a private witness during Compact circuit execution.
 2. **Zero Backend Leakage**: Express REST payloads and PostgreSQL tables contain only `{ tenant_id, verification_status, zk_tx_hash }`.
 3. **Backend Integrity Guards**: The backend strictly rejects any application submission that is not marked `eligible` with a valid authorization reference.
-4. **Denial Hard Gate**: If a tenant cancels or denies the Lace wallet popup, execution halts immediately, clearing all proof states, disabling submit, and making 0 network calls.
+4. **Client Verification Hard Gate**: If eligibility criteria fail, execution halts immediately, clearing all proof states, disabling submit, and making 0 network calls.
 5. **No Secret Leakage**: All wallet mnemonics, private keys, and leveldb states are strictly gitignored and excluded from client bundles.
 
 ---
