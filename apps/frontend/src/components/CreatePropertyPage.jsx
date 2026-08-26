@@ -375,18 +375,6 @@ export default function CreatePropertyPage({ landlord, onBack, onSuccess }) {
               </div>
             </div>
 
-            {/* Quick Badges Preview */}
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
-              <span style={{ background: '#FAF9F5', border: '1px solid #e5e5e5', padding: '3px 8px', borderRadius: '6px', fontSize: '0.72rem', color: '#555' }}>
-                {furnishing}
-              </span>
-              <span style={{ background: '#FAF9F5', border: '1px solid #e5e5e5', padding: '3px 8px', borderRadius: '6px', fontSize: '0.72rem', color: '#555' }}>
-                {areaSqft}
-              </span>
-              <span style={{ background: '#FAF9F5', border: '1px solid #e5e5e5', padding: '3px 8px', borderRadius: '6px', fontSize: '0.72rem', color: '#555' }}>
-                {bathrooms}
-              </span>
-            </div>
           </div>
         </div>
 
