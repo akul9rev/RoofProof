@@ -9,7 +9,7 @@
     "packages/contracts"
   ],
   "scripts": {
-    "build": "npm --prefix apps/frontend install && npm --prefix apps/frontend run build && npm --prefix apps/backend install",
+    "build": "npm --prefix apps/frontend install --include=dev && npm --prefix apps/frontend run build && npm --prefix apps/backend install",
     "start": "node apps/backend/src/server.js",
     "dev:frontend": "npm --prefix apps/frontend run dev",
     "dev:backend": "npm --prefix apps/backend run dev",
