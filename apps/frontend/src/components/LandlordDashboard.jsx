@@ -22,7 +22,9 @@ export default function LandlordDashboard({ properties = [], applications = [], 
     if (!currentUser) return true;
     const matchesId = String(p.landlord_id) === String(currentUser.id);
     const matchesName = p.landlord_name && p.landlord_name.toLowerCase() === currentUser.name?.toLowerCase();
-    return matchesId || matchesName;
+    const matchesEmail = p.landlord_email && p.landlord_email.toLowerCase() === currentUser.email?.toLowerCase();
+    const isCustomProp = String(p.id).startsWith('local_') || String(p.landlord_id) === String(currentUser.id);
+    return matchesId || matchesName || matchesEmail || isCustomProp;
   });
 
   const totalPages = Math.ceil(myProperties.length / ITEMS_PER_PAGE) || 1;

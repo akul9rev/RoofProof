@@ -9,16 +9,7 @@ router.get('/', async (req, res) => {
   try {
     const result = await pool.query(`
       SELECT 
-        p.id,
-        p.landlord_id,
-        p.title,
-        p.property_type,
-        p.location,
-        p.monthly_rent,
-        p.income_threshold,
-        p.description,
-        p.image_url,
-        p.created_at,
+        p.*,
         u.name AS landlord_name,
         u.email AS landlord_email,
         COUNT(a.id)::int AS total_applications
@@ -30,7 +21,6 @@ router.get('/', async (req, res) => {
     `);
     return res.json({ success: true, properties: result.rows });
   } catch (err) {
-    // Graceful fallback to memoryStore if DB is not connected
     console.warn('[RoofProof DB] DB query failed, serving from memory store:', err.message);
     return res.json({ success: true, properties: memoryStore.properties });
   }
@@ -62,7 +52,11 @@ router.get('/:id', async (req, res) => {
 
 // POST /api/properties - Create property listing
 router.post('/', async (req, res) => {
-  const { title, location, monthly_rent, income_threshold, description, image_url, property_type, landlord_id, landlordId } = req.body;
+  const {
+    title, location, monthly_rent, income_threshold, description, image_url, property_type,
+    landlord_id, landlordId, bedrooms, bathrooms, furnishing, area_sqft, parking, deposit,
+    preferred_tenants, available_from, amenities, gallery
+  } = req.body;
 
   if (!title || !location || !monthly_rent || !income_threshold || !description) {
     return res.status(400).json({
@@ -71,15 +65,15 @@ router.post('/', async (req, res) => {
     });
   }
 
-  const lid = landlord_id || landlordId;
-  if (!lid) {
-    return res.status(400).json({ success: false, error: 'landlord_id is required.' });
-  }
+  const lid = landlord_id || landlordId || 1;
 
   try {
     const result = await pool.query(`
-      INSERT INTO properties (landlord_id, title, property_type, location, monthly_rent, income_threshold, description, image_url)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+      INSERT INTO properties (
+        landlord_id, title, property_type, location, monthly_rent, income_threshold, description, image_url,
+        bedrooms, bathrooms, furnishing, area_sqft, parking, deposit, preferred_tenants, available_from, amenities, gallery
+      )
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17::jsonb, $18::jsonb)
       RETURNING *
     `, [
       lid,
@@ -90,12 +84,22 @@ router.post('/', async (req, res) => {
       Number(income_threshold),
       description.trim(),
       image_url || '/houses/house1.jpg',
+      bedrooms || '3 BHK',
+      bathrooms || '3 Bathrooms',
+      furnishing || 'Fully Furnished',
+      area_sqft || '2,150 sq.ft',
+      parking || 'Covered Parking',
+      deposit || `₹${(Number(monthly_rent) * 2).toLocaleString('en-IN')}`,
+      preferred_tenants || 'Families & Working Professionals',
+      available_from || 'Immediate Move-in',
+      JSON.stringify(amenities || []),
+      JSON.stringify(gallery || []),
     ]);
 
     const property = result.rows[0];
     const landlordRes = await pool.query('SELECT name, email FROM users WHERE id = $1', [property.landlord_id]);
-    property.landlord_name = landlordRes.rows[0]?.name || null;
-    property.landlord_email = landlordRes.rows[0]?.email || null;
+    property.landlord_name = landlordRes.rows[0]?.name || req.body.landlord_name || 'Landlord';
+    property.landlord_email = landlordRes.rows[0]?.email || req.body.landlord_email || null;
 
     return res.status(201).json({
       success: true,
@@ -114,6 +118,16 @@ router.post('/', async (req, res) => {
       income_threshold: Number(income_threshold),
       description: description.trim(),
       image_url: image_url || '/houses/house1.jpg',
+      bedrooms: bedrooms || '3 BHK',
+      bathrooms: bathrooms || '3 Bathrooms',
+      furnishing: furnishing || 'Fully Furnished',
+      area_sqft: area_sqft || '2,150 sq.ft',
+      parking: parking || 'Covered Parking',
+      deposit: deposit || `₹${(Number(monthly_rent) * 2).toLocaleString('en-IN')}`,
+      preferred_tenants: preferred_tenants || 'Families & Working Professionals',
+      available_from: available_from || 'Immediate Move-in',
+      amenities: amenities || [],
+      gallery: gallery || [],
       landlord_name: req.body.landlord_name || 'Landlord',
       landlord_email: req.body.landlord_email || null,
       total_applications: 0,
@@ -139,8 +153,8 @@ router.get('/:id/applications', async (req, res) => {
         p.title AS property_title,
         p.income_threshold
       FROM applications a
-      JOIN users u ON a.tenant_id = u.id
-      JOIN properties p ON a.property_id = p.id
+      LEFT JOIN users u ON a.tenant_id = u.id
+      LEFT JOIN properties p ON a.property_id = p.id
       WHERE a.property_id = $1
       ORDER BY a.created_at DESC
     `, [req.params.id]);
@@ -152,99 +166,15 @@ router.get('/:id/applications', async (req, res) => {
   }
 });
 
-// POST /api/properties/:id/apply - Apply for property with Zero Knowledge proof
-router.post('/:id/apply', async (req, res) => {
-  const { tenant_id, verification_status, zk_tx_hash } = req.body;
-
-  // Strict privacy audit: strip forbidden fields
-  const forbiddenFields = ['income', 'tenant_income', 'salary', 'privateIncome', 'bank_statement', 'salary_slip'];
-  for (const field of forbiddenFields) {
-    if (field in req.body) {
-      delete req.body[field];
-      console.warn(`[SECURITY] Stripped forbidden field '${field}' from request.`);
-    }
-  }
-
-  if (!tenant_id) {
-    return res.status(400).json({ success: false, error: 'tenant_id is required.' });
-  }
-
-  const trimmedProofRef = typeof zk_tx_hash === 'string' ? zk_tx_hash.trim() : '';
-
-  if (verification_status !== 'eligible' || !trimmedProofRef) {
-    return res.status(400).json({
-      success: false,
-      error: 'Cannot submit application without a verified Zero-Knowledge proof and valid authorization signature.',
-    });
-  }
-
-  if (trimmedProofRef.length < 32) {
-    return res.status(400).json({
-      success: false,
-      error: 'Invalid authorization signature. Too short to be a valid cryptographic proof.',
-    });
-  }
-
-  try {
-    const propCheck = await pool.query('SELECT * FROM properties WHERE id = $1', [req.params.id]);
-    if (propCheck.rows.length === 0) {
-      return res.status(404).json({ success: false, error: 'Property not found.' });
-    }
-
-    const appCheck = await pool.query(
-      'SELECT id, status FROM applications WHERE property_id = $1 AND tenant_id = $2',
-      [req.params.id, tenant_id]
-    );
-
-    if (appCheck.rows.length > 0) {
-      if (appCheck.rows[0].status === 'rejected') {
-        return res.status(409).json({ success: false, error: 'This rental application was denied. Re-application is not permitted.' });
-      }
-      return res.status(409).json({ success: false, error: 'You already have an active application for this property.' });
-    }
-
-    const insertResult = await pool.query(`
-      INSERT INTO applications (property_id, tenant_id, status, verification_status, zk_tx_hash)
-      VALUES ($1, $2, 'pending', 'eligible', $3)
-      RETURNING *
-    `, [req.params.id, tenant_id, trimmedProofRef]);
-
-    return res.status(201).json({
-      success: true,
-      application: insertResult.rows[0],
-      message: 'Rental application submitted successfully with Midnight ZK privacy protection.',
-    });
-  } catch (err) {
-    const newApp = {
-      id: Date.now(),
-      property_id: Number(req.params.id),
-      tenant_id: Number(tenant_id),
-      status: 'pending',
-      verification_status: 'eligible',
-      zk_tx_hash: trimmedProofRef,
-      created_at: new Date().toISOString(),
-    };
-    memoryStore.applications.push(newApp);
-    return res.status(201).json({
-      success: true,
-      application: newApp,
-      message: 'Rental application submitted successfully with Midnight ZK privacy protection.',
-    });
-  }
-});
-
 // DELETE /api/properties/:id - Delete property listing
 router.delete('/:id', async (req, res) => {
   try {
-    await pool.query('DELETE FROM applications WHERE property_id = $1', [req.params.id]);
-    const result = await pool.query('DELETE FROM properties WHERE id = $1 RETURNING id', [req.params.id]);
-    if (result.rows.length === 0) {
-      return res.status(404).json({ success: false, error: 'Property not found.' });
-    }
-    return res.json({ success: true, message: 'Property listing deleted successfully.', deleted_id: req.params.id });
+    await pool.query('DELETE FROM properties WHERE id = $1', [req.params.id]);
+    return res.json({ success: true, message: 'Property deleted successfully.' });
   } catch (err) {
-    memoryStore.properties = memoryStore.properties.filter(p => String(p.id) !== String(req.params.id));
-    return res.json({ success: true, message: 'Property listing deleted successfully.', deleted_id: req.params.id });
+    const index = memoryStore.properties.findIndex(p => String(p.id) === String(req.params.id));
+    if (index !== -1) memoryStore.properties.splice(index, 1);
+    return res.json({ success: true, message: 'Property deleted successfully.' });
   }
 });
 

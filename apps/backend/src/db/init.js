@@ -45,6 +45,18 @@ export async function initDb() {
         rejection_reason TEXT,
         created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
       );
+
+      -- Extended Specification & Gallery Columns
+      ALTER TABLE properties ADD COLUMN IF NOT EXISTS bedrooms VARCHAR(100) DEFAULT '3 BHK';
+      ALTER TABLE properties ADD COLUMN IF NOT EXISTS bathrooms VARCHAR(100) DEFAULT '3 Bathrooms';
+      ALTER TABLE properties ADD COLUMN IF NOT EXISTS furnishing VARCHAR(100) DEFAULT 'Fully Furnished';
+      ALTER TABLE properties ADD COLUMN IF NOT EXISTS area_sqft VARCHAR(100) DEFAULT '2,150 sq.ft';
+      ALTER TABLE properties ADD COLUMN IF NOT EXISTS parking VARCHAR(255) DEFAULT 'Covered Parking';
+      ALTER TABLE properties ADD COLUMN IF NOT EXISTS deposit VARCHAR(100) DEFAULT '2 Months Rent';
+      ALTER TABLE properties ADD COLUMN IF NOT EXISTS preferred_tenants VARCHAR(255) DEFAULT 'Families & Working Professionals';
+      ALTER TABLE properties ADD COLUMN IF NOT EXISTS available_from VARCHAR(100) DEFAULT 'Immediate Move-in';
+      ALTER TABLE properties ADD COLUMN IF NOT EXISTS amenities JSONB DEFAULT '[]'::jsonb;
+      ALTER TABLE properties ADD COLUMN IF NOT EXISTS gallery JSONB DEFAULT '[]'::jsonb;
     `);
 
     // 2. Check if users table is empty; if so, automatically seed
@@ -58,53 +70,43 @@ export async function initDb() {
       console.log(`[RoofProof DB] ✓ Database connected (${userCount} users found).`);
     }
   } catch (err) {
-    console.error('[RoofProof DB] Init error:', err.message);
+    console.warn('[RoofProof DB] Auto-init skipped / connection pending:', err.message);
   } finally {
     client.release();
   }
 }
 
-/**
- * Seeds initial demo landlords, tenants, and properties.
- */
-export async function seedData(clientOrPool = pool) {
-  const client = clientOrPool.connect ? await clientOrPool.connect() : clientOrPool;
-  const shouldRelease = Boolean(clientOrPool.connect);
+async function seedData(client) {
+  const users = [
+    ['Rohan Mehta', 'rohan.mehta@roofproof.demo', 'password123', 'landlord', '+91 98200 11223', 'Coorg, KA', null, 'Mehta Luxury Estates'],
+    ['Priya Nair', 'priya.nair@roofproof.demo', 'password123', 'landlord', '+91 98450 33445', 'Jaipur, RJ', null, 'Heritage Living India'],
+    ['Arjun Sharma', 'arjun.sharma@roofproof.demo', 'password123', 'tenant', '+91 98765 43210', 'Bangalore, KA', 'Senior Software Engineer', null],
+    ['Neha Kapoor', 'neha.kapoor@roofproof.demo', 'password123', 'tenant', '+91 98111 22334', 'Mumbai, MH', 'Product Lead', null],
+  ];
 
-  try {
-    await client.query('BEGIN');
-    await client.query('TRUNCATE TABLE applications, properties, users RESTART IDENTITY CASCADE;');
-
-    // Seed 2 Landlords & 2 Tenants
+  for (const u of users) {
     await client.query(`
-      INSERT INTO users (id, name, email, password, role, phone, city, occupation, organization) VALUES
-      (1, 'Rohan Mehta', 'rohan.mehta@roofproof.demo', 'password123', 'landlord', '+91 98200 11223', 'Coorg, KA', NULL, 'Mehta Luxury Estates'),
-      (2, 'Priya Nair', 'priya.nair@roofproof.demo', 'password123', 'landlord', '+91 98450 33445', 'Jaipur, RJ', NULL, 'Heritage Living India'),
-      (3, 'Arjun Sharma', 'arjun.sharma@roofproof.demo', 'password123', 'tenant', '+91 98765 43210', 'Bangalore, KA', 'Senior Software Engineer', NULL),
-      (4, 'Neha Kapoor', 'neha.kapoor@roofproof.demo', 'password123', 'tenant', '+91 98111 22334', 'Mumbai, MH', 'Product Lead', NULL);
-      ALTER SEQUENCE users_id_seq RESTART WITH 5;
-    `);
-
-    // Seed 6 Properties
-    await client.query(`
-      INSERT INTO properties (id, landlord_id, title, property_type, location, monthly_rent, income_threshold, description, image_url) VALUES
-      (1, 1, 'Misty Valley Villa', 'Luxury Villa', 'Coorg, Karnataka', 65000, 195000, '3 BHK luxury villa with a private outdoor area, mountain views, furnished living spaces, and a modern kitchen.', '/houses/house1.jpg'),
-      (2, 1, 'Royal Courtyard Residence', 'Heritage House', 'Udaipur, Rajasthan', 55000, 165000, 'Spacious heritage-style residence with a private courtyard, traditional interiors, large living areas, and a peaceful setting.', '/houses/house2.jpg'),
-      (3, 1, 'Heritage Garden Bungalow', 'Bungalow', 'Ooty, Tamil Nadu', 48000, 144000, 'Charming 3 BHK bungalow with a large garden, traditional architecture, wooden interiors, spacious rooms, and a peaceful hill-station setting.', '/houses/house3.jpg'),
-      (4, 1, 'Greenview Family Home', 'Family House', 'Bangalore, Karnataka', 38000, 114000, 'Comfortable 3 BHK family home with generous natural light, multiple balconies, a quiet neighborhood, and nearby residential amenities.', '/houses/house4.jpg'),
-      (5, 2, 'Pink Palace Residence', 'Luxury Residence', 'Jaipur, Rajasthan', 72000, 216000, 'Elegant 3 BHK residence inspired by Jaipur architecture, featuring ornate interiors, spacious common areas, and a distinctive heritage character.', '/houses/house5.jpg'),
-      (6, 2, 'Glassfront Modern Estate', 'Modern Villa', 'Kolkata, West Bengal', 52000, 156000, 'Characterful independent modern villa with glass facades, bright interiors, private entry, and a quiet residential setting.', '/houses/house6.jpg');
-      ALTER SEQUENCE properties_id_seq RESTART WITH 7;
-    `);
-
-    await client.query('COMMIT');
-    console.log('[RoofProof DB] ✓ Successfully seeded database with 4 users and 6 properties.');
-    return { success: true, message: 'Database seeded with 4 users and 6 properties' };
-  } catch (err) {
-    await client.query('ROLLBACK');
-    console.error('[RoofProof DB] Seed failed:', err.message);
-    throw err;
-  } finally {
-    if (shouldRelease) client.release();
+      INSERT INTO users (name, email, password, role, phone, city, occupation, organization)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+      ON CONFLICT (email) DO NOTHING
+    `, u);
   }
+
+  const props = [
+    [1, 'Misty Valley Villa', 'Luxury Villa', 'Coorg, Karnataka', 65000, 195000, '3 BHK luxury villa with mountain views.', '/houses/house1.jpg', '3 BHK', '3 Bathrooms', 'Fully Furnished', '2,400 sq.ft', 'Covered (2 Cars + 2 Bikes)', '₹1,30,000 (2 Months)', 'Families & Working Professionals', 'Immediate Move-in', JSON.stringify(['Mountain View', 'Private Balcony', 'Modular Kitchen', '24/7 Power Backup'])],
+    [1, 'Royal Courtyard Residence', 'Heritage House', 'Udaipur, Rajasthan', 55000, 165000, 'Spacious heritage residence.', '/houses/house2.jpg', '3 BHK', '3 Bathrooms', 'Fully Furnished', '2,100 sq.ft', 'Open Courtyard (2 Cars)', '₹1,10,000 (2 Months)', 'Families & Expats', 'Immediate Move-in', JSON.stringify(['Private Courtyard', 'Traditional Architecture', 'Modular Kitchen'])],
+    [1, 'Heritage Garden Bungalow', 'Bungalow', 'Ooty, Tamil Nadu', 48000, 144000, 'Charming bungalow with garden.', '/houses/house3.jpg', '3 BHK', '2 Bathrooms', 'Semi-Furnished', '1,950 sq.ft', 'Dedicated Car Porch (1 Car)', '₹96,000 (2 Months)', 'Families & Remote Workers', 'Immediate Move-in', JSON.stringify(['Private Botanical Garden', 'Fireplace'])],
+    [1, 'Greenview Family Home', 'Family House', 'Bangalore, Karnataka', 38000, 114000, 'Comfortable 3 BHK family home.', '/houses/house4.jpg', '3 BHK', '2 Bathrooms', 'Semi-Furnished', '1,650 sq.ft', 'Covered Parking (1 Car)', '₹76,000 (2 Months)', 'Families & Professionals', 'Immediate Move-in', JSON.stringify(['Multiple Balconies', 'Park Facing'])],
+    [2, 'Pink Palace Residence', 'Luxury Residence', 'Jaipur, Rajasthan', 72000, 216000, 'Elegant 3 BHK Jaipur residence.', '/houses/house5.jpg', '3 BHK', '3 Bathrooms', 'Fully Furnished', '2,600 sq.ft', 'Covered Parking (2 Cars)', '₹1,44,000 (2 Months)', 'Families & Corporate Executives', 'Immediate Move-in', JSON.stringify(['Rooftop Terrace', 'Jaipur Architecture'])],
+    [2, 'Glassfront Modern Estate', 'Modern Villa', 'Kolkata, West Bengal', 52000, 156000, 'Modern villa with glass facades.', '/houses/house6.jpg', '3 BHK', '3 Bathrooms', 'Fully Furnished', '2,300 sq.ft', 'Covered Parking (1 Car + 2 Bikes)', '₹1,04,000 (2 Months)', 'Any Working Professionals', 'Immediate Move-in', JSON.stringify(['Floor-to-Ceiling Glass', 'Private Garden'])],
+  ];
+
+  for (const p of props) {
+    await client.query(`
+      INSERT INTO properties (landlord_id, title, property_type, location, monthly_rent, income_threshold, description, image_url, bedrooms, bathrooms, furnishing, area_sqft, parking, deposit, preferred_tenants, available_from, amenities)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17::jsonb)
+    `, p);
+  }
+
+  console.log('[RoofProof DB] Seed completed successfully.');
 }

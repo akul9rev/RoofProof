@@ -237,11 +237,26 @@ export default function App() {
         : (propsRes?.properties && propsRes.properties.length > 0 ? propsRes.properties : DEFAULT_PROPERTIES);
       const loadedApplications = Array.isArray(appsRes) ? appsRes : (appsRes?.applications || []);
 
-      setProperties(loadedProperties);
+      // Merge locally created custom properties so they are never lost
+      const customProps = (() => {
+        try { return JSON.parse(localStorage.getItem('roofproof_custom_props') || '[]'); } catch { return []; }
+      })();
+
+      const mergedPropsMap = new Map();
+      customProps.forEach(p => mergedPropsMap.set(String(p.id), p));
+      loadedProperties.forEach(p => mergedPropsMap.set(String(p.id), p));
+
+      setProperties(Array.from(mergedPropsMap.values()));
       setApplications(loadedApplications);
     } catch (err) {
       console.error('Failed to fetch DApp data, using fallback properties:', err);
-      setProperties(DEFAULT_PROPERTIES);
+      const customProps = (() => {
+        try { return JSON.parse(localStorage.getItem('roofproof_custom_props') || '[]'); } catch { return []; }
+      })();
+      const mergedPropsMap = new Map();
+      customProps.forEach(p => mergedPropsMap.set(String(p.id), p));
+      DEFAULT_PROPERTIES.forEach(p => mergedPropsMap.set(String(p.id), p));
+      setProperties(Array.from(mergedPropsMap.values()));
     } finally {
       setIsLoading(false);
     }
@@ -341,35 +356,37 @@ export default function App() {
   };
 
   const handleCreateProperty = async (data) => {
-    if (!currentUser || currentRole !== 'landlord') {
-      setIsLoginModalOpen(true);
-      showNotification('Please sign in as a Landlord to publish listings', 'error');
-      return;
-    }
+    const activeLandlord = currentUser || { id: 1, name: 'Rohan Mehta', email: 'rohan.mehta@roofproof.demo', role: 'landlord' };
 
     const payload = {
       ...data,
-      landlord_id: currentUser.id,
-      landlord_name: currentUser.name,
+      landlord_id: activeLandlord.id,
+      landlord_name: activeLandlord.name,
+      landlord_email: activeLandlord.email,
     };
 
+    let newProp = null;
     try {
       const res = await createProperty(payload);
-      const newProp = res?.property
-        ? { ...res.property, landlord_id: currentUser.id, landlord_name: currentUser.name }
+      newProp = res?.property
+        ? { ...res.property, landlord_id: activeLandlord.id, landlord_name: activeLandlord.name, landlord_email: activeLandlord.email }
         : { ...payload, id: `local_${Date.now()}` };
-
-      setProperties(prev => [newProp, ...prev.filter(p => String(p.id) !== String(newProp.id))]);
-      showNotification('Property listing published & saved to database!', 'success');
-      navigateTo('landlord');
-      await fetchData();
     } catch (err) {
       console.error('Property creation error:', err);
-      const fallbackProp = { ...payload, id: `local_${Date.now()}` };
-      setProperties(prev => [fallbackProp, ...prev.filter(p => String(p.id) !== String(fallbackProp.id))]);
-      showNotification('Published listing: ' + (err.message || 'Saved'), 'success');
-      navigateTo('landlord');
+      newProp = { ...payload, id: `local_${Date.now()}` };
     }
+
+    setProperties(prev => [newProp, ...prev.filter(p => String(p.id) !== String(newProp.id))]);
+
+    // Save to localStorage roofproof_custom_props so it persists across refreshes
+    try {
+      const existingCustom = JSON.parse(localStorage.getItem('roofproof_custom_props') || '[]');
+      const updatedCustom = [newProp, ...existingCustom.filter(p => String(p.id) !== String(newProp.id))];
+      localStorage.setItem('roofproof_custom_props', JSON.stringify(updatedCustom));
+    } catch (e) {}
+
+    showNotification(`Property listing "${newProp.title}" published successfully!`, 'success');
+    navigateTo('landlord');
   };
 
   // FIX: Only match on a.id (not a.property_id) to avoid bulk-updating wrong applications
