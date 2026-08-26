@@ -74,6 +74,24 @@ export default function PropertyCard({
   const imageUrl = getImageUrl(property);
   const landlordName = property.landlord_name || 'Property Owner';
 
+  // Format auto-detected listing date
+  const formatListingDate = (dateStr) => {
+    if (!dateStr) return 'Listed Recently';
+    try {
+      const d = new Date(dateStr);
+      if (isNaN(d.getTime())) return 'Listed Recently';
+      const now = new Date();
+      if (now.toDateString() === d.toDateString()) {
+        return 'Listed Today';
+      }
+      return `Listed ${d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}`;
+    } catch {
+      return 'Listed Recently';
+    }
+  };
+
+  const listingDateStr = formatListingDate(property.created_at);
+
   const isApprovedStatus = application?.status === 'approved';
   const isRejectedStatus = application?.status === 'rejected' || isDenied;
   const isPendingStatus = application?.status === 'pending' || (hasApplied && !isApprovedStatus && !isRejectedStatus);
@@ -164,6 +182,29 @@ export default function PropertyCard({
               <ShieldCheck size={13} /> ZK Eligible
             </span>
 
+            {/* Automatic Date Badge Top-Left */}
+            <span
+              style={{
+                position: 'absolute',
+                top: '8px',
+                left: onDelete ? '82px' : '8px',
+                background: 'rgba(12, 18, 25, 0.82)',
+                backdropFilter: 'blur(8px)',
+                padding: '4px 10px',
+                borderRadius: '999px',
+                fontSize: '0.7rem',
+                color: '#ffffff',
+                fontWeight: 600,
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px',
+                border: '1px solid rgba(255, 255, 255, 0.2)',
+                boxShadow: '0 4px 10px rgba(0, 0, 0, 0.25)',
+              }}
+            >
+              📅 {listingDateStr}
+            </span>
+
             {/* Quick View Details Badge */}
             <span
               style={{
@@ -224,10 +265,13 @@ export default function PropertyCard({
             {property.title}
           </h3>
 
-          {/* Listed By Landlord Badge */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#555e56', fontSize: '0.78rem', marginBottom: '4px' }}>
-            <User size={12} color="#4A7C59" />
-            <span>Listed by: <strong style={{ color: '#1a221b', fontWeight: 700 }}>{landlordName}</strong></span>
+          {/* Listed By Landlord & Date */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', color: '#555e56', fontSize: '0.78rem', marginBottom: '4px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <User size={12} color="#4A7C59" />
+              <span>Listed by: <strong style={{ color: '#1a221b', fontWeight: 700 }}>{landlordName}</strong></span>
+            </div>
+            <span style={{ fontSize: '0.72rem', color: '#6B9B76', fontWeight: 700 }}>{listingDateStr}</span>
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '5px', color: '#555e56', fontSize: '0.8rem', marginBottom: '8px' }}>

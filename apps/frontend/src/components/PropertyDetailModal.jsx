@@ -89,6 +89,21 @@ export default function PropertyDetailModal({
 
   const currentPhoto = photos[activePhotoIdx] || photos[0];
 
+  const formatListingDate = (dateStr) => {
+    if (!dateStr) return 'Listed Recently';
+    try {
+      const d = new Date(dateStr);
+      if (isNaN(d.getTime())) return 'Listed Recently';
+      const now = new Date();
+      if (now.toDateString() === d.toDateString()) {
+        return 'Listed Today';
+      }
+      return `Listed ${d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}`;
+    } catch {
+      return 'Listed Recently';
+    }
+  };
+
   const handlePrevPhoto = (e) => {
     e.stopPropagation();
     setActivePhotoIdx((prev) => (prev === 0 ? photos.length - 1 : prev - 1));
@@ -376,6 +391,8 @@ export default function PropertyDetailModal({
                   <span>{property.location}</span>
                   <span style={{ opacity: 0.5 }}>•</span>
                   <span style={{ color: '#EBA834', fontWeight: 600 }}>Listed by {property.landlord_name || 'Property Owner'}</span>
+                  <span style={{ opacity: 0.5 }}>•</span>
+                  <span style={{ color: '#4ade80', fontWeight: 600 }}>📅 {formatListingDate(property.created_at)}</span>
                 </div>
               </div>
 
