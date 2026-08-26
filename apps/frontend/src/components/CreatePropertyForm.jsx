@@ -50,12 +50,7 @@ export default function CreatePropertyForm({ landlord, onClose, onSuccess }) {
   const [deposit, setDeposit] = useState('');
   const [preferredTenants, setPreferredTenants] = useState('Families & Working Professionals');
   const [availableFrom, setAvailableFrom] = useState('Immediate Move-in');
-  const [selectedAmenities, setSelectedAmenities] = useState([
-    'Private Balcony',
-    'Modular Kitchen',
-    '24/7 Power Backup',
-    '24/7 Security & CCTV',
-  ]);
+  const [selectedAmenities, setSelectedAmenities] = useState([]);
 
   // Multi-Photo Management State (Empty by default)
   const [photos, setPhotos] = useState([]);
