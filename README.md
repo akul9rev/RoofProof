@@ -3,17 +3,39 @@
 > **"Proof before roof."**  
 > *Prove you're eligible. Don't prove your entire financial life.*
 >
-> Zero-Knowledge Privacy-Preserving Rental Eligibility DApp built on the **Midnight Network**.
+> Zero-Knowledge Privacy-Preserving Rental Verification DApp built on the **Midnight Network**.
 
 ---
 
 ## 🌟 Executive Summary
 
-**RoofProof** revolutionizes residential tenant screening by replacing sensitive financial paperwork with **Zero-Knowledge (ZK) proofs** powered by **Midnight Network** and **Compact** smart contracts.
+**RoofProof** revolutionizes residential tenant screening by replacing sensitive financial paperwork with **Zero-Knowledge (ZK) proofs** powered by **Midnight Network** and **Compact** smart contracts, complemented by an **AI-powered Form 16 Anomaly & Tamper Detector**.
 
 In traditional rental applications, tenants are forced to hand over unredacted bank statements, tax returns, and employer salary slips to prospective landlords and third-party property management portals. This exposes tenants to identity theft, financial surveillance, and severe privacy breaches.
 
-With **RoofProof**, tenants prove mathematically that their monthly income satisfies or exceeds the landlord's required threshold (`income >= threshold`) without disclosing their exact salary, employer identity, bank account balance, or transaction history.
+With **RoofProof**:
+1. **Tenants** prove mathematically that their monthly income satisfies or exceeds the landlord's required threshold (`income >= threshold`) without disclosing their exact salary, employer identity, bank account balance, or transaction history.
+2. **Landlords** receive a cryptographically guaranteed **"Eligible ✓ (Midnight Verified)"** status, while our AI anomaly detection engine verifies uploaded Form 16 tax documents for structural tampering or numerical manipulation without storing private financial figures.
+
+---
+
+## 👥 Demo Accounts (1-Click Login Credentials)
+
+Use any of these pre-seeded demo accounts to test the full end-to-end rental application & verification workflow:
+
+### 🔑 Landlord Accounts (Listing & Approval Portal)
+
+| Role | Name | Email | Password | Organization / Portfolio |
+| :--- | :--- | :--- | :--- | :--- |
+| **Landlord** | Rohan Mehta | `rohan.mehta@roofproof.demo` | `password123` | Mehta Luxury Estates (Coorg & Udaipur Properties) |
+| **Landlord** | Priya Nair | `priya.nair@roofproof.demo` | `password123` | Heritage Living India (Jaipur & Kolkata Properties) |
+
+### 🔑 Tenant Accounts (Application & ZK Verification Portal)
+
+| Role | Name | Email | Password | Occupation & City |
+| :--- | :--- | :--- | :--- | :--- |
+| **Tenant** | Arjun Sharma | `arjun.sharma@roofproof.demo` | `password123` | Senior Software Engineer (Bangalore, KA) |
+| **Tenant** | Neha Kapoor | `neha.kapoor@roofproof.demo` | `password123` | Product Lead (Mumbai, MH) |
 
 ---
 
@@ -23,7 +45,7 @@ With **RoofProof**, tenants prove mathematically that their monthly income satis
 |---|---|
 | Tenant hands over unredacted bank statements & salary slips | Tenant evaluates income locally in browser memory as a private witness |
 | Landlord sees exact balance, salary, employer, and transactions | Landlord sees only: **`Eligibility: Satisfied ✓ (Midnight Verified)`** |
-| Financial documents stored on insecure centralized servers | **0 Bytes** of private financial figures sent over the network |
+| Financial documents stored on insecure centralized servers | **0 Bytes** of private financial figures sent over network or stored in DB |
 | High exposure to data breaches & identity theft | Cryptographically guaranteed by Midnight Compact ZK circuits |
 
 ---
@@ -71,6 +93,38 @@ export circuit verifyEligibility(applicationId: Uint<64>, threshold: Uint<64>): 
 
 ---
 
+## 🤖 Form 16 AI Anomaly & Tamper Detection Engine
+
+Under `apps/backend/src/services/anomalyDetector/`, RoofProof incorporates a machine-learning document verification engine designed specifically for Indian **Form 16 Tax Certificates**:
+
+* **8 Extracted Structural Features**:
+  1. Font Inconsistency Score
+  2. PDF Text Stream Mismatch Ratio
+  3. Section 1(d) Gross Salary Field Edits
+  4. Visual Text Overlays & Hidden Layers
+  5. Layout Bounding Box Anomalies
+  6. Internal Arithmetic Inconsistencies
+  7. PDF Object Stream Tamper Signs
+  8. Metadata Modification Timestamp Conflicts
+* **Interpretable Risk Output**: Evaluates document authenticity (`LOW`, `MEDIUM`, `HIGH`, `UNKNOWN`) and flags manipulated tax certificates before application processing.
+* **Unit Test Suite**: 12/12 passing test suite (`node apps/backend/src/test_anomaly_detector.js`).
+
+---
+
+## 🎨 Key Application Features
+
+1. **Multi-Photo Room Studio**:
+   - Landlords can upload distinct images for *Facade / Exterior, Living Room, Washroom, Kitchen, and Bedroom*.
+   - Interactive cover selector allows setting any uploaded photo as the **Cover Thumbnail**.
+   - Strict photo gallery isolation ensures custom listings show *only* their uploaded photos.
+2. **Automatic Listing Date Detection**:
+   - Automatically tracks listing timestamps (`created_at`).
+   - Displays exact calendar dates (e.g. `Listed 27 Aug 2026`) on property cards without asking landlords for manual date entry.
+3. **Live Neon Cloud PostgreSQL Database**:
+   - Connected live to Neon Cloud PostgreSQL for automatic schema migration, property persistence, and real-time application state synchronization.
+
+---
+
 ## 🏗️ Architecture & Technical Data Flow
 
 ```
@@ -88,8 +142,9 @@ export circuit verifyEligibility(applicationId: Uint<64>, threshold: Uint<64>): 
         ▼ (Verification Status & Authorization Reference)
 [ Node.js + Express REST API ]
         │
-        ▼ (Stores metadata & verification status ONLY, NO income)
-[ PostgreSQL Database ]
+        ├── 🤖 Form 16 AI Anomaly Detector
+        ▼ (Stores metadata & verification status ONLY, NO income figures)
+[ Neon Cloud PostgreSQL Database ]
         │
         ▼
 [ Landlord Dashboard ] ──▶ Sees "Eligible ✓ (Midnight Verified)" (Actual Income: NEVER DISCLOSED)
@@ -97,26 +152,12 @@ export circuit verifyEligibility(applicationId: Uint<64>, threshold: Uint<64>): 
 
 ---
 
-## 🔑 Data Element Segregation & Terminology
-
-RoofProof strictly segregates data elements to maintain technical defensibility:
-
-* `walletAddress`: Authentic Bech32m wallet address from Midnight Lace (`mn_addr_preview1...`).
-* `laceSignature`: Cryptographic signature returned by Lace `signData` (where supported).
-* `authorizationProof`: Authenticated Lace connection reference token.
-* `zkTxHash`: Real Midnight transaction hash (`5deb9fcd464487459544cf4ae07445d6b1f037033f0c40305527d81a297b061c`).
-* `verificationStatus`: `eligible` | `ineligible`.
-
-*Note: RoofProof never uses wallet addresses as signatures or assigns transaction hashes to synthetic identifiers.*
-
----
-
-## 🚀 Quickstart Guide
+## 🚀 Local Setup & Installation Guide
 
 ### Prerequisites
 * **Node.js**: v18+ or v20+
-* **PostgreSQL**: Local or remote database instance
-* **Chrome Browser**: With official Midnight Lace Wallet extension installed for Preview testing
+* **npm**: v9+
+* **Browser**: Chrome or Brave (with official Midnight Lace Wallet extension installed for Preview testing)
 
 ### 1. Clone & Install Dependencies
 ```bash
@@ -125,29 +166,26 @@ cd RoofProof
 npm install
 ```
 
-### 2. Setup Backend & PostgreSQL Database
+### 2. Configure Environment Variables
 ```bash
-# Configure environment
-cp .env.example .env
+# Copy backend environment configuration
+cp apps/backend/.env.example apps/backend/.env
+```
+*(The backend defaults to active Neon Cloud PostgreSQL & Midnight Preview RPC endpoints).*
 
-# Run database migrations and seed data
-npm run db:migrate --workspace=apps/backend
-npm run db:seed --workspace=apps/backend
-
-# Start backend server (Port 4000)
-npm run dev --workspace=apps/backend
+### 3. Run Development Servers
+Start both the Vite frontend and Express backend concurrently:
+```bash
+npm run dev
 ```
 
-### 3. Start Frontend Application
-```bash
-# Start Vite dev server (Port 5173)
-npm run dev --workspace=apps/frontend
-```
-Open **`http://localhost:5173`** in your browser.
+- **Frontend Application**: `http://localhost:5173`
+- **Backend REST API**: `http://localhost:3001` (or `http://localhost:4000`)
+- **Health Check Endpoint**: `GET http://localhost:3001/api/health`
 
 ---
 
-## 🧪 Testing & Verification Evidence
+## 🧪 Testing & Verification Commands
 
 ### 1. Compact Smart Contract Unit Tests
 ```bash
@@ -158,7 +196,13 @@ npm run test --workspace=packages/contracts
 * **Test 3**: Boundary condition (`60,000 == 60,000`) &rarr; **PASS**
 * **Test 4**: Ledger privacy check (0 private bytes written) &rarr; **PASS**
 
-### 2. Full-Stack Backend API Integration Tests
+### 2. AI Anomaly Detector Test Suite
+```bash
+node apps/backend/src/test_anomaly_detector.js
+```
+* Passes 12/12 synthetic tax document tampering test cases &rarr; **PASS**
+
+### 3. Backend API Integration Tests
 ```bash
 node apps/backend/src/test_api.js
 ```
@@ -167,14 +211,12 @@ node apps/backend/src/test_api.js
 * **Scenario 3**: Ineligible/Unsigned submission blocked (HTTP 400) &rarr; **PASS**
 * **Scenario 4**: Verified application submission & status update &rarr; **PASS**
 * **Scenario 5**: Strict Privacy Audit (0 income values in API responses) &rarr; **PASS**
-* **Scenario 6**: Re-application lock on denied listing (HTTP 409) &rarr; **PASS**
-* **Scenario 7**: Application withdrawal flow &rarr; **PASS**
 
-### 3. Frontend Production Build
+### 4. Production Build Validation
 ```bash
-npm run build --workspace=apps/frontend
+npm run build
 ```
-* **Vite Production Build**: **0 errors**
+* Bundles monorepo cleanly with Vite & ESM Node server.
 
 ---
 
@@ -184,20 +226,7 @@ npm run build --workspace=apps/frontend
 2. **Zero Backend Leakage**: Express REST payloads and PostgreSQL tables contain only `{ tenant_id, verification_status, zk_tx_hash }`.
 3. **Backend Integrity Guards**: The backend strictly rejects any application submission that is not marked `eligible` with a valid authorization reference.
 4. **Denial Hard Gate**: If a tenant cancels or denies the Lace wallet popup, execution halts immediately, clearing all proof states, disabling submit, and making 0 network calls.
-5. **No Secret Leakage**: All wallet mnemonics, private keys, and leveldb states are strictly excluded from client code and gitignored.
-
----
-
-## 🔮 Future Architecture: Verifiable Credential Issuers
-
-In this hackathon demonstration, income input can be evaluated either as a **Self-Declared Private Witness** or as a **RoofProof Demo Credential Issuer (W3C Signed)**.
-
-In full production deployment, RoofProof will integrate trusted **W3C Verifiable Credential Issuers**:
-* Employer / Payroll APIs (e.g., ADP, Gusto, Deel)
-* Open Banking APIs (e.g., Plaid, MX, Salt Edge)
-* Government Tax Portals
-
-The issuer digitally signs the tenant's income credential off-chain. The tenant stores the credential in their local wallet, using it as the private witness in the Midnight Compact circuit without ever exposing the credential payload to the landlord.
+5. **No Secret Leakage**: All wallet mnemonics, private keys, and leveldb states are strictly gitignored and excluded from client bundles.
 
 ---
 
