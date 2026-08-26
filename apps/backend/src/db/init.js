@@ -76,37 +76,45 @@ export async function initDb() {
   }
 }
 
-async function seedData(client) {
-  const users = [
-    ['Rohan Mehta', 'rohan.mehta@roofproof.demo', 'password123', 'landlord', '+91 98200 11223', 'Coorg, KA', null, 'Mehta Luxury Estates'],
-    ['Priya Nair', 'priya.nair@roofproof.demo', 'password123', 'landlord', '+91 98450 33445', 'Jaipur, RJ', null, 'Heritage Living India'],
-    ['Arjun Sharma', 'arjun.sharma@roofproof.demo', 'password123', 'tenant', '+91 98765 43210', 'Bangalore, KA', 'Senior Software Engineer', null],
-    ['Neha Kapoor', 'neha.kapoor@roofproof.demo', 'password123', 'tenant', '+91 98111 22334', 'Mumbai, MH', 'Product Lead', null],
-  ];
+export async function seedData(passedClient) {
+  const client = passedClient || await pool.connect();
+  const shouldRelease = !passedClient;
+  try {
+    const users = [
+      ['Rohan Mehta', 'rohan.mehta@roofproof.demo', 'password123', 'landlord', '+91 98200 11223', 'Coorg, KA', null, 'Mehta Luxury Estates'],
+      ['Priya Nair', 'priya.nair@roofproof.demo', 'password123', 'landlord', '+91 98450 33445', 'Jaipur, RJ', null, 'Heritage Living India'],
+      ['Arjun Sharma', 'arjun.sharma@roofproof.demo', 'password123', 'tenant', '+91 98765 43210', 'Bangalore, KA', 'Senior Software Engineer', null],
+      ['Neha Kapoor', 'neha.kapoor@roofproof.demo', 'password123', 'tenant', '+91 98111 22334', 'Mumbai, MH', 'Product Lead', null],
+    ];
 
-  for (const u of users) {
-    await client.query(`
-      INSERT INTO users (name, email, password, role, phone, city, occupation, organization)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-      ON CONFLICT (email) DO NOTHING
-    `, u);
+    for (const u of users) {
+      await client.query(`
+        INSERT INTO users (name, email, password, role, phone, city, occupation, organization)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+        ON CONFLICT (email) DO NOTHING
+      `, u);
+    }
+
+    const props = [
+      [1, 'Misty Valley Villa', 'Luxury Villa', 'Coorg, Karnataka', 65000, 195000, '3 BHK luxury villa with mountain views.', '/houses/house1.jpg', '3 BHK', '3 Bathrooms', 'Fully Furnished', '2,400 sq.ft', 'Covered (2 Cars + 2 Bikes)', '₹1,30,000 (2 Months)', 'Families & Working Professionals', 'Immediate Move-in', JSON.stringify(['Mountain View', 'Private Balcony', 'Modular Kitchen', '24/7 Power Backup'])],
+      [1, 'Royal Courtyard Residence', 'Heritage House', 'Udaipur, Rajasthan', 55000, 165000, 'Spacious heritage residence.', '/houses/house2.jpg', '3 BHK', '3 Bathrooms', 'Fully Furnished', '2,100 sq.ft', 'Open Courtyard (2 Cars)', '₹1,10,000 (2 Months)', 'Families & Expats', 'Immediate Move-in', JSON.stringify(['Private Courtyard', 'Traditional Architecture', 'Modular Kitchen'])],
+      [1, 'Heritage Garden Bungalow', 'Bungalow', 'Ooty, Tamil Nadu', 48000, 144000, 'Charming bungalow with garden.', '/houses/house3.jpg', '3 BHK', '2 Bathrooms', 'Semi-Furnished', '1,950 sq.ft', 'Dedicated Car Porch (1 Car)', '₹96,000 (2 Months)', 'Families & Remote Workers', 'Immediate Move-in', JSON.stringify(['Private Botanical Garden', 'Fireplace'])],
+      [1, 'Greenview Family Home', 'Family House', 'Bangalore, Karnataka', 38000, 114000, 'Comfortable 3 BHK family home.', '/houses/house4.jpg', '3 BHK', '2 Bathrooms', 'Semi-Furnished', '1,650 sq.ft', 'Covered Parking (1 Car)', '₹76,000 (2 Months)', 'Families & Professionals', 'Immediate Move-in', JSON.stringify(['Multiple Balconies', 'Park Facing'])],
+      [2, 'Pink Palace Residence', 'Luxury Residence', 'Jaipur, Rajasthan', 72000, 216000, 'Elegant 3 BHK Jaipur residence.', '/houses/house5.jpg', '3 BHK', '3 Bathrooms', 'Fully Furnished', '2,600 sq.ft', 'Covered Parking (2 Cars)', '₹1,44,000 (2 Months)', 'Families & Corporate Executives', 'Immediate Move-in', JSON.stringify(['Rooftop Terrace', 'Jaipur Architecture'])],
+      [2, 'Glassfront Modern Estate', 'Modern Villa', 'Kolkata, West Bengal', 52000, 156000, 'Modern villa with glass facades.', '/houses/house6.jpg', '3 BHK', '3 Bathrooms', 'Fully Furnished', '2,300 sq.ft', 'Covered Parking (1 Car + 2 Bikes)', '₹1,04,000 (2 Months)', 'Any Working Professionals', 'Immediate Move-in', JSON.stringify(['Floor-to-Ceiling Glass', 'Private Garden'])],
+    ];
+
+    for (const p of props) {
+      await client.query(`
+        INSERT INTO properties (landlord_id, title, property_type, location, monthly_rent, income_threshold, description, image_url, bedrooms, bathrooms, furnishing, area_sqft, parking, deposit, preferred_tenants, available_from, amenities)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17::jsonb)
+      `, p);
+    }
+
+    console.log('[RoofProof DB] Seed completed successfully.');
+  } finally {
+    if (shouldRelease) {
+      client.release();
+    }
   }
-
-  const props = [
-    [1, 'Misty Valley Villa', 'Luxury Villa', 'Coorg, Karnataka', 65000, 195000, '3 BHK luxury villa with mountain views.', '/houses/house1.jpg', '3 BHK', '3 Bathrooms', 'Fully Furnished', '2,400 sq.ft', 'Covered (2 Cars + 2 Bikes)', '₹1,30,000 (2 Months)', 'Families & Working Professionals', 'Immediate Move-in', JSON.stringify(['Mountain View', 'Private Balcony', 'Modular Kitchen', '24/7 Power Backup'])],
-    [1, 'Royal Courtyard Residence', 'Heritage House', 'Udaipur, Rajasthan', 55000, 165000, 'Spacious heritage residence.', '/houses/house2.jpg', '3 BHK', '3 Bathrooms', 'Fully Furnished', '2,100 sq.ft', 'Open Courtyard (2 Cars)', '₹1,10,000 (2 Months)', 'Families & Expats', 'Immediate Move-in', JSON.stringify(['Private Courtyard', 'Traditional Architecture', 'Modular Kitchen'])],
-    [1, 'Heritage Garden Bungalow', 'Bungalow', 'Ooty, Tamil Nadu', 48000, 144000, 'Charming bungalow with garden.', '/houses/house3.jpg', '3 BHK', '2 Bathrooms', 'Semi-Furnished', '1,950 sq.ft', 'Dedicated Car Porch (1 Car)', '₹96,000 (2 Months)', 'Families & Remote Workers', 'Immediate Move-in', JSON.stringify(['Private Botanical Garden', 'Fireplace'])],
-    [1, 'Greenview Family Home', 'Family House', 'Bangalore, Karnataka', 38000, 114000, 'Comfortable 3 BHK family home.', '/houses/house4.jpg', '3 BHK', '2 Bathrooms', 'Semi-Furnished', '1,650 sq.ft', 'Covered Parking (1 Car)', '₹76,000 (2 Months)', 'Families & Professionals', 'Immediate Move-in', JSON.stringify(['Multiple Balconies', 'Park Facing'])],
-    [2, 'Pink Palace Residence', 'Luxury Residence', 'Jaipur, Rajasthan', 72000, 216000, 'Elegant 3 BHK Jaipur residence.', '/houses/house5.jpg', '3 BHK', '3 Bathrooms', 'Fully Furnished', '2,600 sq.ft', 'Covered Parking (2 Cars)', '₹1,44,000 (2 Months)', 'Families & Corporate Executives', 'Immediate Move-in', JSON.stringify(['Rooftop Terrace', 'Jaipur Architecture'])],
-    [2, 'Glassfront Modern Estate', 'Modern Villa', 'Kolkata, West Bengal', 52000, 156000, 'Modern villa with glass facades.', '/houses/house6.jpg', '3 BHK', '3 Bathrooms', 'Fully Furnished', '2,300 sq.ft', 'Covered Parking (1 Car + 2 Bikes)', '₹1,04,000 (2 Months)', 'Any Working Professionals', 'Immediate Move-in', JSON.stringify(['Floor-to-Ceiling Glass', 'Private Garden'])],
-  ];
-
-  for (const p of props) {
-    await client.query(`
-      INSERT INTO properties (landlord_id, title, property_type, location, monthly_rent, income_threshold, description, image_url, bedrooms, bathrooms, furnishing, area_sqft, parking, deposit, preferred_tenants, available_from, amenities)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17::jsonb)
-    `, p);
-  }
-
-  console.log('[RoofProof DB] Seed completed successfully.');
 }
